@@ -213,11 +213,10 @@ const API = {
   async call(params){
     if(!this.url) return {success:false,error:'No API URL set. Go to Settings to configure.'};
     try{
-      const r = await fetch(this.url, {
-        method:'POST', redirect:'follow',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify(params)
-      });
+      const qs = Object.entries(params).map(([k,v])=>
+        encodeURIComponent(k)+'='+encodeURIComponent(typeof v==='object'?JSON.stringify(v):v)
+      ).join('&');
+      const r = await fetch(this.url+'?'+qs, {method:'GET',redirect:'follow'});
       return await r.json();
     } catch(e){
       return {success:false, error:e.message};

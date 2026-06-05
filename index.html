@@ -188,23 +188,28 @@ const API = {
   url: localStorage.getItem('apiUrl')||'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec',
   setUrl(u){ this.url=u; localStorage.setItem('apiUrl',u); },
   async call(params, bust=false){
-    if(!this.url) return {success:false,error:'No API URL. Go to Settings.'};
-    const key = JSON.stringify(params);
-    const isRead = (params.action||'').startsWith('get')||(params.action||'').startsWith('fetch');
-    if(!bust && isRead){ const c=cacheGet(key); if(c)return c; }
-    try{
-      const r=await fetch(this.url,{
-        method:'POST',
-        redirect:'follow',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify(params)
-      });
-      const data=await r.json();
-      if(isRead&&data.success) cacheSet(key,data);
-      if(!isRead&&data.success) Object.keys(_cache).forEach(k=>delete _cache[k]);
-      return data;
-    }catch(e){ return {success:false,error:e.message}; }
-  }
+  if(!this.url) return {success:false, error:'No API URL. Go to Settings.'};
+  const key = JSON.stringify(params);
+  const isRead = (params.action||'').startsWith('get') || (params.action||'').startsWith('fetch');
+  if(!bust && isRead){ const c=cacheGet(key); if(c) return c; }
+  try{
+    // Send as plain text (no preflight) — Apps Script reads via e.postData.contents
+    const r = await fetch(this.url, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(params)
+    });
+    if(!r.ok) return {success:false, error:`HTTP ${r.status}`};
+    const text = await r.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { return {success:false, error:'Bad response from server: ' + text.slice(0,100)}; }
+    if(isRead && data.success) cacheSet(key, data);
+    if(!isRead && data.success) Object.keys(_cache).forEach(k=>delete _cache[k]);
+    return data;
+  }catch(e){ return {success:false, error:e.message}; }
+}
 };
 
 // ═══════════════════════════════════════════════════════

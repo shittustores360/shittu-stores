@@ -88,6 +88,7 @@ tr:hover td{background:var(--bg3)}
 .badge-uncontacted{background:rgba(90,96,112,0.15);color:var(--text3)}
 .badge-contacted{background:var(--blue-dim);color:var(--blue)}
 .badge-supplier{background:var(--purple-dim);color:var(--purple)}
+.badge-unassigned{background:rgba(245,166,35,0.15);color:var(--accent)}
 .form-grid{display:grid;gap:14px}
 .form-grid-2{grid-template-columns:1fr 1fr}.form-grid-3{grid-template-columns:1fr 1fr 1fr}
 .form-group{display:flex;flex-direction:column;gap:5px}
@@ -113,6 +114,7 @@ tr:hover td{background:var(--bg3)}
 .login-logo{font-family:var(--font-head);font-size:28px;font-weight:800;color:var(--accent);margin-bottom:6px}
 .login-sub{color:var(--text3);font-size:13px;margin-bottom:32px}
 .login-error{background:var(--red-dim);color:var(--red);border:1px solid rgba(231,76,60,0.25);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-bottom:16px}
+.signup-success{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,113,0.25);border-radius:var(--radius);padding:14px;font-size:13px;margin-bottom:16px;text-align:center}
 .setup-banner{background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px}
 .tabs{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:var(--radius);width:fit-content;margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:6px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);transition:all var(--transition)}
@@ -142,6 +144,7 @@ tr:hover td{background:var(--bg3)}
 .section-divider{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .alert-info{background:var(--blue-dim);border:1px solid rgba(52,152,219,0.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:12px}
 .alert-warning{background:var(--accent-dim);border:1px solid rgba(245,166,35,0.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--accent);margin-bottom:12px}
+.alert-success{background:var(--green-dim);border:1px solid rgba(46,204,113,0.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--green);margin-bottom:12px}
 .price-history-item{background:var(--bg3);border-radius:8px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
 .product-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition)}
 .product-chip.active{background:var(--blue-dim);border-color:rgba(52,152,219,0.3);color:var(--blue)}
@@ -164,6 +167,11 @@ tr:hover td{background:var(--bg3)}
 .bundle-info-label{color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;font-size:11px}
 .bundle-info-value{font-family:var(--font-mono);font-weight:600;color:var(--text)}
 .bundle-info-gift{color:var(--green);font-size:11px;display:flex;align-items:center;gap:4px;margin-top:6px}
+.signup-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:16px}
+.signup-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:460px;box-shadow:var(--shadow)}
+.copy-link-box{display:flex;gap:8px;align-items:center;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text2);word-break:break-all;margin-bottom:8px}
+.copy-link-btn{flex-shrink:0;background:var(--accent-dim);border:1px solid rgba(245,166,35,0.3);color:var(--accent);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.copy-link-btn:hover{background:rgba(245,166,35,0.25)}
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -206,6 +214,8 @@ const BUST_MAP = {
   addExpense:['getExpenses'],deleteExpense:['getExpenses'],
   addWithdrawal:['getWithdrawals'],
   addPayoutRecord:['getPayoutRecords','getDashboard'],
+  signupSupplier:['getSuppliers'],
+  signupStaff:['getStaff'],
 };
 
 const API = {
@@ -288,6 +298,23 @@ const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
 const PERMS_LIST=['view_orders','add_orders','edit_orders','delete_orders','view_financials','view_dashboard','manage_expenses'];
 const STAFF_PAYOUT_NGN=2000;
+// Staff signup token — stored in localStorage, generated fresh if absent
+function getSignupTokens(){
+  try{ return JSON.parse(localStorage.getItem('ssSignupTokens')||'{}'); }catch{ return {}; }
+}
+function saveSignupTokens(t){ localStorage.setItem('ssSignupTokens',JSON.stringify(t)); }
+function genToken(){ return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10); }
+function getOrCreateToken(type){
+  const tokens=getSignupTokens();
+  if(!tokens[type]){ tokens[type]=genToken(); saveSignupTokens(tokens); }
+  return tokens[type];
+}
+function revokeToken(type){
+  const tokens=getSignupTokens();
+  tokens[type]=genToken();
+  saveSignupTokens(tokens);
+  return tokens[type];
+}
 
 function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
 function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
@@ -397,15 +424,116 @@ function LineChart({data,color='var(--accent)',height=80}){
   );
 }
 
+// ─── SIGNUP PAGES (public, token-gated) ──────────────────────
+
+function SignupPage({type,token}){
+  const storedToken=getOrCreateToken(type);
+  const [valid,setValid]=useState(false);
+  const [done,setDone]=useState(false);
+  const [f,setF]=useState({name:'',username:'',password:'',phone:'',phone2:''});
+  const [showPhone2,setShowPhone2]=useState(false);
+  const [saving,setSaving]=useState(false);
+  const [err,setErr]=useState('');
+
+  useEffect(()=>{
+    // Token from URL must match stored token
+    if(token&&token===storedToken) setValid(true);
+  },[token,storedToken]);
+
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+
+  const submit=async e=>{
+    e.preventDefault();setErr('');
+    if(!f.name||!f.username||!f.password||!f.phone){setErr('All required fields must be filled.');return;}
+    setSaving(true);
+    const action=type==='supplier'?'signupSupplier':'signupStaff';
+    const r=await API.call({action,data:JSON.stringify(f)});
+    setSaving(false);
+    if(r.success){setDone(true);}
+    else setErr(r.error||'Signup failed. Please contact the admin.');
+  };
+
+  if(!API.url)return React.createElement('div',{className:'signup-wrap'},
+    React.createElement('div',{className:'signup-card'},
+      React.createElement('div',{className:'login-logo'},'Shittu Stores'),
+      React.createElement('div',{className:'alert-warning'},'⚠️ This signup link is not yet active. The admin needs to configure the database connection first.')
+    )
+  );
+
+  if(!valid)return React.createElement('div',{className:'signup-wrap'},
+    React.createElement('div',{className:'signup-card'},
+      React.createElement('div',{className:'login-logo'},'Shittu Stores'),
+      React.createElement('div',{className:'login-error'},'❌ This signup link is invalid or has expired. Please request a new one from the admin.')
+    )
+  );
+
+  if(done)return React.createElement('div',{className:'signup-wrap'},
+    React.createElement('div',{className:'signup-card'},
+      React.createElement('div',{className:'login-logo'},'Shittu Stores'),
+      React.createElement('div',{className:'signup-success',style:{fontSize:14}},
+        React.createElement('div',{style:{fontSize:24,marginBottom:8}},'🎉'),
+        React.createElement('div',{style:{fontWeight:700,marginBottom:4}},'Account Created!'),
+        type==='supplier'
+          ? 'Your supplier account has been created. The admin will assign your products shortly.'
+          : 'Your staff account has been created. Contact the admin for login access.',
+        React.createElement('div',{style:{marginTop:12,fontSize:12,color:'var(--text3)'}},`Username: ${f.username}`)
+      )
+    )
+  );
+
+  return React.createElement('div',{className:'signup-wrap'},
+    React.createElement('div',{className:'signup-card'},
+      React.createElement('div',{className:'login-logo'},'Shittu Stores'),
+      React.createElement('div',{className:'login-sub'},
+        type==='supplier'?'Supplier Account Registration':'Staff Account Registration'
+      ),
+      err&&React.createElement('div',{className:'login-error'},err),
+      React.createElement('form',{onSubmit:submit},
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Full Name *'),
+          React.createElement('input',{className:'form-input',value:f.name,onChange:set('name'),placeholder:'Your full name',required:true,autoFocus:true})
+        ),
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Username *'),
+          React.createElement('input',{className:'form-input',value:f.username,onChange:set('username'),placeholder:'Choose a username',required:true})
+        ),
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Password *'),
+          React.createElement('input',{className:'form-input',type:'password',value:f.password,onChange:set('password'),placeholder:'Choose a password',required:true})
+        ),
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Phone Number *'),
+          React.createElement('input',{className:'form-input',value:f.phone,onChange:set('phone'),placeholder:'Primary phone number',required:true}),
+          !showPhone2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginTop:6,alignSelf:'flex-start'},onClick:()=>setShowPhone2(true)},'+ Add 2nd Phone Number'),
+          showPhone2&&React.createElement('input',{className:'form-input',style:{marginTop:8},value:f.phone2,onChange:set('phone2'),placeholder:'Second phone number (optional)'})
+        ),
+        React.createElement('button',{className:'btn btn-primary',type:'submit',style:{width:'100%',marginTop:8},disabled:saving},saving?React.createElement('span',{className:'spinner'}):null,' Create Account')
+      )
+    )
+  );
+}
+
 function App(){
   const toasts=useToast();
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [page,setPage]=useState('dashboard');
   const [user,setUser]=useState(()=>{try{const u=localStorage.getItem('ssUser');return u?JSON.parse(u):null;}catch{return null;}});
 
+  // Check if URL has signup token
+  const urlParams=new URLSearchParams(window.location.search);
+  const signupType=urlParams.get('signup'); // 'supplier' or 'staff'
+  const signupToken=urlParams.get('token');
+
   const login=useCallback(u=>{setUser(u);localStorage.setItem('ssUser',JSON.stringify(u));},[]);
   const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
   const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
+
+  // Show signup page if token present
+  if(signupType&&signupToken){
+    return React.createElement(ThemeProvider,null,
+      React.createElement(SignupPage,{type:signupType,token:signupToken})
+    );
+  }
 
   if(!user) return React.createElement(ThemeProvider,null,React.createElement(LoginPage,{onLogin:login}));
 
@@ -418,6 +546,7 @@ function App(){
   const navItems=[
     {id:'dashboard',icon:'📊',label:'Dashboard',show:true},
     {id:'orders',icon:'📦',label:'Orders',show:isAdmin||isSupplier||can('view_orders')},
+    {id:'myanalytics',icon:'📈',label:'My Analytics',show:isCC&&!isAdmin&&!isSupplier},
     {id:'financials',icon:'💰',label:'Financials',show:isAdmin||can('view_financials')},
     {id:'analytics',icon:'📈',label:'Analytics',show:isAdmin||isSupplier},
     {id:'expenses',icon:'📉',label:'Expenses',show:isAdmin||can('manage_expenses')},
@@ -431,6 +560,7 @@ function App(){
   const pageMap={
     dashboard:React.createElement(DashboardPage,ctx),
     orders:React.createElement(OrdersPage,ctx),
+    myanalytics:React.createElement(StaffAnalyticsPage,ctx),
     financials:React.createElement(FinancialsPage,ctx),
     analytics:React.createElement(AnalyticsPage,ctx),
     expenses:React.createElement(ExpensesPage,ctx),
@@ -679,6 +809,7 @@ function StaffDashboard({data,loading,user}){
     {label:'My Earnings (NGN)',value:fmtNGN(d.earnedNGN),sub:'₦2,000/delivered+paid',cls:'green'},
     {label:'Pending Payout',value:fmtNGN(d.pendingPayoutNGN),sub:'Delivered but unpaid',cls:'orange'},
     {label:'Total Paid Out',value:fmtNGN(d.paidOutNGN||0),sub:'Already received',cls:'blue'},
+    {label:'My Conversion Rate',value:d.conversionRate!=null?`${d.conversionRate}%`:'—',sub:'Delivered+paid ÷ Contacted',cls:'purple'},
   ];
   return React.createElement('div',null,
     React.createElement('div',{className:'section-title',style:{marginBottom:16}},`Welcome, ${user.name||user.username} 👋`),
@@ -708,6 +839,185 @@ function SupplierDashboard({data,loading,user}){
       React.createElement('div',{className:'stat-value'},s.value),
       React.createElement('div',{className:'stat-sub'},s.sub)
     )))
+  );
+}
+
+// ─── STAFF PERSONAL ANALYTICS PAGE ──────────────────────────
+
+function StaffAnalyticsPage({user}){
+  const [orders,setOrders]=useState([]);
+  const [payoutRecords,setPayoutRecords]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [period,setPeriod]=useState('all');
+  const [selMonth,setSelMonth]=useState(()=>today().slice(0,7));
+  const [selYear,setSelYear]=useState(()=>today().slice(0,4));
+
+  useEffect(()=>{
+    setLoading(true);
+    Promise.all([
+      API.call({action:'getOrders'}),
+      API.call({action:'getPayoutRecords'}),
+    ]).then(([or,pr])=>{
+      if(or.success) setOrders(or.data||[]);
+      if(pr.success) setPayoutRecords(pr.data||[]);
+      setLoading(false);
+    });
+  },[]);
+
+  const username=user.username;
+  const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);
+  const years=useMemo(()=>{const s=new Set(myOrders.map(o=>(o.date||'').slice(0,4)).filter(Boolean));return [...s].sort().reverse();},[myOrders]);
+
+  const filtered=useMemo(()=>{
+    if(period==='month') return myOrders.filter(o=>(o.date||'').startsWith(selMonth));
+    if(period==='year') return myOrders.filter(o=>(o.date||'').startsWith(selYear));
+    return myOrders;
+  },[myOrders,period,selMonth,selYear]);
+
+  const delivered=filtered.filter(o=>statusOf(o)==='Delivered');
+  const deliveredPaid=delivered.filter(o=>paymentOf(o)==='Paid');
+  const pending=filtered.filter(o=>!['Delivered','Canceled'].includes(statusOf(o)));
+  const canceled=filtered.filter(o=>statusOf(o)==='Canceled');
+  const revenueGHC=deliveredPaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
+  const earnings=deliveredPaid.length*STAFF_PAYOUT_NGN;
+  const paidOut=payoutRecords.filter(r=>r.staffName===username).reduce((s,r)=>s+sp(r.amountNGN),0);
+
+  // Personal conversion rate: delivered+paid ÷ total contacted × 100
+  const allTimeConv=myOrders.length>0?Math.round(myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid').length/myOrders.length*100):0;
+  const filteredConv=filtered.length>0?Math.round(deliveredPaid.length/filtered.length*100):0;
+
+  // Monthly charts
+  const monthlyData=useMemo(()=>{
+    const months=[];
+    for(let i=7;i>=0;i--){
+      const dt=new Date();dt.setMonth(dt.getMonth()-i);
+      const key=dt.toISOString().slice(0,7);
+      months.push({key,label:dt.toLocaleString('default',{month:'short'}),orders:0,delivered:0,paidDelivered:0,revenue:0});
+    }
+    myOrders.forEach(o=>{
+      const mk=(o.date||'').slice(0,7);
+      const m=months.find(x=>x.key===mk);
+      if(!m)return;
+      m.orders++;
+      if(statusOf(o)==='Delivered') m.delivered++;
+      if(statusOf(o)==='Delivered'&&paymentOf(o)==='Paid'){m.paidDelivered++;m.revenue+=sp(o.sellingPrice);}
+    });
+    return months;
+  },[myOrders]);
+
+  const monthlyConvData=monthlyData.map(m=>({label:m.label,value:m.orders>0?Math.round(m.paidDelivered/m.orders*100):0}));
+  const monthlyRevData=monthlyData.map(m=>({label:m.label,value:m.revenue}));
+  const monthlyOrderData=monthlyData.map(m=>({label:m.label,value:m.orders}));
+
+  const byStatus=useMemo(()=>{
+    const m={};
+    DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});
+    return m;
+  },[filtered]);
+
+  const byProduct=useMemo(()=>{
+    const m={};
+    filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  },[filtered]);
+
+  if(loading&&orders.length===0) return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
+
+  return React.createElement('div',null,
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',null,
+        React.createElement('div',{className:'section-title'},'My Analytics'),
+        React.createElement('div',{className:'section-sub'},`Performance breakdown for ${user.name||user.username}`)
+      )
+    ),
+    // Period filter
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},
+        React.createElement('div',{className:'tabs',style:{margin:0}},
+          [{id:'all',label:'All Time'},{id:'year',label:'By Year'},{id:'month',label:'By Month'}].map(t=>
+            React.createElement('div',{key:t.id,className:`tab ${period===t.id?'active':''}`,onClick:()=>setPeriod(t.id)},t.label)
+          )
+        ),
+        period==='month'&&React.createElement('input',{type:'month',className:'form-input',style:{width:160},value:selMonth,onChange:e=>setSelMonth(e.target.value)}),
+        period==='year'&&React.createElement('select',{className:'form-select',style:{width:120},value:selYear,onChange:e=>setSelYear(e.target.value)},years.map(y=>React.createElement('option',{key:y,value:y},y)))
+      )
+    ),
+    // Stats
+    React.createElement('div',{className:'stat-grid'},
+      [
+        {label:'Orders Contacted',value:filtered.length,sub:'In selected period',cls:'blue'},
+        {label:'Delivered',value:delivered.length,sub:'Successfully delivered',cls:'green'},
+        {label:'Delivered & Paid',value:deliveredPaid.length,sub:'Eligible for payout',cls:'green'},
+        {label:'Pending',value:pending.length,sub:'In progress',cls:'orange'},
+        {label:'Canceled',value:canceled.length,sub:'Lost orders',cls:'red'},
+        {label:'Period Conversion',value:`${filteredConv}%`,sub:'Delivered+paid ÷ Contacted',cls:'purple'},
+        {label:'All-Time Conversion',value:`${allTimeConv}%`,sub:'Across all orders',cls:'orange'},
+        {label:'Revenue Generated (GHC)',value:fmtGHC(revenueGHC),sub:'From paid deliveries',cls:'green'},
+        {label:'My Earnings (NGN)',value:fmtNGN(earnings),sub:'₦2,000/delivered+paid',cls:'green'},
+        {label:'Total Paid Out (NGN)',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},
+        {label:'Unpaid Balance (NGN)',value:fmtNGN(myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid').length*STAFF_PAYOUT_NGN-paidOut),sub:'Pending from admin',cls:'orange'},
+      ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
+        React.createElement('div',{className:'stat-label'},s.label),
+        React.createElement('div',{className:'stat-value'},s.value),
+        React.createElement('div',{className:'stat-sub'},s.sub)
+      ))
+    ),
+    // Charts row
+    React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:20}},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{style:{marginBottom:10,display:'flex',justifyContent:'space-between'}},
+          React.createElement('div',{className:'section-title',style:{fontSize:14}},'My Conversion Rate (%)'),
+          React.createElement('div',{className:'text-muted'},'Last 8 months')
+        ),
+        monthlyConvData.filter(m=>m.value>0||monthlyData.find(x=>x.label===m.label)?.orders>0).length>1
+          ?React.createElement(LineChart,{data:monthlyConvData,color:'var(--purple)',height:90})
+          :React.createElement('div',{className:'text-muted'},'Not enough data yet')
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{style:{marginBottom:10,display:'flex',justifyContent:'space-between'}},
+          React.createElement('div',{className:'section-title',style:{fontSize:14}},'Revenue I Generated (GHC)'),
+          React.createElement('div',{className:'text-muted'},'Paid+delivered')
+        ),
+        monthlyRevData.some(m=>m.value>0)
+          ?React.createElement(BarChart,{data:monthlyRevData,color:'var(--green)',height:90})
+          :React.createElement('div',{className:'text-muted'},'No revenue data yet')
+      )
+    ),
+    React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:20}},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{style:{marginBottom:10}},
+          React.createElement('div',{className:'section-title',style:{fontSize:14}},'Orders Per Month'),
+        ),
+        React.createElement(BarChart,{data:monthlyOrderData,color:'var(--blue)',height:90})
+      ),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Order Status Breakdown'),
+        DELIVERY_STATUSES.map(s=>{
+          const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;
+          return React.createElement('div',{key:s,style:{marginBottom:10}},
+            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
+              React.createElement('span',null,s),
+              React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)
+            ),
+            React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}}))
+          );
+        })
+      )
+    ),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title',style:{marginBottom:14}},'My Top Products'),
+      byProduct.length===0?React.createElement('div',{className:'text-muted'},'No data'):
+      byProduct.map(([name,c])=>{
+        const pct=filtered.length>0?Math.round(c/filtered.length*100):0;
+        return React.createElement('div',{key:name,style:{marginBottom:10}},
+          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
+            React.createElement('span',{style:{maxWidth:'65%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},name),
+            React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)
+          ),
+          React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--blue)'}}))
+        );
+      })
+    )
   );
 }
 
@@ -1027,7 +1337,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     )
   );
 
-  // FIX: build gift text safely without trailing comma issue
   const buildGiftText=(bundle)=>{
     let txt='🎁 Free gift included';
     if(bundle.freeGiftCost) txt+=` — Cost: ${fmtGHC(bundle.freeGiftCost)}`;
@@ -1063,7 +1372,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
           React.createElement('label',{className:'form-label'},'Delivery Address *'),
           React.createElement('textarea',{className:'form-textarea',rows:2,value:f.address||'',onChange:set('address')})
         ),
-
         React.createElement('div',{className:'section-divider'},'Product & Bundle'),
         React.createElement('div',{className:'form-group',style:{marginBottom:12}},
           React.createElement('label',{className:'form-label'},'Product *'),
@@ -1072,7 +1380,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             products.filter(p=>isActive(p.active)).map(p=>React.createElement('option',{key:p.id,value:p.name},p.name))
           )
         ),
-
         f.product&&React.createElement('div',{className:'form-group',style:{marginBottom:12}},
           React.createElement('label',{className:'form-label'},'Bundle *'),
           React.createElement('select',{className:'form-select',value:isCustom?'__custom__':f.bundleLabel||'',onChange:e=>pickBundle(e.target.value)},
@@ -1083,7 +1390,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             React.createElement('option',{value:'__custom__'},'✏ Custom / Special Order')
           )
         ),
-
         selectedBundle&&!isCustom&&React.createElement('div',{className:'bundle-info-card',style:{marginBottom:14}},
           React.createElement('div',{className:'bundle-info-row'},
             React.createElement('span',{className:'bundle-info-label'},'Selling Price'),
@@ -1097,10 +1403,8 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             React.createElement('span',{className:'bundle-info-label'},'Quantity'),
             React.createElement('span',{className:'bundle-info-value'},selectedBundle.qty||1)
           ),
-          // FIX: no trailing comma — use helper function instead
           selectedBundle.hasFreeGift&&React.createElement('div',{className:'bundle-info-gift'},buildGiftText(selectedBundle))
         ),
-
         isAdmin&&selectedBundle&&!isCustom&&React.createElement('div',null,
           React.createElement('div',{className:'alert-info',style:{marginBottom:8}},'Admin: you can override these values for this order.'),
           React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
@@ -1118,9 +1422,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             )
           )
         ),
-
         sizes.length>0&&sl('Size *','size',sizes),
-
         isCustom&&React.createElement('div',null,
           React.createElement('div',{className:'alert-warning',style:{marginBottom:12}},'⚡ Custom order — fill in all fields below. A note is required.'),
           React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
@@ -1150,7 +1452,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             )
           )
         ),
-
         React.createElement('div',{className:'form-group',style:{marginTop:8}},
           React.createElement('label',{className:'form-label'},isCustom?'Notes * (required for custom orders)':'Notes'),
           React.createElement('textarea',{className:'form-textarea',rows:2,value:f.notes||'',onChange:set('notes'),placeholder:isCustom?'Describe the custom order…':'Optional notes'})
@@ -1189,7 +1490,6 @@ function FinancialsPage({isAdmin}){
   },[]);
   useEffect(()=>{load();},[load]);
 
-  // FIX: guard lastExRate with || 0 so netProfitNGN never becomes NaN
   const lastExRate=useMemo(()=>{
     const s=[...withdrawals].sort((a,b)=>new Date(b.date)-new Date(a.date));
     return s[0]&&s[0].exchangeRate?s[0].exchangeRate:null;
@@ -1203,7 +1503,6 @@ function FinancialsPage({isAdmin}){
   const totalAdSpend=expenses.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
   const totalWdNGN=withdrawals.reduce((s,w)=>s+sp(w.amountNGN),0);
   const totalWdGHC=withdrawals.reduce((s,w)=>s+sp(w.amountGHC),0);
-  // FIX: use sp() safely — sp(null) returns 0, so netProfitNGN stays numeric
   const netProfitNGN=lastExRate!=null?(profitGHC*sp(lastExRate)-totalAdSpend):0;
   const pendRevGHC=delivUnpaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
 
@@ -1614,7 +1913,6 @@ function ProductsPage(){
                   bundles.some(b=>b.hasFreeGift)&&React.createElement('div',{style:{fontSize:10,color:'var(--green)',marginTop:2}},'🎁 Some have free gifts')
                 ):'—'
               ),
-              // FIX: was (p.hasSizes===true||p.hasSizes!=='true') — double negative always true
               React.createElement('td',null,(p.hasSizes===true||p.hasSizes==='true')?'✓':'—'),
               React.createElement('td',null,productSuppliers||'None'),
               React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(p.active)?'badge-delivered':'badge-canceled'}`},isActive(p.active)?'Active':'Inactive')),
@@ -1646,8 +1944,7 @@ function ProductModal({product,onSave,onClose}){
     try{
       const raw=JSON.parse(product&&product.bundles||'[]');
       return raw.map(b=>({
-        label:b.label||'',
-        qty:b.qty||1,
+        label:b.label||'',qty:b.qty||1,
         sellingPrice:b.sellingPrice||b.price||'',
         costPrice:b.costPrice||b.cost||'',
         hasFreeGift:b.hasFreeGift||false,
@@ -1697,17 +1994,10 @@ function ProductModal({product,onSave,onClose}){
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')
       ),
       React.createElement('div',{className:'modal-body'},
-
         React.createElement('div',{className:'section-divider'},'Basic Info'),
         React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Product Name *'),
-            React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Description'),
-            React.createElement('input',{className:'form-input',value:f.description||'',onChange:set('description')})
-          )
+          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Product Name *'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
+          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Description'),React.createElement('input',{className:'form-input',value:f.description||'',onChange:set('description')}))
         ),
         React.createElement('div',{className:'form-group',style:{marginBottom:14}},
           React.createElement('label',{className:'form-label'},'Status'),
@@ -1715,17 +2005,10 @@ function ProductModal({product,onSave,onClose}){
             React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive')
           )
         ),
-
         React.createElement('div',{className:'section-divider'},'Bundles / Pricing'),
-        React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
-          'Each bundle has its own selling price, cost price, quantity, and optional free gift.'
-        ),
+        React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'Each bundle has its own selling price, cost price, quantity, and optional free gift.'),
         bundles.map((b,i)=>React.createElement('div',{key:i,className:'bundle-row'},
-          React.createElement('button',{
-            className:'btn btn-danger btn-sm',
-            style:{position:'absolute',top:8,right:8},
-            onClick:()=>rmBundle(i)
-          },'✕'),
+          React.createElement('button',{className:'btn btn-danger btn-sm',style:{position:'absolute',top:8,right:8},onClick:()=>rmBundle(i)},'✕'),
           React.createElement('div',{className:'bundle-row-header'},
             React.createElement('div',{className:'form-group',style:{flex:2,minWidth:120}},
               i===0&&React.createElement('label',{className:'form-label'},'Bundle Label'),
@@ -1746,34 +2029,15 @@ function ProductModal({product,onSave,onClose}){
           ),
           React.createElement('div',{className:'bundle-free-gift-row'},
             React.createElement('span',{style:{fontSize:11,fontWeight:600,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.4px',marginRight:8}},'Free Gift?'),
-            React.createElement('label',null,
-              React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',false)}),
-              React.createElement('span',{style:{marginLeft:4}},'No')
-            ),
-            React.createElement('label',null,
-              React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',true)}),
-              React.createElement('span',{style:{marginLeft:4}},'Yes')
-            ),
+            React.createElement('label',null,React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',false)}),React.createElement('span',{style:{marginLeft:4}},'No')),
+            React.createElement('label',null,React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',true)}),React.createElement('span',{style:{marginLeft:4}},'Yes')),
             b.hasFreeGift&&React.createElement('div',{className:'bundle-gift-cost'},
-              React.createElement('input',{
-                className:'form-input',type:'number',
-                style:{width:110,padding:'5px 8px',fontSize:12},
-                value:b.freeGiftCost,
-                onChange:e=>updBundle(i,'freeGiftCost',e.target.value),
-                placeholder:'Gift cost'
-              }),
-              React.createElement('input',{
-                className:'form-input',
-                style:{width:140,padding:'5px 8px',fontSize:12},
-                value:b.freeGiftName,
-                onChange:e=>updBundle(i,'freeGiftName',e.target.value),
-                placeholder:'Gift name'
-              })
+              React.createElement('input',{className:'form-input',type:'number',style:{width:110,padding:'5px 8px',fontSize:12},value:b.freeGiftCost,onChange:e=>updBundle(i,'freeGiftCost',e.target.value),placeholder:'Gift cost'}),
+              React.createElement('input',{className:'form-input',style:{width:140,padding:'5px 8px',fontSize:12},value:b.freeGiftName,onChange:e=>updBundle(i,'freeGiftName',e.target.value),placeholder:'Gift name'})
             )
           )
         )),
         React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginBottom:14},onClick:addBundle},'+ Add Bundle'),
-
         React.createElement('div',{className:'section-divider'},'Sizes'),
         React.createElement('div',{className:'form-group',style:{marginBottom:10}},
           React.createElement('label',{className:'form-label'},'Requires Sizes?'),
@@ -1790,7 +2054,6 @@ function ProductModal({product,onSave,onClose}){
             sizes.map(s=>React.createElement('div',{key:s,className:'tag'},s,React.createElement('span',{className:'tag-remove',onClick:()=>rmSize(s)},'×')))
           )
         ),
-
         React.createElement('div',{className:'section-divider'},'Supplier Assignment'),
         (suppliers||[]).length===0?
           React.createElement('div',{className:'text-muted',style:{marginBottom:14}},'Create suppliers first.'):
@@ -1841,6 +2104,8 @@ function PriceHistoryModal({product,onClose}){
   );
 }
 
+// ─── STAFF PAGE ──────────────────────────────────────────────
+
 function StaffPage(){
   const {data,loading,reload}=useData('getStaff');
   const [showModal,setShowModal]=useState(false);
@@ -1853,16 +2118,36 @@ function StaffPage(){
     const r=await API.call({action:'deleteStaff',id:s.id});
     if(r.success){toast('Removed');reload();}else toast(r.error||'Delete failed','error');
   };
-  const toggle=async s=>{
-    const r=await API.call({action:'updateStaff',id:s.id,staff:JSON.stringify({active:!isActive(s.active)})});
-    if(r.success){toast(isActive(s.active)?'Deactivated':'Activated');reload();}else toast(r.error||'Update failed','error');
-  };
+
+  // Signup link generation
+  const [staffToken,setStaffToken]=useState(()=>getOrCreateToken('staff'));
+  const [copied,setCopied]=useState(false);
+  const signupUrl=`${window.location.origin}${window.location.pathname}?signup=staff&token=${staffToken}`;
+  const copyLink=()=>{navigator.clipboard.writeText(signupUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
+  const revokeStaffToken=()=>{const t=revokeToken('staff');setStaffToken(t);toast('Signup link revoked — new link generated');};
 
   return React.createElement('div',null,
+    // Signup link card
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},
+        React.createElement('div',null,
+          React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Staff Signup Link'),
+          React.createElement('div',{className:'text-muted'},'Share this link with staff to let them create their own account.')
+        ),
+        React.createElement('div',{style:{display:'flex',gap:8}},
+          React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeStaffToken},'↺ Revoke Link')
+        )
+      ),
+      React.createElement('div',{className:'copy-link-box'},
+        React.createElement('span',{style:{flex:1}},signupUrl),
+        React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy')
+      ),
+      React.createElement('div',{className:'text-muted'},'⚠️ Revoking generates a new link — the old one stops working immediately.')
+    ),
     React.createElement('div',{className:'section-header'},
       React.createElement('div',null,
         React.createElement('div',{className:'section-title'},'Staff Access'),
-        React.createElement('div',{className:'section-sub'},'Staff and customer-care logins.')
+        React.createElement('div',{className:'section-sub'},'Customer care staff logins.')
       ),
       React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Staff')
     ),
@@ -1871,19 +2156,21 @@ function StaffPage(){
     React.createElement('div',{className:'table-wrap'},
       React.createElement('table',null,
         React.createElement('thead',null,React.createElement('tr',null,
-          ['Name','Username','Role','Permissions','Status','Actions'].map(h=>React.createElement('th',{key:h},h))
+          ['Name','Username','Phone','Status','Actions'].map(h=>React.createElement('th',{key:h},h))
         )),
         React.createElement('tbody',null,
-          staff.map(s=>React.createElement('tr',{key:s.id||s.username},
+          staff.filter(s=>s.role!=='admin').map(s=>React.createElement('tr',{key:s.id||s.username},
             React.createElement('td',null,s.name||'-'),
             React.createElement('td',{className:'td-mono'},s.username),
-            React.createElement('td',null,React.createElement('span',{className:`badge ${s.role==='admin'?'badge-processing':'badge-rescheduled'}`},s.role||'staff')),
-            React.createElement('td',null,React.createElement('div',{style:{fontSize:11,color:'var(--text3)',maxWidth:220}},s.permissions==='all'?'All':(s.permissions||'none'))),
+            React.createElement('td',null,
+              React.createElement('div',null,s.phone||'—'),
+              s.phone2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},s.phone2)
+            ),
             React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),
             React.createElement('td',null,
               React.createElement('div',{style:{display:'flex',gap:4}},
                 React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'Edit'),
-                s.role!=='admin'&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')
+                React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')
               )
             )
           ))
@@ -1896,20 +2183,15 @@ function StaffPage(){
 
 function StaffModal({staff,onSave,onClose}){
   const isEdit=!!staff;
-  const [f,setF]=useState(staff?{...staff}:{name:'',username:'',password:'',role:'staff',active:true,permissions:''});
-  const [selPerms,setSelPerms]=useState(()=>{
-    if(!staff||staff.permissions==='all')return staff&&staff.permissions==='all'?['all']:[];
-    return (staff.permissions||'').split(',').map(s=>s.trim()).filter(Boolean);
-  });
+  // Role is always customer_care; permissions are auto-set
+  const AUTO_PERMS='view_orders,add_orders,edit_orders,view_dashboard';
+  const [f,setF]=useState(staff?{...staff}:{name:'',username:'',password:'',phone:'',phone2:'',role:'customer_care',active:true,permissions:AUTO_PERMS});
+  const [showPhone2,setShowPhone2]=useState(!!(staff&&staff.phone2));
   const [saving,setSaving]=useState(false);
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const togglePerm=p=>{
-    if(p==='all'){setSelPerms(prev=>prev.includes('all')?[]:['all']);return;}
-    setSelPerms(prev=>{const n=prev.filter(x=>x!=='all');return n.includes(p)?n.filter(x=>x!==p):[...n,p];});
-  };
   const save=async()=>{
     if(!f.username||(!isEdit&&!f.password)){toast('Username and password required','error');return;}
-    const data={...f,permissions:selPerms.includes('all')?'all':selPerms.join(',')};
+    const data={...f,role:'customer_care',permissions:AUTO_PERMS};
     setSaving(true);
     const r=await API.call(isEdit?{action:'updateStaff',id:staff.id,staff:JSON.stringify(data)}:{action:'addStaff',staff:JSON.stringify(data)});
     setSaving(false);
@@ -1918,24 +2200,20 @@ function StaffModal({staff,onSave,onClose}){
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal'},
       React.createElement('div',{className:'modal-header'},
-        React.createElement('div',{className:'modal-title'},isEdit?'Edit':'Add'),
+        React.createElement('div',{className:'modal-title'},isEdit?'Edit Staff':'Add Staff'),
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')
       ),
       React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'Staff are added as Customer Care with standard order-viewing and contact permissions.'),
         React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Role'),
-            React.createElement('select',{className:'form-select',value:f.role||'staff',onChange:set('role')},
-              ['staff','customer_care','manager','admin'].map(r=>React.createElement('option',{key:r,value:r},r))
-            )
-          )
-        ),
-        React.createElement('div',{className:'form-group'},
-          React.createElement('label',{className:'form-label'},'Permissions'),
-          React.createElement('div',{className:'permission-grid'},
-            ['all',...PERMS_LIST].map(p=>React.createElement('div',{key:p,className:`perm-chip ${selPerms.includes(p)?'active':''}`,onClick:()=>togglePerm(p)},p))
+          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Full Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
+          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username *'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username')})),
+          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password *'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Phone'),
+            React.createElement('input',{className:'form-input',value:f.phone||'',onChange:set('phone'),placeholder:'Primary phone'}),
+            !showPhone2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginTop:6,alignSelf:'flex-start'},onClick:()=>setShowPhone2(true)},'+ 2nd Phone'),
+            showPhone2&&React.createElement('input',{className:'form-input',style:{marginTop:6},value:f.phone2||'',onChange:set('phone2'),placeholder:'Second phone'})
           )
         )
       ),
@@ -1947,12 +2225,20 @@ function StaffModal({staff,onSave,onClose}){
   );
 }
 
+// ─── SUPPLIERS PAGE ──────────────────────────────────────────
+
 function SuppliersPage(){
   const [suppliers,setSuppliers]=useState([]);
   const [products,setProducts]=useState([]);
   const [loading,setLoading]=useState(true);
   const [showModal,setShowModal]=useState(false);
   const [editing,setEditing]=useState(null);
+  const [supplierToken,setSupplierToken]=useState(()=>getOrCreateToken('supplier'));
+  const [copied,setCopied]=useState(false);
+
+  const signupUrl=`${window.location.origin}${window.location.pathname}?signup=supplier&token=${supplierToken}`;
+  const copyLink=()=>{navigator.clipboard.writeText(signupUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
+  const revokeSupplierToken=()=>{const t=revokeToken('supplier');setSupplierToken(t);toast('Signup link revoked — new link generated');};
 
   const toArray=(v)=>{
     if(Array.isArray(v)) return v;
@@ -1964,21 +2250,16 @@ function SuppliersPage(){
   const load=useCallback(async()=>{
     try{
       setLoading(true);
-
       const [su,pr]=await Promise.all([
         API.call({action:'getSuppliers'}),
         API.call({action:'getProducts'})
       ]);
-
       setSuppliers(toArray(su?.data));
       setProducts(toArray(pr?.data));
     }catch(err){
       console.error('Suppliers load error:',err);
-      setSuppliers([]);
-      setProducts([]);
-    }finally{
-      setLoading(false);
-    }
+      setSuppliers([]);setProducts([]);
+    }finally{setLoading(false);}
   },[]);
 
   useEffect(()=>{load();},[load]);
@@ -1986,80 +2267,73 @@ function SuppliersPage(){
   const del=async s=>{
     if(!confirm(`Remove supplier ${s?.name||s?.username}?`)) return;
     const r=await API.call({action:'deleteSupplier',id:s?.id});
-    if(r.success){
-      toast('Removed');
-      load();
-    }else{
-      toast(r.error||'Failed','error');
-    }
+    if(r.success){toast('Removed');load();}
+    else toast(r.error||'Failed','error');
   };
 
   const safeSuppliers=Array.isArray(suppliers)?suppliers:[];
   const safeProducts=Array.isArray(products)?products:[];
 
   return React.createElement('div',null,
+    // Signup link card
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},
+        React.createElement('div',null,
+          React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Supplier Signup Link'),
+          React.createElement('div',{className:'text-muted'},'Share this link with suppliers to let them register. You can assign products after they sign up.')
+        ),
+        React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeSupplierToken},'↺ Revoke Link')
+      ),
+      React.createElement('div',{className:'copy-link-box'},
+        React.createElement('span',{style:{flex:1}},signupUrl),
+        React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy')
+      ),
+      React.createElement('div',{className:'text-muted'},'⚠️ Suppliers who sign up will have no products assigned until you edit them.')
+    ),
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Suppliers'),
-      React.createElement('button',{
-        className:'btn btn-primary',
-        onClick:()=>{setEditing(null);setShowModal(true);}
-      },'+ Add Supplier')
+      React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Supplier')
     ),
-
-    loading
-      ? React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}))
-
-      : safeSuppliers.length===0
-        ? React.createElement('div',{className:'empty-state'},
-            React.createElement('div',{className:'empty-text'},'No suppliers yet')
-          )
-
-        : React.createElement('div',{className:'table-wrap'},
-            React.createElement('table',null,
-              React.createElement('thead',null,
-                React.createElement('tr',null,
-                  ['Name','Username','Products','Status','Actions']
-                    .map(h=>React.createElement('th',{key:h},h))
-                )
+    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
+    safeSuppliers.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No suppliers yet')):
+    React.createElement('div',{className:'table-wrap'},
+      React.createElement('table',null,
+        React.createElement('thead',null,React.createElement('tr',null,
+          ['Name','Username','Phone','Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h))
+        )),
+        React.createElement('tbody',null,
+          safeSuppliers.map(s=>{
+            const assigned=readList(s?.assignedProducts||s?.products||[]);
+            const hasNoProducts=assigned.length===0||assigned.every(x=>!x);
+            return React.createElement('tr',{key:s?.id||s?.username||s?.name},
+              React.createElement('td',null,s?.name||'-'),
+              React.createElement('td',{className:'td-mono'},s?.username||'-'),
+              React.createElement('td',null,
+                React.createElement('div',null,s?.phone||'—'),
+                s?.phone2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},s.phone2)
               ),
-              React.createElement('tbody',null,
-                safeSuppliers.map(s=>{
-                  const assigned=readList(s?.assignedProducts || s?.products || []);
-                  return React.createElement('tr',{key:s?.id||s?.username||s?.name},
-                    React.createElement('td',null,s?.name||'-'),
-                    React.createElement('td',{className:'td-mono'},s?.username||'-'),
-                    React.createElement('td',null,assigned.length ? assigned.join(', ') : 'None'),
-                    React.createElement('td',null,
-                      React.createElement('span',{
-                        className:`badge ${isActive(s?.active)?'badge-delivered':'badge-canceled'}`
-                      },isActive(s?.active)?'Active':'Inactive')
-                    ),
-                    React.createElement('td',null,
-                      React.createElement('div',{style:{display:'flex',gap:4}},
-                        React.createElement('button',{
-                          className:'btn btn-secondary btn-sm',
-                          onClick:()=>{setEditing(s);setShowModal(true);}
-                        },'Edit'),
-                        React.createElement('button',{
-                          className:'btn btn-danger btn-sm',
-                          onClick:()=>del(s)
-                        },'Delete')
-                      )
-                    )
-                  );
-                })
+              React.createElement('td',null,
+                hasNoProducts
+                  ?React.createElement('span',{className:'badge badge-unassigned'},'⚠ No products assigned')
+                  :React.createElement('span',null,assigned.join(', '))
+              ),
+              React.createElement('td',null,
+                React.createElement('span',{className:`badge ${isActive(s?.active)?'badge-delivered':'badge-canceled'}`},isActive(s?.active)?'Active':'Inactive')
+              ),
+              React.createElement('td',null,
+                React.createElement('div',{style:{display:'flex',gap:4}},
+                  React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},hasNoProducts?'✏ Assign Products':'✏ Edit'),
+                  React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')
+                )
               )
-            )
-          ),
-
-    showModal && React.createElement(SupplierModal,{
-      supplier:editing,
-      products:safeProducts,
-      onSave:()=>{
-        setShowModal(false);
-        load();
-        toast('Saved');
-      },
+            );
+          })
+        )
+      )
+    ),
+    showModal&&React.createElement(SupplierModal,{
+      supplier:editing,products:safeProducts,
+      onSave:()=>{setShowModal(false);load();toast('Saved');},
       onClose:()=>setShowModal(false)
     })
   );
@@ -2067,7 +2341,8 @@ function SuppliersPage(){
   
 function SupplierModal({supplier,products,onSave,onClose}){
   const isEdit=!!supplier;
-  const [f,setF]=useState(supplier?{...supplier}:{name:'',username:'',password:'',active:true});
+  const [f,setF]=useState(supplier?{...supplier}:{name:'',username:'',password:'',phone:'',phone2:'',active:true});
+  const [showPhone2,setShowPhone2]=useState(!!(supplier&&supplier.phone2));
   const [selected,setSelected]=useState(()=>readList(supplier&&supplier.assignedProducts||supplier&&supplier.products));
   const [saving,setSaving]=useState(false);
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
@@ -2082,19 +2357,26 @@ function SupplierModal({supplier,products,onSave,onClose}){
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal'},
       React.createElement('div',{className:'modal-header'},
-        React.createElement('div',{className:'modal-title'},isEdit?'Edit':'Add'),
+        React.createElement('div',{className:'modal-title'},isEdit?'Edit Supplier':'Add Supplier'),
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')
       ),
       React.createElement('div',{className:'modal-body'},
         React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
           React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
           React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')}))
+          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Phone'),
+            React.createElement('input',{className:'form-input',value:f.phone||'',onChange:set('phone'),placeholder:'Primary phone'}),
+            !showPhone2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginTop:6,alignSelf:'flex-start'},onClick:()=>setShowPhone2(true)},'+ 2nd Phone'),
+            showPhone2&&React.createElement('input',{className:'form-input',style:{marginTop:6},value:f.phone2||'',onChange:set('phone2'),placeholder:'Second phone'})
+          )
         ),
+        selected.length===0&&React.createElement('div',{className:'alert-warning',style:{marginBottom:12}},'⚠️ No products assigned yet. Select products below.'),
         React.createElement('div',{className:'form-group'},
-          React.createElement('label',{className:'form-label'},'Products'),
+          React.createElement('label',{className:'form-label'},'Assigned Products'),
           React.createElement('div',{className:'permission-grid'},
-            (products || []).map(p=>React.createElement('div',{key:p.name,className:`product-chip ${selected.includes(p.name)?'active':''}`,onClick:()=>toggleProduct(p.name)},p.name))
+            (products||[]).map(p=>React.createElement('div',{key:p.name,className:`product-chip ${selected.includes(p.name)?'active':''}`,onClick:()=>toggleProduct(p.name)},p.name))
           )
         )
       ),
@@ -2105,6 +2387,8 @@ function SupplierModal({supplier,products,onSave,onClose}){
     )
   );
 }
+
+// ─── SETTINGS PAGE ───────────────────────────────────────────
 
 function SettingsPage({user}){
   const [url,setUrl]=useState(API.url||'');
@@ -2154,37 +2438,15 @@ if (!window.React || !window.ReactDOM) {
 }
 
 class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { error: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { error };
-  }
-
-  componentDidCatch(error, info) {
-    console.error('React error boundary caught:', error, info);
-  }
-
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  componentDidCatch(error, info) { console.error('React error boundary caught:', error, info); }
   render() {
     if (this.state.error) {
-      return React.createElement(
-        'div',
-        {
-          style: {
-            padding: '24px',
-            color: 'var(--red)',
-            background: 'var(--bg)',
-            whiteSpace: 'pre-wrap',
-            fontFamily: 'monospace',
-            lineHeight: 1.6,
-          },
-        },
+      return React.createElement('div',{style:{padding:'24px',color:'var(--red)',background:'var(--bg)',whiteSpace:'pre-wrap',fontFamily:'monospace',lineHeight:1.6}},
         `App crashed:\n${this.state.error.message}\n\nOpen the browser console for the full stack trace.`
       );
     }
-
     return this.props.children;
   }
 }

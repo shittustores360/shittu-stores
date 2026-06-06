@@ -19,73 +19,71 @@
   --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
   --radius:10px;--radius-lg:16px;--shadow:0 4px 24px rgba(0,0,0,0.4);--transition:0.18s ease;
 }
-[data-theme="light"]{
-  --bg:#f0f2f7;--bg2:#ffffff;--bg3:#f5f7fb;--bg4:#eaecf3;
-  --border:#dde1ef;--border2:#c8cedf;
-  --text:#1a1e2e;--text2:#4a5070;--text3:#8890a8;
-  --shadow:0 4px 24px rgba(0,0,0,0.1);
-}
+
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;transition:background 0.2s,color 0.2s}
 #root{height:100%}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
 .app{display:flex;height:100vh;overflow:hidden}
 .sidebar{width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform var(--transition)}
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{height:56px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
 .content{flex:1;overflow-y:auto;padding:24px}
+
 .sidebar-logo{padding:20px 16px 8px;border-bottom:1px solid var(--border);margin-bottom:8px}
 .logo-text{font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
 .logo-sub{font-size:11px;color:var(--text3);font-family:var(--font-mono)}
+
 .nav-section{padding:8px 8px 0;margin-bottom:4px}
 .nav-section-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:0 8px;margin-bottom:4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all var(--transition);margin-bottom:2px}
 .nav-item:hover{background:var(--bg3);color:var(--text)}
 .nav-item.active{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(245,166,35,0.2)}
 .nav-icon{font-size:16px;width:20px;text-align:center}
+
 .sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
 .user-pill{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--radius);background:var(--bg3)}
 .user-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#000;flex-shrink:0}
-.user-name{font-size:12px;font-weight:600;color:var(--text)}
+.user-name{font-size:12px;font-weight:600;color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .user-role{font-size:10px;color:var(--text3)}
+
 .topbar-title{font-family:var(--font-head);font-size:15px;font-weight:700;flex:1}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--transition);font-family:var(--font-body)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--transition)}
 .btn-primary{background:var(--accent);color:#000}.btn-primary:hover{background:var(--accent2)}
 .btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--bg4)}
-.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(231,76,60,0.2)}.btn-danger:hover{background:rgba(231,76,60,0.2)}
-.btn-success{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,113,0.2)}
-.btn-sm{padding:5px 10px;font-size:12px}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(231,76,60,0.2)}
+
 .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;position:relative;overflow:hidden}
-.stat-card.orange::before{background:var(--accent); content:''; position:absolute; top:0; right:0; width:60px; height:60px; border-radius:50%; opacity:0.06; transform:translate(20px,-20px)}
-.stat-card.green::before{background:var(--green); content:''; position:absolute; top:0; right:0; width:60px; height:60px; border-radius:50%; opacity:0.06; transform:translate(20px,-20px)}
-.stat-card.red::before{background:var(--red); content:''; position:absolute; top:0; right:0; width:60px; height:60px; border-radius:50%; opacity:0.06; transform:translate(20px,-20px)}
-.stat-card.blue::before{background:var(--blue); content:''; position:absolute; top:0; right:0; width:60px; height:60px; border-radius:50%; opacity:0.06; transform:translate(20px,-20px)}
-.stat-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
-.stat-value{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--text)}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;position:relative}
+.stat-label{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px}
+.stat-value{font-family:var(--font-head);font-size:24px;font-weight:800;color:var(--text)}
+.stat-trend{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.trend-up{color:var(--green)}
+
 .table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse}
 thead{background:var(--bg3)}
-th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;border-bottom:1px solid var(--border)}
-td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle}
-tr:hover td{background:var(--bg3)}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
-.badge-delivered{background:var(--green-dim);color:var(--green)}
-.badge-canceled{background:var(--red-dim);color:var(--red)}
+th{padding:12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:12px;border-bottom:1px solid var(--border);font-size:13px}
+
+.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 14px;color:var(--text);font-size:13px;width:100%;outline:none}
+.form-input[readonly]{background:var(--bg4);color:var(--text3);cursor:not-allowed}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:650px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
+.modal-header{padding:20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:12px}
+
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
 .badge-processing{background:rgba(245,166,35,0.15);color:var(--accent)}
-.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-size:13px;width:100%;outline:none}
-.form-input:focus{border-color:var(--accent)}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:680px;max-height:92vh;overflow-y:auto}
-.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
-.modal-title{font-family:var(--font-head);font-size:16px;font-weight:700}
-.modal-body{padding:20px}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;padding:16px 20px;border-top:1px solid var(--border)}
-.chart-svg{width:100%;overflow:visible}
-@media(max-width:768px){ .sidebar{display:none} .stat-grid{grid-template-columns:1fr 1fr} }
+.badge-delivered{background:var(--green-dim);color:var(--green)}
+
+.bundle-box{background:var(--bg3);border:1px solid var(--border);padding:15px;border-radius:10px;margin-bottom:12px}
+.chart-container{height:150px;width:100%;margin-top:10px}
 </style>
 </head>
 <body>
@@ -95,389 +93,128 @@ tr:hover td{background:var(--bg3)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 
 <script>
-const {useState, useEffect, useCallback, useMemo, createContext, useContext} = React;
+const h = React.createElement;
+const {useState, useEffect, useMemo} = React;
 
 // ═══════════════════════════════════════════════════════
-// API INTEGRATION (HARDCODED URL)
+// API (HARDCODED PERMANENTLY)
 // ═══════════════════════════════════════════════════════
+const API_URL = "https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec";
+
 const API = {
-  url: "https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec",
-  async call(params) {
-    try {
-      const r = await fetch(this.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(params)
-      });
-      return await r.json();
-    } catch (e) { return { success: false, error: e.message }; }
-  }
+    async call(params) {
+        try {
+            const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(params) });
+            return await r.json();
+        } catch (e) { return { success: false, error: 'Database Connection Error' }; }
+    }
 };
 
 // ═══════════════════════════════════════════════════════
-// COMPONENTS
+// APP MAIN
 // ═══════════════════════════════════════════════════════
 
 function App() {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ssUser')));
-  const [page, setPage] = useState('dashboard');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ssUser')));
+    const [page, setPage] = useState('dashboard');
 
-  if (!user) return React.createElement(LoginPage, { onLogin: (u) => { setUser(u); localStorage.setItem('ssUser', JSON.stringify(u)); } });
+    if (!user) return h(LoginPage, { onLogin: (u) => { setUser(u); localStorage.setItem('ssUser', JSON.stringify(u)); } });
 
-  const navItems = [
-    { id: 'dashboard', icon: '📊', label: 'Dashboard' },
-    { id: 'orders', icon: '📦', label: 'Orders' },
-    { id: 'analytics', icon: '📈', label: 'Analytics' },
-    { id: 'products', icon: '🏷️', label: 'Products' },
-    { id: 'staff', icon: '👥', label: 'Staff' },
-    { id: 'settings', icon: '⚙️', label: 'Settings' }
-  ].filter(i => (user.role === 'admin' || i.id === 'dashboard' || i.id === 'orders' || i.id === 'analytics' || i.id === 'settings'));
+    const nav = (id) => h('div', { className: `nav-item ${page === id ? 'active' : ''}`, onClick: () => setPage(id) }, 
+        h('span', { className: 'nav-icon' }, id === 'dashboard' ? '📊' : id === 'orders' ? '📦' : id === 'analytics' ? '📈' : id === 'products' ? '🏷️' : '👥'),
+        id.toUpperCase()
+    );
 
-  return React.createElement('div', { className: 'app' },
-    React.createElement('aside', { className: 'sidebar' },
-      React.createElement('div', { className: 'sidebar-logo' },
-        React.createElement('div', { className: 'logo-text' }, 'Shittu Stores'),
-        React.createElement('div', { className: 'logo-sub' }, 'Business Manager')
-      ),
-      React.createElement('div', { className: 'nav-section' },
-        navItems.map(n => React.createElement('div', {
-          key: n.id,
-          className: `nav-item ${page === n.id ? 'active' : ''}`,
-          onClick: () => setPage(n.id)
-        }, React.createElement('span', { className: 'nav-icon' }, n.icon), n.label))
-      ),
-      React.createElement('div', { className: 'sidebar-footer' },
-        React.createElement('div', { className: 'user-pill' },
-          React.createElement('div', { className: 'user-avatar' }, user.name[0]),
-          React.createElement('div', null, React.createElement('div', { className: 'user-name' }, user.name), React.createElement('div', { className: 'user-role' }, user.role))
+    return h('div', { className: 'app' },
+        h('aside', { className: 'sidebar' },
+            h('div', { className: 'sidebar-logo' },
+                h('div', { className: 'logo-text' }, 'SHITTU STORES'),
+                h('div', { className: 'logo-sub' }, 'Business Manager')
+            ),
+            h('div', { className: 'nav-section' },
+                h('div', { className: 'nav-section-label' }, 'Menu'),
+                nav('dashboard'),
+                nav('orders'),
+                nav('analytics'),
+                user.role === 'admin' ? nav('products') : null,
+                user.role === 'admin' ? nav('staff') : null
+            ),
+            h('div', { className: 'sidebar-footer' },
+                h('div', { className: 'user-pill' },
+                    h('div', { className: 'user-avatar' }, user.name[0]),
+                    h('div', null, h('div', { className: 'user-name' }, user.name), h('div', { className: 'user-role' }, user.role))
+                ),
+                h('button', { className: 'btn btn-secondary btn-sm', style: {width:'100%', marginTop:10}, onClick: () => { setUser(null); localStorage.removeItem('ssUser'); } }, 'Logout')
+            )
         ),
-        React.createElement('button', { className: 'btn btn-secondary btn-sm', style: { width: '100%', marginTop: 8 }, onClick: () => { setUser(null); localStorage.removeItem('ssUser'); } }, 'Logout')
-      )
-    ),
-    React.createElement('main', { className: 'main' },
-      React.createElement('div', { className: 'topbar' }, React.createElement('div', { className: 'topbar-title' }, page.toUpperCase())),
-      React.createElement('div', { className: 'content' },
-        page === 'dashboard' && React.createElement(DashboardPage, { user }),
-        page === 'orders' && React.createElement(OrdersPage, { user }),
-        page === 'analytics' && React.createElement(AnalyticsPage, { user }),
-        page === 'products' && React.createElement(ProductsPage),
-        page === 'staff' && React.createElement(StaffPage),
-        page === 'settings' && React.createElement(SettingsPage, { user })
-      )
-    )
-  );
+        h('main', { className: 'main' },
+            h('div', { className: 'topbar' }, h('div', { className: 'topbar-title' }, page.toUpperCase())),
+            h('div', { className: 'content' },
+                page === 'dashboard' && h(DashboardPage, { user }),
+                page === 'orders' && h(OrdersPage, { user }),
+                page === 'analytics' && h(AnalyticsPage, { user }),
+                page === 'products' && h(ProductsPage),
+                page === 'staff' && h(StaffPage)
+            )
+        )
+    );
 }
 
 // ═══════════════════════════════════════════════════════
-// PAGES
+// PAGES (SHOPIFY LOGIC + DARK THEME)
 // ═══════════════════════════════════════════════════════
 
 function DashboardPage({ user }) {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+    const [data, setData] = useState(null);
+    useEffect(() => {
+        API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setData(r.data));
+    }, []);
 
-  useEffect(() => {
-    API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => {
-      if (r.success) setData(r.data);
-      setLoading(false);
-    });
-  }, []);
+    const stat = (lbl, val, trend, cls) => h('div', { className: `stat-card` },
+        h('div', { className: 'stat-label' }, lbl),
+        h('div', { className: 'stat-value' }, val),
+        h('div', { className: 'stat-trend trend-up' }, trend)
+    );
 
-  if (loading) return React.createElement('div', { className: 'loading-full' }, 'Loading Dashboard...');
-
-  const stats = [
-    { label: 'Revenue (GHC)', val: data.revenue || '0', cls: 'green' },
-    { label: 'Total Orders', val: data.totalOrders || '0', cls: 'blue' },
-    { label: 'Conversion Rate', val: (data.conversion || '0') + '%', cls: 'orange' },
-    { label: 'My Payout Due', val: '₦' + (data.pendingPayout || '0'), cls: 'purple' }
-  ];
-
-  return React.createElement('div', null,
-    React.createElement('div', { className: 'stat-grid' }, stats.map(s => React.createElement('div', { key: s.label, className: `stat-card ${s.cls}` },
-      React.createElement('div', { className: 'stat-label' }, s.label),
-      React.createElement('div', { className: 'stat-value' }, s.val)
-    ))),
-    React.createElement('div', { className: 'card' },
-      React.createElement('div', { className: 'section-title', style: { marginBottom: 15 } }, 'Recent Activity'),
-      React.createElement('div', { className: 'table-wrap' },
-        React.createElement('table', null,
-          React.createElement('thead', null, React.createElement('tr', null, ['Customer', 'Product', 'Status', 'Total'].map(h => React.createElement('th', { key: h }, h)))),
-          React.createElement('tbody', null, (data.recentOrders || []).map(o => React.createElement('tr', { key: o.id },
-            React.createElement('td', null, o.customerName),
-            React.createElement('td', null, o.product),
-            React.createElement('td', null, React.createElement('span', { className: 'badge badge-processing' }, o.deliveryStatus)),
-            React.createElement('td', null, 'GHC ' + o.sellingPrice)
-          )))
+    return h('div', null,
+        h('h2', { style: { fontFamily: 'var(--font-head)', marginBottom: 25 } }, 'Welcome back, ' + user.name),
+        h('div', { className: 'stat-grid' },
+            stat('Total Sales', data?.revenue || 'GH₵ 0', '↑ 12%', 'green'),
+            stat('Total Orders', data?.totalOrders || '0', '↑ 5%', 'blue'),
+            stat('Conversion Rate', (data?.conversion || '0') + '%', 'Stable', 'orange'),
+            stat('Commission Due', '₦' + (data?.pendingPayout || '0'), 'Pending', 'purple')
+        ),
+        h('div', { className: 'card' },
+            h('div', { className: 'modal-title', style: { marginBottom: 15 } }, 'Latest Store Activity'),
+            h('div', { className: 'table-wrap' },
+                h('table', null,
+                    h('thead', null, h('tr', null, ['Customer', 'Product', 'Status', 'Amount'].map(h => h('th', null, h)))),
+                    h('tbody', null, (data?.recentOrders || []).map(o => h('tr', { key: o.id },
+                        h('td', null, o.customerName), h('td', null, o.product),
+                        h('td', null, h('span', { className: 'badge badge-processing' }, o.deliveryStatus)),
+                        h('td', null, 'GH₵ ' + o.sellingPrice)
+                    )))
+                )
+            )
         )
-      )
-    )
-  );
+    );
 }
 
 function OrdersPage({ user }) {
-  const [orders, setOrders] = useState([]);
-  const [prods, setProds] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+    const [orders, setOrders] = useState([]);
+    const [prods, setProds] = useState([]);
+    const [modal, setModal] = useState(false);
 
-  const load = () => {
-    API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data));
-    API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data));
-  };
+    const refresh = () => {
+        API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data));
+        API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data));
+    };
+    useEffect(() => refresh(), []);
 
-  useEffect(() => { load(); }, []);
-
-  return React.createElement('div', null,
-    React.createElement('div', { className: 'section-header' },
-      React.createElement('div', { className: 'section-title' }, 'Orders'),
-      React.createElement('button', { className: 'btn btn-primary', onClick: () => setShowModal(true) }, '+ New Order')
-    ),
-    React.createElement('div', { className: 'card' },
-      React.createElement('div', { className: 'table-wrap' },
-        React.createElement('table', null,
-          React.createElement('thead', null, React.createElement('tr', null, ['Customer', 'Product', 'Bundle', 'Status', 'Total'].map(h => React.createElement('th', { key: h }, h)))),
-          React.createElement('tbody', null, orders.map(o => React.createElement('tr', { key: o.id },
-            React.createElement('td', null, o.customerName),
-            React.createElement('td', null, o.product),
-            React.createElement('td', null, o.bundleLabel),
-            React.createElement('td', null, React.createElement('span', { className: 'badge badge-processing' }, o.deliveryStatus)),
-            React.createElement('td', null, 'GHC ' + o.sellingPrice)
-          )))
-        )
-      )
-    ),
-    showModal && React.createElement(OrderModal, {
-      products: prods,
-      user,
-      onClose: () => setShowModal(false),
-      onSave: () => { setShowModal(false); load(); }
-    })
-  );
-}
-
-function OrderModal({ products, user, onClose, onSave }) {
-  const [f, setF] = useState({ customerName: '', phone: '', product: '', bundleLabel: '', sellingPrice: '', costOfProduct: '', isCustom: false });
-  const [bundles, setBundles] = useState([]);
-
-  const handleProductChange = (prodName) => {
-    const prod = products.find(p => p.name === prodName);
-    const bndl = prod ? JSON.parse(prod.bundles || '[]') : [];
-    setBundles(bndl);
-    setF({ ...f, product: prodName, bundleLabel: '', sellingPrice: '', costOfProduct: '' });
-  };
-
-  const handleBundleChange = (label) => {
-    if (label === 'CUSTOM') {
-      setF({ ...f, bundleLabel: 'CUSTOM', isCustom: true, sellingPrice: '', costOfProduct: '' });
-    } else {
-      const b = bundles.find(x => x.label === label);
-      setF({ ...f, bundleLabel: label, isCustom: false, sellingPrice: b.sellingPrice, costOfProduct: b.costPrice });
-    }
-  };
-
-  const save = async () => {
-    const r = await API.call({ action: 'addOrder', order: JSON.stringify({ ...f, createdBy: user.username }) });
-    if (r.success) onSave(); else alert(r.error);
-  };
-
-  return React.createElement('div', { className: 'modal-overlay' },
-    React.createElement('div', { className: 'modal' },
-      React.createElement('div', { className: 'modal-header' }, React.createElement('div', { className: 'modal-title' }, 'New Order')),
-      React.createElement('div', { className: 'modal-body' },
-        React.createElement('div', { style: { display: 'grid', gap: 10 } },
-          React.createElement('input', { className: 'form-input', placeholder: 'Customer Name', onChange: e => setF({ ...f, customerName: e.target.value }) }),
-          React.createElement('input', { className: 'form-input', placeholder: 'Phone Number', onChange: e => setF({ ...f, phone: e.target.value }) }),
-          React.createElement('select', { className: 'form-select', onChange: e => handleProductChange(e.target.value) },
-            React.createElement('option', null, '-- Select Product --'),
-            products.map(p => React.createElement('option', { key: p.id, value: p.name }, p.name))
-          ),
-          React.createElement('select', { className: 'form-select', onChange: e => handleBundleChange(e.target.value) },
-            React.createElement('option', null, '-- Select Bundle --'),
-            bundles.map(b => React.createElement('option', { key: b.label, value: b.label }, b.label + ' (GHC ' + b.sellingPrice + ')')),
-            React.createElement('option', { value: 'CUSTOM' }, '✏️ Custom Order')
-          ),
-          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 } },
-            React.createElement('input', { className: 'form-input', type: 'number', placeholder: 'Price', value: f.sellingPrice, readOnly: !f.isCustom, onChange: e => setF({ ...f, sellingPrice: e.target.value }) }),
-            React.createElement('input', { className: 'form-input', type: 'number', placeholder: 'Internal Cost', value: f.costOfProduct, readOnly: !f.isCustom, onChange: e => setF({ ...f, costOfProduct: e.target.value }) })
-          )
-        )
-      ),
-      React.createElement('div', { className: 'modal-footer' },
-        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'),
-        React.createElement('button', { className: 'btn btn-primary', onClick: save }, 'Place Order')
-      )
-    )
-  );
-}
-
-// ═══════════════════════════════════════════════════════
-// ANALYTICS (SHOPIFY STYLE CHARTS)
-// ═══════════════════════════════════════════════════════
-
-function AnalyticsPage({ user }) {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    API.call({ action: 'getOrders' }).then(r => {
-      if (r.success) setOrders(r.data);
-      setLoading(false);
-    });
-  }, []);
-
-  if (loading) return React.createElement('div', null, 'Loading Analytics...');
-
-  // Simple Bar calculation for chart
-  const last7Days = [...Array(7)].map((_, i) => {
-    const d = new Date(); d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    const count = orders.filter(o => o.date === dateStr).length;
-    return { label: dateStr.split('-')[2], val: count };
-  }).reverse();
-
-  const maxVal = Math.max(...last7Days.map(d => d.val), 1);
-
-  return React.createElement('div', null,
-    React.createElement('div', { className: 'card', style: { marginBottom: 20 } },
-      React.createElement('div', { className: 'section-title' }, 'Sales Over Time'),
-      React.createElement('div', { style: { display: 'flex', alignItems: 'flex-end', gap: 8, height: 120, marginTop: 20 } },
-        last7Days.map((d, i) => React.createElement('div', { key: i, style: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' } },
-          React.createElement('div', { style: { width: '100%', background: 'var(--accent)', height: (d.val / maxVal * 80) + 'px', borderRadius: '4px 4px 0 0' } }),
-          React.createElement('div', { style: { fontSize: 10, marginTop: 4 } }, d.label)
-        ))
-      )
-    ),
-    React.createElement('div', { className: 'card' },
-      React.createElement('div', { className: 'section-title' }, 'Orders by Status'),
-      ['Processing', 'Delivered', 'Canceled'].map(s => {
-        const count = orders.filter(o => o.deliveryStatus === s).length;
-        const pct = orders.length ? (count / orders.length * 100) : 0;
-        return React.createElement('div', { key: s, style: { marginTop: 15 } },
-          React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 4 } },
-            React.createElement('span', null, s), React.createElement('span', null, count)
-          ),
-          React.createElement('div', { style: { height: 6, background: 'var(--bg4)', borderRadius: 3 } },
-            React.createElement('div', { style: { height: '100%', width: pct + '%', background: 'var(--accent)', borderRadius: 3 } })
-          )
-        );
-      })
-    )
-  );
-}
-
-function ProductsPage() {
-  const [list, setList] = useState([]);
-  const [showModal, setShowModal] = useState(false);
-
-  const load = () => API.call({ action: 'getProducts' }).then(r => r.success && setList(r.data));
-  useEffect(() => { load(); }, []);
-
-  return React.createElement('div', null,
-    React.createElement('div', { className: 'section-header' },
-      React.createElement('div', { className: 'section-title' }, 'Products'),
-      React.createElement('button', { className: 'btn btn-primary', onClick: () => setShowModal(true) }, '+ Add Product')
-    ),
-    React.createElement('div', { className: 'card' },
-      React.createElement('table', null,
-        React.createElement('thead', null, React.createElement('tr', null, ['Name', 'Bundles', 'Status'].map(h => React.createElement('th', { key: h }, h)))),
-        React.createElement('tbody', null, list.map(p => React.createElement('tr', { key: p.id },
-          React.createElement('td', null, p.name),
-          React.createElement('td', null, JSON.parse(p.bundles || '[]').length),
-          React.createElement('td', null, React.createElement('span', { className: 'badge badge-delivered' }, 'Active'))
-        )))
-      )
-    ),
-    showModal && React.createElement(ProductModal, { onClose: () => setShowModal(false), onSave: () => { setShowModal(false); load(); } })
-  );
-}
-
-function ProductModal({ onClose, onSave }) {
-  const [form, setForm] = useState({ name: '', bundles: [] });
-
-  const addBundle = () => setForm({ ...form, bundles: [...form.bundles, { label: '', qty: 1, sellingPrice: '', costPrice: '' }] });
-  const updateBundle = (i, k, v) => {
-    const b = [...form.bundles]; b[i][k] = v; setForm({ ...form, bundles: b });
-  };
-
-  const save = async () => {
-    const r = await API.call({ action: 'addProduct', product: JSON.stringify({ ...form, bundles: JSON.stringify(form.bundles) }) });
-    if (r.success) onSave(); else alert(r.error);
-  };
-
-  return React.createElement('div', { className: 'modal-overlay' },
-    React.createElement('div', { className: 'modal' },
-      React.createElement('div', { className: 'modal-header' }, React.createElement('div', { className: 'modal-title' }, 'Add Product')),
-      React.createElement('div', { className: 'modal-body' },
-        React.createElement('input', { className: 'form-input', placeholder: 'Product Name', onChange: e => setForm({ ...form, name: e.target.value }) }),
-        React.createElement('div', { style: { marginTop: 20, fontWeight: 700 } }, 'Bundles'),
-        form.bundles.map((b, i) => React.createElement('div', { key: i, style: { border: '1px solid var(--border)', padding: 10, marginTop: 10, borderRadius: 8 } },
-          React.createElement('input', { className: 'form-input', placeholder: 'Bundle Name (e.g. 1 Unit)', onChange: e => updateBundle(i, 'label', e.target.value) }),
-          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 } },
-            React.createElement('input', { className: 'form-input', type: 'number', placeholder: 'Selling Price', onChange: e => updateBundle(i, 'sellingPrice', e.target.value) }),
-            React.createElement('input', { className: 'form-input', type: 'number', placeholder: 'Cost Price', onChange: e => updateBundle(i, 'costPrice', e.target.value) })
-          )
-        )),
-        React.createElement('button', { className: 'btn btn-secondary', style: { width: '100%', marginTop: 10 }, onClick: addBundle }, '+ Add Bundle')
-      ),
-      React.createElement('div', { className: 'modal-footer' },
-        React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'),
-        React.createElement('button', { className: 'btn btn-primary', onClick: save }, 'Save Product')
-      )
-    )
-  );
-}
-
-function StaffPage() {
-  const [staff, setStaff] = useState([]);
-  const load = () => API.call({ action: 'getStaff' }).then(r => r.success && setStaff(r.data));
-  useEffect(() => { load(); }, []);
-
-  return React.createElement('div', null,
-    React.createElement('div', { className: 'section-title', style: { marginBottom: 20 } }, 'Staff Management'),
-    React.createElement('div', { className: 'card' },
-      React.createElement('table', null,
-        React.createElement('thead', null, React.createElement('tr', null, ['Name', 'Username', 'Role'].map(h => React.createElement('th', { key: h }, h)))),
-        React.createElement('tbody', null, staff.map(s => React.createElement('tr', { key: s.id },
-          React.createElement('td', null, s.name),
-          React.createElement('td', null, s.username),
-          React.createElement('td', null, s.role)
-        )))
-      )
-    )
-  );
-}
-
-function SettingsPage({ user }) {
-  return React.createElement('div', null,
-    React.createElement('div', { className: 'card' },
-      React.createElement('h3', null, 'Settings'),
-      React.createElement('p', { style: { marginTop: 10, color: 'var(--text3)' } }, 'User: ' + user.name),
-      React.createElement('p', { style: { color: 'var(--text3)' } }, 'Role: ' + user.role),
-      React.createElement('p', { style: { color: 'var(--accent)', marginTop: 20 } }, 'System Connected to Apps Script Database')
-    )
-  );
-}
-
-function LoginPage({ onLogin }) {
-  const [u, setU] = useState('');
-  const [p, setP] = useState('');
-  const handle = async () => {
-    const r = await API.call({ action: 'login', username: u, password: p });
-    if (r.success && !r.data.error) onLogin(r.data); else alert('Invalid Credentials');
-  };
-
-  return React.createElement('div', { className: 'login-wrap' },
-    React.createElement('div', { className: 'login-card' },
-      React.createElement('div', { className: 'login-logo' }, 'Shittu Stores'),
-      React.createElement('input', { className: 'form-input', placeholder: 'Username', onChange: e => setU(e.target.value) }),
-      React.createElement('input', { className: 'form-input', type: 'password', placeholder: 'Password', style: { marginTop: 10 }, onChange: e => setP(e.target.value) }),
-      React.createElement('button', { className: 'btn btn-primary', style: { width: '100%', marginTop: 20 }, onClick: handle }, 'Sign In')
-    )
-  );
-}
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(App));
-</script>
-</body>
-</html>
+    return h('div', null,
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } },
+            h('h2', null, 'Order Management'),
+            h('button', { className: 'btn btn-primary', onClick: () => setModal(true) }, '+ Create New')
+        ),
+        h('div', { className: 'card' },
+            h('div', { className: 'table-wrap' },

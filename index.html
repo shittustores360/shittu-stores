@@ -152,23 +152,18 @@ tr:hover td{background:var(--bg3)}
 .bar-wrap{background:var(--bg4);border-radius:3px;height:6px;overflow:hidden;margin-top:3px}
 .bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
 .chart-svg{width:100%;overflow:visible}
-
-/* Bundle row in product modal */
 .bundle-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;position:relative}
 .bundle-row-header{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}
 .bundle-free-gift-row{display:flex;align-items:center;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 .bundle-free-gift-row label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer}
 .bundle-free-gift-row input[type=radio]{accent-color:var(--accent)}
 .bundle-gift-cost{display:flex;align-items:center;gap:8px;margin-left:8px}
-
-/* Order bundle info card */
 .bundle-info-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-top:8px}
 .bundle-info-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
 .bundle-info-row:last-child{border-bottom:none;margin-top:4px;padding-top:8px}
 .bundle-info-label{color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;font-size:11px}
 .bundle-info-value{font-family:var(--font-mono);font-weight:600;color:var(--text)}
 .bundle-info-gift{color:var(--green);font-size:11px;display:flex;align-items:center;gap:4px;margin-top:6px}
-
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -190,12 +185,9 @@ tr:hover td{background:var(--bg3)}
 <script>
 const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext} = React;
 
-// ═══════════════════════════════════════════════════════
-// SPEED LAYER — SWR-style cache with background revalidation
-// ═══════════════════════════════════════════════════════
 const _cache = {};
 const _inflight = {};
-const CACHE_TTL = 90000; // 90s stale-while-revalidate
+const CACHE_TTL = 90000;
 
 function cacheGet(k){ const e=_cache[k]; if(e)return e; return null; }
 function cacheSet(k,v){ _cache[k]={v,ts:Date.now()}; }
@@ -204,7 +196,6 @@ function cacheBust(keys){
   else { Object.keys(_cache).forEach(k=>delete _cache[k]); }
 }
 
-// Mutation → bust only related caches
 const BUST_MAP = {
   addOrder:['getOrders','getDashboard','getMyDashboard'],
   updateOrder:['getOrders','getDashboard','getMyDashboard'],
@@ -217,9 +208,6 @@ const BUST_MAP = {
   addPayoutRecord:['getPayoutRecords','getDashboard'],
 };
 
-// ═══════════════════════════════════════════════════════
-// API — with request dedup and smart cache busting
-// ═══════════════════════════════════════════════════════
 const API = {
   url: localStorage.getItem('apiUrl')||'',
   setUrl(u){ this.url=u; localStorage.setItem('apiUrl',u); },
@@ -228,19 +216,13 @@ const API = {
     const key = JSON.stringify(params);
     const action = params.action||'';
     const isRead = action.startsWith('get')||action.startsWith('fetch');
-    
-    // Return cached if fresh enough
     if(isRead){ 
       const c=cacheGet(key); 
       if(c && Date.now()-c.ts < CACHE_TTL) return {success:true,data:c.v,_cached:true}; 
     }
-    
-    // Deduplicate in-flight requests (for reads)
     if(isRead && _inflight[key]){ return _inflight[key]; }
-    
     const promise = this._fetch(params, key, isRead);
     if(isRead) _inflight[key] = promise;
-    
     try {
       const result = await promise;
       return result;
@@ -266,20 +248,16 @@ const API = {
       return data;
     }catch(e){ return {success:false,error:e.message}; }
   },
-  // Background prefetch — fire and forget
   prefetch(action){
     if(!this.url) return;
     const params={action};
     const key=JSON.stringify(params);
     const c=cacheGet(key);
-    if(c && Date.now()-c.ts<CACHE_TTL) return; // already fresh
+    if(c && Date.now()-c.ts<CACHE_TTL) return;
     this.call(params);
   }
 };
 
-// ═══════════════════════════════════════════════════════
-// THEME CONTEXT
-// ═══════════════════════════════════════════════════════
 const ThemeCtx = createContext({theme:'dark',toggleTheme:()=>{}});
 function ThemeProvider({children}){
   const [theme,setTheme]=useState(()=>localStorage.getItem('ssTheme')||'dark');
@@ -291,9 +269,6 @@ function ThemeProvider({children}){
   return React.createElement(ThemeCtx.Provider,{value:{theme,toggleTheme}},children);
 }
 
-// ═══════════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════════
 let _toastFn=null;
 function useToast(){
   const [toasts,setToasts]=useState([]);
@@ -308,18 +283,12 @@ function useToast(){
 }
 const toast=(msg,type)=>_toastFn&&_toastFn(msg,type);
 
-// ═══════════════════════════════════════════════════════
-// CONSTANTS
-// ═══════════════════════════════════════════════════════
 const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
 const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
 const PERMS_LIST=['view_orders','add_orders','edit_orders','delete_orders','view_financials','view_dashboard','manage_expenses'];
 const STAFF_PAYOUT_NGN=2000;
 
-// ═══════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════
 function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
 function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
 function fmtGHC(n){return `GH₵${fmt(n,2)}`;}
@@ -350,12 +319,8 @@ function supplierOwnsOrder(order,products,user){
     assigned.includes(order.product);
 }
 
-// ═══════════════════════════════════════════════════════
-// SWR-STYLE DATA HOOK
-// ═══════════════════════════════════════════════════════
 function useData(action,enabled=true){
   const [data,setData]=useState(()=>{
-    // Serve stale cache immediately if available
     if(!enabled||!API.url) return null;
     const cached=cacheGet(JSON.stringify({action}));
     return cached?cached.v:null;
@@ -363,19 +328,17 @@ function useData(action,enabled=true){
   const [loading,setLoading]=useState(()=>{
     if(!enabled||!API.url) return false;
     const cached=cacheGet(JSON.stringify({action}));
-    return !cached; // not loading if we have cache
+    return !cached;
   });
   const [error,setError]=useState('');
   
   const load=useCallback(async(forceRefresh=false)=>{
     if(!enabled){setLoading(false);return;}
     if(!API.url){setLoading(false);return;}
-    // If we have cache and not forced, background revalidate
     const cached=cacheGet(JSON.stringify({action}));
     if(cached && !forceRefresh){
       setData(cached.v);
       setLoading(false);
-      // Background refresh if stale
       if(Date.now()-cached.ts > CACHE_TTL/2){
         API.call({action}).then(r=>{ if(r.success&&!r._cached) setData(r.data||[]); });
       }
@@ -392,9 +355,6 @@ function useData(action,enabled=true){
   return {data,loading,error,reload:()=>load(true),setData};
 }
 
-// ═══════════════════════════════════════════════════════
-// MINI SVG CHARTS
-// ═══════════════════════════════════════════════════════
 function BarChart({data,color='var(--accent)',height=80}){
   if(!data||data.length===0)return null;
   const max=Math.max(...data.map(d=>d.value),1);
@@ -437,9 +397,6 @@ function LineChart({data,color='var(--accent)',height=80}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// APP SHELL
-// ═══════════════════════════════════════════════════════
 function App(){
   const toasts=useToast();
   const [sidebarOpen,setSidebarOpen]=useState(false);
@@ -492,7 +449,6 @@ function App(){
 
 function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,toasts,children}){
   const {theme,toggleTheme}=useContext(ThemeCtx);
-  // Prefetch on hover
   const prefetchOnHover=(id)=>{
     const actionMap={dashboard:'getDashboard',orders:'getOrders',financials:'getOrders',analytics:'getOrders',expenses:'getExpenses',products:'getProducts',staff:'getStaff',suppliers:'getSuppliers'};
     if(actionMap[id]) API.prefetch(actionMap[id]);
@@ -541,9 +497,6 @@ function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,toas
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// LOGIN
-// ═══════════════════════════════════════════════════════
 function LoginPage({onLogin}){
   const [u,setU]=useState('');const [p,setP]=useState('');const [err,setErr]=useState('');const [loading,setLoading]=useState(false);const [showPw,setShowPw]=useState(false);
   const submit=async e=>{
@@ -576,9 +529,6 @@ function LoginPage({onLogin}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// DASHBOARD
-// ═══════════════════════════════════════════════════════
 function DashboardPage({user,isAdmin,isSupplier,isCC}){
   const {data,loading,reload}=useData('getDashboard',isAdmin);
   const [myData,setMyData]=useState(null);
@@ -679,7 +629,7 @@ function AdminDashboard({data,reload}){
         React.createElement(LineChart,{data:monthlyData.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:90})
       )
     ),
-    d.staffPayouts?.length>0&&React.createElement('div',{className:'card',style:{marginBottom:20}},
+    d.staffPayouts&&d.staffPayouts.length>0&&React.createElement('div',{className:'card',style:{marginBottom:20}},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Staff Payout Summary'),
       React.createElement('div',{className:'table-wrap'},
         React.createElement('table',null,
@@ -698,7 +648,7 @@ function AdminDashboard({data,reload}){
         )
       )
     ),
-    d.supplierSummary?.length>0&&React.createElement('div',{className:'card'},
+    d.supplierSummary&&d.supplierSummary.length>0&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Supplier Summary'),
       React.createElement('div',{className:'table-wrap'},
         React.createElement('table',null,
@@ -761,9 +711,6 @@ function SupplierDashboard({data,loading,user}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// ORDERS — Optimistic updates
-// ═══════════════════════════════════════════════════════
 function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const [orders,setOrders]=useState([]);
   const [loading,setLoading]=useState(true);
@@ -781,7 +728,6 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     setLoading(true);
     const params={action:'getOrders'};
     if(isSupplier)params.supplierUsername=user.username;
-    // Parallel fetch all needed data
     const [or,pr,sf]=await Promise.all([
       API.call(params),
       API.call({action:'getProducts'}),
@@ -794,7 +740,6 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   },[isSupplier,user.username]);
   
   useEffect(()=>{
-    // Serve from cache instantly if available
     const key=JSON.stringify({action:'getOrders',...(isSupplier?{supplierUsername:user.username}:{})});
     const cached=cacheGet(key);
     if(cached){setOrders(cached.v);setLoading(false);}
@@ -987,9 +932,6 @@ function ContactedByModal({staffList,onConfirm,onClose}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// ORDER MODAL — Fixed syntax error in isCustom block
-// ═══════════════════════════════════════════════════════
 function OrderModal({order,products,user,isAdmin,onSave,onClose}){
   const isEdit=!!order;
   const [f,setF]=useState(()=>order?{...order}:{
@@ -1000,14 +942,14 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     isCustom:false
   });
   const [saving,setSaving]=useState(false);
-  const [showContact2,setShowContact2]=useState(!!(order?.contact2));
+  const [showContact2,setShowContact2]=useState(!!(order&&order.contact2));
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
 
   const prod=useMemo(()=>products.find(p=>p.name===f.product),[f.product,products]);
-  const bundles=useMemo(()=>{try{return JSON.parse(prod?.bundles||'[]');}catch{return[];}},[prod]);
+  const bundles=useMemo(()=>{try{return JSON.parse(prod&&prod.bundles||'[]');}catch{return[];}},[prod]);
   const sizes=useMemo(()=>{
     if(!prod||(prod.hasSizes!==true&&prod.hasSizes!=='true'))return[];
-    try{return JSON.parse(prod?.sizes||'[]');}catch{return[];}
+    try{return JSON.parse(prod&&prod.sizes||'[]');}catch{return[];}
   },[prod]);
 
   const prevProduct=useRef(f.product);
@@ -1025,7 +967,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
 
   const isCustom=f.bundleLabel==='__custom__'||f.isCustom;
   
-  // The selected bundle object
   const selectedBundle=useMemo(()=>{
     if(isCustom||!f.bundleLabel)return null;
     return bundles.find(b=>b.label===f.bundleLabel)||null;
@@ -1038,14 +979,14 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     }
     const b=bundles.find(x=>x.label===sel);
     if(!b)return;
-    const supplierUsernames=readList(prod?.supplierUsernames||prod?.supplierUsername);
+    const supplierUsernames=readList(prod&&prod.supplierUsernames||prod&&prod.supplierUsername);
     setF(p=>({...p,
       bundleLabel:b.label,
       qty:b.qty,
       sellingPrice:b.sellingPrice||b.price||'',
       costOfProduct:b.costPrice||b.cost||'',
       isCustom:false,
-      supplierUsername:supplierUsernames[0]||prod?.supplierUsernames||p.supplierUsername||''
+      supplierUsername:supplierUsernames[0]||p.supplierUsername||''
     }));
   };
 
@@ -1073,7 +1014,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
       :await API.call({action:'addOrder',order:JSON.stringify(payload)});
     setSaving(false);
     if(r.success){
-      const saved=isEdit?payload:{...payload,id:r.data?.id||('tmp_'+Date.now())};
+      const saved=isEdit?payload:{...payload,id:r.data&&r.data.id||('tmp_'+Date.now())};
       onSave(saved);
     }else toast(r.error||'Save failed','error');
   };
@@ -1086,6 +1027,14 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     )
   );
 
+  // FIX: build gift text safely without trailing comma issue
+  const buildGiftText=(bundle)=>{
+    let txt='🎁 Free gift included';
+    if(bundle.freeGiftCost) txt+=` — Cost: ${fmtGHC(bundle.freeGiftCost)}`;
+    if(bundle.freeGiftName) txt+=` (${bundle.freeGiftName})`;
+    return txt;
+  };
+
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal modal-lg'},
       React.createElement('div',{className:'modal-header'},
@@ -1093,7 +1042,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')
       ),
       React.createElement('div',{className:'modal-body'},
-        // ── Customer ──
         React.createElement('div',{className:'section-divider'},'Customer'),
         React.createElement('div',{className:'form-group',style:{marginBottom:12}},
           React.createElement('label',{className:'form-label'},'Order Date *'),
@@ -1116,7 +1064,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
           React.createElement('textarea',{className:'form-textarea',rows:2,value:f.address||'',onChange:set('address')})
         ),
 
-        // ── Product & Bundle ──
         React.createElement('div',{className:'section-divider'},'Product & Bundle'),
         React.createElement('div',{className:'form-group',style:{marginBottom:12}},
           React.createElement('label',{className:'form-label'},'Product *'),
@@ -1131,14 +1078,12 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
           React.createElement('select',{className:'form-select',value:isCustom?'__custom__':f.bundleLabel||'',onChange:e=>pickBundle(e.target.value)},
             React.createElement('option',{value:''},'— Select Bundle —'),
             bundles.map(b=>React.createElement('option',{key:b.label,value:b.label},
-              `${b.label} — ${fmtGHC(b.sellingPrice||b.price||0)}`+
-              (b.hasFreeGift?` 🎁 Free Gift incl.`:'')
+              b.label+' — '+fmtGHC(b.sellingPrice||b.price||0)+(b.hasFreeGift?' 🎁 Free Gift incl.':'')
             )),
             React.createElement('option',{value:'__custom__'},'✏ Custom / Special Order')
           )
         ),
 
-        // Bundle info card
         selectedBundle&&!isCustom&&React.createElement('div',{className:'bundle-info-card',style:{marginBottom:14}},
           React.createElement('div',{className:'bundle-info-row'},
             React.createElement('span',{className:'bundle-info-label'},'Selling Price'),
@@ -1152,11 +1097,8 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             React.createElement('span',{className:'bundle-info-label'},'Quantity'),
             React.createElement('span',{className:'bundle-info-value'},selectedBundle.qty||1)
           ),
-          selectedBundle.hasFreeGift&&React.createElement('div',{className:'bundle-info-gift'},
-            '🎁 Free gift included',
-            selectedBundle.freeGiftCost?` — Cost: ${fmtGHC(selectedBundle.freeGiftCost)}`:'',
-            selectedBundle.freeGiftName?` (${selectedBundle.freeGiftName})`:'',
-          )
+          // FIX: no trailing comma — use helper function instead
+          selectedBundle.hasFreeGift&&React.createElement('div',{className:'bundle-info-gift'},buildGiftText(selectedBundle))
         ),
 
         isAdmin&&selectedBundle&&!isCustom&&React.createElement('div',null,
@@ -1222,9 +1164,6 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// FINANCIALS
-// ═══════════════════════════════════════════════════════
 function FinancialsPage({isAdmin}){
   const [tab,setTab]=useState('overview');
   const [orders,setOrders]=useState([]);
@@ -1250,9 +1189,10 @@ function FinancialsPage({isAdmin}){
   },[]);
   useEffect(()=>{load();},[load]);
 
+  // FIX: guard lastExRate with || 0 so netProfitNGN never becomes NaN
   const lastExRate=useMemo(()=>{
     const s=[...withdrawals].sort((a,b)=>new Date(b.date)-new Date(a.date));
-    return s[0]?.exchangeRate||null;
+    return s[0]&&s[0].exchangeRate?s[0].exchangeRate:null;
   },[withdrawals]);
 
   const paid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
@@ -1263,7 +1203,8 @@ function FinancialsPage({isAdmin}){
   const totalAdSpend=expenses.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
   const totalWdNGN=withdrawals.reduce((s,w)=>s+sp(w.amountNGN),0);
   const totalWdGHC=withdrawals.reduce((s,w)=>s+sp(w.amountGHC),0);
-  const netProfitNGN=profitGHC*sp(lastExRate)-totalAdSpend;
+  // FIX: use sp() safely — sp(null) returns 0, so netProfitNGN stays numeric
+  const netProfitNGN=lastExRate!=null?(profitGHC*sp(lastExRate)-totalAdSpend):0;
   const pendRevGHC=delivUnpaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
 
   return React.createElement('div',null,
@@ -1278,7 +1219,7 @@ function FinancialsPage({isAdmin}){
           {label:'Revenue in GHC',value:fmtGHC(totalRevGHC),sub:'From paid orders',cls:'green'},
           {label:'Revenue in NGN',value:fmtNGN(totalWdNGN),sub:'Total withdrawn GHC→NGN',cls:'green'},
           {label:'Gross Profit (GHC)',value:fmtGHC(profitGHC),sub:'After product+delivery costs',cls:'orange'},
-          {label:'Net Profit After Ads',value:fmtNGN(netProfitNGN),sub:`Ad spend: ${fmtNGN(totalAdSpend)}`,cls:netProfitNGN>=0?'green':'red'},
+          {label:'Net Profit After Ads',value:lastExRate!=null?fmtNGN(netProfitNGN):'Set exchange rate',sub:`Ad spend: ${fmtNGN(totalAdSpend)}`,cls:netProfitNGN>=0?'green':'red'},
           {label:'Pending Revenue (GHC)',value:fmtGHC(pendRevGHC),sub:'Delivered, unpaid',cls:'orange'},
           {label:'Last Exchange Rate',value:lastExRate?`₦${lastExRate}/GH₵`:'Not set',sub:'From last withdrawal',cls:'blue'},
           {label:'Total GHC Withdrawn',value:fmtGHC(totalWdGHC),sub:'GHC converted to NGN',cls:'blue'},
@@ -1431,9 +1372,6 @@ function WithdrawalModal({onSave,onClose}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// ANALYTICS
-// ═══════════════════════════════════════════════════════
 function AnalyticsPage({user,isAdmin,isSupplier}){
   const [orders,setOrders]=useState([]);
   const [loading,setLoading]=useState(true);
@@ -1571,9 +1509,6 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// EXPENSES
-// ═══════════════════════════════════════════════════════
 function ExpensesPage({isAdmin}){
   const {data,loading,reload}=useData('getExpenses');
   const [showAdd,setShowAdd]=useState(false);
@@ -1636,9 +1571,6 @@ function ExpensesPage({isAdmin}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// PRODUCTS — with bundle-level pricing + per-bundle free gift
-// ═══════════════════════════════════════════════════════
 function ProductsPage(){
   const {data,loading,reload}=useData('getProducts');
   const [showModal,setShowModal]=useState(false);
@@ -1682,7 +1614,8 @@ function ProductsPage(){
                   bundles.some(b=>b.hasFreeGift)&&React.createElement('div',{style:{fontSize:10,color:'var(--green)',marginTop:2}},'🎁 Some have free gifts')
                 ):'—'
               ),
-              React.createElement('td',null,(p.hasSizes===true||p.hasSizes!=='true')?'✓':'—'),
+              // FIX: was (p.hasSizes===true||p.hasSizes!=='true') — double negative always true
+              React.createElement('td',null,(p.hasSizes===true||p.hasSizes==='true')?'✓':'—'),
               React.createElement('td',null,productSuppliers||'None'),
               React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(p.active)?'badge-delivered':'badge-canceled'}`},isActive(p.active)?'Active':'Inactive')),
               React.createElement('td',null,
@@ -1702,19 +1635,16 @@ function ProductsPage(){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// PRODUCT MODAL — Fixed syntax errors in bundles section
-// ═══════════════════════════════════════════════════════
 function ProductModal({product,onSave,onClose}){
   const isEdit=!!product;
   const [f,setF]=useState(product?{...product}:{name:'',description:'',active:true,hasSizes:false});
   const [saving,setSaving]=useState(false);
-  const [sizes,setSizes]=useState(()=>{try{return JSON.parse(product?.sizes||'[]');}catch{return[];}});
+  const [sizes,setSizes]=useState(()=>{try{return JSON.parse(product&&product.sizes||'[]');}catch{return[];}});
   const [sizeInput,setSizeInput]=useState('');
 
   const [bundles,setBundles]=useState(()=>{
     try{
-      const raw=JSON.parse(product?.bundles||'[]');
+      const raw=JSON.parse(product&&product.bundles||'[]');
       return raw.map(b=>({
         label:b.label||'',
         qty:b.qty||1,
@@ -1728,7 +1658,7 @@ function ProductModal({product,onSave,onClose}){
   });
 
   const {data:suppliers}=useData('getSuppliers');
-  const [assignedSuppliers,setAssignedSuppliers]=useState(()=>readList(product?.supplierUsernames||product?.supplierUsername));
+  const [assignedSuppliers,setAssignedSuppliers]=useState(()=>readList(product&&product.supplierUsernames||product&&product.supplierUsername));
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
 
   const addSize=()=>{if(sizeInput.trim()){setSizes(s=>[...s,sizeInput.trim()]);setSizeInput('');}};
@@ -1749,8 +1679,8 @@ function ProductModal({product,onSave,onClose}){
       supplierNames:supplierNames.join(', '),
       sizes:JSON.stringify(sizes),
       bundles:JSON.stringify(bundles),
-      costGHC:bundles[0]?.costPrice||'',
-      sellingPriceGHC:bundles[0]?.sellingPrice||'',
+      costGHC:bundles[0]&&bundles[0].costPrice||'',
+      sellingPriceGHC:bundles[0]&&bundles[0].sellingPrice||'',
     };
     const r=isEdit?await API.call({action:'updateProduct',id:product.id,product:JSON.stringify(data)})
                   :await API.call({action:'addProduct',product:JSON.stringify(data)});
@@ -1911,9 +1841,6 @@ function PriceHistoryModal({product,onClose}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// STAFF
-// ═══════════════════════════════════════════════════════
 function StaffPage(){
   const {data,loading,reload}=useData('getStaff');
   const [showModal,setShowModal]=useState(false);
@@ -1971,7 +1898,7 @@ function StaffModal({staff,onSave,onClose}){
   const isEdit=!!staff;
   const [f,setF]=useState(staff?{...staff}:{name:'',username:'',password:'',role:'staff',active:true,permissions:''});
   const [selPerms,setSelPerms]=useState(()=>{
-    if(!staff||staff.permissions==='all')return staff?.permissions==='all'?['all']:[];
+    if(!staff||staff.permissions==='all')return staff&&staff.permissions==='all'?['all']:[];
     return (staff.permissions||'').split(',').map(s=>s.trim()).filter(Boolean);
   });
   const [saving,setSaving]=useState(false);
@@ -2020,9 +1947,6 @@ function StaffModal({staff,onSave,onClose}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// SUPPLIERS
-// ═══════════════════════════════════════════════════════
 function SuppliersPage(){
   const [suppliers,setSuppliers]=useState([]);
   const [products,setProducts]=useState([]);
@@ -2081,7 +2005,7 @@ function SuppliersPage(){
 function SupplierModal({supplier,products,onSave,onClose}){
   const isEdit=!!supplier;
   const [f,setF]=useState(supplier?{...supplier}:{name:'',username:'',password:'',active:true});
-  const [selected,setSelected]=useState(()=>readList(supplier?.assignedProducts||supplier?.products));
+  const [selected,setSelected]=useState(()=>readList(supplier&&supplier.assignedProducts||supplier&&supplier.products));
   const [saving,setSaving]=useState(false);
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const toggleProduct=name=>setSelected(prev=>prev.includes(name)?prev.filter(x=>x!==name):[...prev,name]);
@@ -2119,9 +2043,6 @@ function SupplierModal({supplier,products,onSave,onClose}){
   );
 }
 
-// ═══════════════════════════════════════════════════════
-// SETTINGS
-// ═══════════════════════════════════════════════════════
 function SettingsPage({user}){
   const [url,setUrl]=useState(API.url||'');
   const [saved,setSaved]=useState(false);

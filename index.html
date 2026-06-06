@@ -28,11 +28,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .content{flex:1;overflow-y:auto;padding:24px}
 .sidebar-logo{padding:20px 16px 8px;border-bottom:1px solid var(--border);margin-bottom:8px}
 .logo-text{font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--accent);letter-spacing:-0.5px}
-.nav-section{padding:8px 8px 0;}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all var(--transition);margin-bottom:2px}
 .nav-item.active{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(245,166,35,0.2)}
 .sidebar-footer{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
 .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;}
 .stat-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:6px}
 .stat-value{font-family:var(--font-head);font-size:20px;font-weight:700;}
@@ -44,238 +43,222 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 table{width:100%;border-collapse:collapse}
 th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;background:var(--bg3)}
 td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px}
-.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-size:13px;width:100%;outline:none}
+.form-input,.form-select{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-size:13px;width:100%;outline:none}
 .form-input[readonly]{background:var(--bg4);color:var(--text3);cursor:not-allowed}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:680px;max-height:92vh;overflow-y:auto}
-.section-divider{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px)}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:650px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column}
 .bundle-item-card{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:15px;margin-bottom:12px}
 .radio-group{display:flex;gap:15px;margin-top:5px}
 .radio-label{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer}
-.locked-info{background:var(--accent-dim);border:1px solid rgba(245,166,35,0.2);padding:10px;border-radius:8px;margin-bottom:15px;font-size:12px}
+.locked-info{background:var(--accent-dim);border:1px solid rgba(245,166,35,0.2);padding:10px;border-radius:8px;margin-bottom:15px;font-size:12px;color:var(--accent)}
 </style>
 </head>
 <body>
 <div id="root"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+
 <script>
+const h = React.createElement;
 const {useState, useEffect, useMemo} = React;
 
-// Integrated Apps Script URL
 const API_URL = "https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec";
 
 const API = {
-  async call(params) {
-    try {
-      const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(params) });
-      return await r.json();
-    } catch (e) { return { success: false, error: e.message }; }
-  }
+    async call(params) {
+        try {
+            const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(params) });
+            return await r.json();
+        } catch (e) { return { success: false, error: 'Database Connection Error' }; }
+    }
 };
 
+// ═══════════════════════════════════════════════════════
+// MAIN COMPONENTS
+// ═══════════════════════════════════════════════════════
+
 function App() {
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ssUser')));
-  const [page, setPage] = useState('dashboard');
+    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ssUser')));
+    const [page, setPage] = useState('dashboard');
 
-  if (!user) return React.createElement(LoginPage, { onLogin: (u) => { setUser(u); localStorage.setItem('ssUser', JSON.stringify(u)); } });
+    if (!user) return h(LoginPage, { onLogin: (u) => { setUser(u); localStorage.setItem('ssUser', JSON.stringify(u)); } });
 
-  const nav = [
-    {id:'dashboard', icon:'📊', label:'Dashboard'},
-    {id:'orders', icon:'📦', label:'Orders'},
-    {id:'analytics', icon:'📈', label:'Analytics'},
-    {id:'products', icon:'🏷️', label:'Products', admin:true},
-    {id:'staff', icon:'👥', label:'Staff', admin:true}
-  ].filter(i => !i.admin || user.role === 'admin');
+    const navItems = [
+        {id:'dashboard', icon:'📊', label:'Dashboard'},
+        {id:'orders', icon:'📦', label:'Orders'},
+        {id:'analytics', icon:'📈', label:'Analytics'},
+        {id:'products', icon:'🏷️', label:'Products', admin:true},
+        {id:'staff', icon:'👥', label:'Staff', admin:true}
+    ].filter(i => !i.admin || user.role === 'admin');
 
-  return React.createElement('div', {className:'app'},
-    React.createElement('aside', {className:'sidebar'},
-      React.createElement('div', {className:'sidebar-logo'}, React.createElement('div', {className:'logo-text'}, 'SHITTU STORES')),
-      React.createElement('div', {className:'nav-section'}, nav.map(n => React.createElement('div', {
-        key: n.id, className: `nav-item ${page === n.id ? 'active' : ''}`, onClick: () => setPage(n.id)
-      }, n.icon + ' ' + n.label))),
-      React.createElement('div', {className:'sidebar-footer'},
-        React.createElement('div', {className:'user-pill'}, React.createElement('div', {className:'user-avatar'}, user.name[0]), React.createElement('div', null, React.createElement('div', {className:'user-name'}, user.name), React.createElement('div', {className:'user-role'}, user.role))),
-        React.createElement('button', {className:'btn btn-secondary btn-sm', style:{width:'100%', marginTop:10}, onClick: () => { setUser(null); localStorage.removeItem('ssUser'); }}, 'Logout')
-      )
-    ),
-    React.createElement('main', {className:'main'},
-      React.createElement('div', {className:'topbar'}, React.createElement('div', {className:'topbar-title'}, page.toUpperCase())),
-      React.createElement('div', {className:'content'},
-        page === 'dashboard' && React.createElement(DashboardPage, {user}),
-        page === 'orders' && React.createElement(OrdersPage, {user}),
-        page === 'analytics' && React.createElement(AnalyticsPage, {user}),
-        page === 'products' && React.createElement(ProductsPage),
-        page === 'staff' && React.createElement(StaffPage)
-      )
-    )
-  );
-}
-
-// ═══════════════════════════════════════════════════════
-// BUNDLE LOGIC INTEGRATED MODALS
-// ═══════════════════════════════════════════════════════
-
-function OrderModal({ products, user, onClose, onRefresh }) {
-  const [f, setF] = useState({ customerName: '', phone: '', product: '', bundle: '', price: '', cost: '', qty: 1, isCustom: false, giftInfo: '' });
-  const selectedProd = products.find(p => p.name === f.product);
-  const bundles = selectedProd ? JSON.parse(selectedProd.bundles || '[]') : [];
-
-  const handleBundle = (lbl) => {
-    if (lbl === 'CUSTOM') {
-      setF({ ...f, bundle: 'CUSTOM', isCustom: true, price: '', cost: '', qty: 1, giftInfo: '' });
-    } else {
-      const b = bundles.find(x => x.label === lbl);
-      const totalCost = parseFloat(b.costPrice) + (b.hasFreeGift ? parseFloat(b.giftCost || 0) : 0);
-      setF({ ...f, bundle: lbl, isCustom: false, price: b.sellingPrice, cost: totalCost, qty: b.qty, giftInfo: b.hasFreeGift ? `🎁 Includes Free Gift (Value: GHC ${b.giftCost})` : '' });
-    }
-  };
-
-  const save = async () => {
-    const r = await API.call({ action: 'addOrder', order: JSON.stringify({ ...f, bundleLabel: f.bundle, sellingPrice: f.price, costOfProduct: f.cost, createdBy: user.username }) });
-    if (r.success) { onRefresh(); onClose(); } else alert(r.error);
-  };
-
-  return React.createElement('div', { className: 'modal-overlay' },
-    React.createElement('div', { className: 'modal' },
-      React.createElement('div', { style:{padding:20, borderBottom:'1px solid var(--border)'}, className:'modal-title' }, 'Create Order'),
-      React.createElement('div', { className: 'modal-body' },
-        React.createElement('input', { className: 'form-input', placeholder: 'Customer Name', onChange: e => setF({ ...f, customerName: e.target.value }), style: { marginBottom: 10 } }),
-        React.createElement('input', { className: 'form-input', placeholder: 'Phone Number', onChange: e => setF({ ...f, phone: e.target.value }), style: { marginBottom: 15 } }),
-        React.createElement('select', { className: 'form-select', onChange: e => setF({ ...f, product: e.target.value }), style: { marginBottom: 10 } },
-          React.createElement('option', null, '-- Select Product --'),
-          products.map(p => React.createElement('option', { key: p.id }, p.name))
+    return h('div', { className: 'app' },
+        h('aside', { className: 'sidebar' },
+            h('div', { className: 'sidebar-logo' }, h('div', { className: 'logo-text' }, 'SHITTU STORES')),
+            h('div', { style: { padding: '8px' } }, navItems.map(n => h('div', {
+                key: n.id, className: 'nav-item ' + (page === n.id ? 'active' : ''), onClick: () => setPage(n.id)
+            }, n.icon + ' ' + n.label))),
+            h('div', { className: 'sidebar-footer' },
+                h('div', { className: 'user-pill' }, h('div', { className: 'user-avatar' }, user.name[0]), h('div', null, h('div', {className:'user-name'}, user.name), h('div', {className:'user-role'}, user.role))),
+                h('button', { className: 'btn btn-secondary btn-sm', style:{width:'100%', marginTop:10}, onClick: () => { setUser(null); localStorage.removeItem('ssUser'); } }, 'Logout')
+            )
         ),
-        React.createElement('select', { className: 'form-select', onChange: e => handleBundle(e.target.value), style: { marginBottom: 15 } },
-          React.createElement('option', null, '-- Select Bundle --'),
-          bundles.map(b => React.createElement('option', { key: b.label }, b.label + ' (GHC ' + b.sellingPrice + ')')),
-          React.createElement('option', { value: 'CUSTOM' }, '✏️ Custom Order')
-        ),
-        f.giftInfo && React.createElement('div', {className:'locked-info', style:{color:'var(--green)'}}, f.giftInfo),
-        !f.isCustom && f.bundle && React.createElement('div', {className:'locked-info'}, "Fields locked. Prices are set by the bundle."),
-        React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 } },
-          React.createElement('div', null, React.createElement('div', { className: 'stat-label' }, 'Selling Price'), React.createElement('input', { className: 'form-input', type: 'number', value: f.price, readOnly: !f.isCustom, onChange: e => setF({ ...f, price: e.target.value }) })),
-          React.createElement('div', null, React.createElement('div', { className: 'stat-label' }, 'Cost Price'), React.createElement('input', { className: 'form-input', type: 'number', value: f.cost, readOnly: !f.isCustom, onChange: e => setF({ ...f, cost: e.target.value }) })),
-          React.createElement('div', null, React.createElement('div', { className: 'stat-label' }, 'Quantity'), React.createElement('input', { className: 'form-input', type: 'number', value: f.qty, readOnly: !f.isCustom, onChange: e => setF({ ...f, qty: e.target.value }) }))
+        h('main', { className: 'main' },
+            h('div', { className: 'topbar' }, h('div', { className: 'topbar-title' }, page.toUpperCase())),
+            h('div', { className: 'content' },
+                page === 'dashboard' ? h(DashboardPage, { user }) :
+                page === 'orders' ? h(OrdersPage, { user }) :
+                page === 'analytics' ? h(AnalyticsPage, { user }) :
+                page === 'products' ? h(ProductsPage) :
+                page === 'staff' ? h(StaffPage) : null
+            )
         )
-      ),
-      React.createElement('div', { className: 'modal-footer' }, React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'), React.createElement('button', { className: 'btn btn-primary', onClick: save }, 'Place Order'))
-    )
-  );
+    );
 }
-
-function ProductModal({ product, onClose, onRefresh }) {
-  const [f, setF] = useState(product ? { ...product, bundles: JSON.parse(product.bundles || '[]') } : { name: '', bundles: [] });
-  
-  const addB = () => setF({ ...f, bundles: [...f.bundles, { label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasFreeGift: false, giftCost: 0 }] });
-  const updB = (i, k, v) => { const b = [...f.bundles]; b[i][k] = v; setF({ ...f, bundles: b }); };
-
-  const save = async () => {
-    const r = await API.call({ action: product ? 'updateProduct' : 'addProduct', product: JSON.stringify({ ...f, bundles: JSON.stringify(f.bundles) }), id: product?.id });
-    if (r.success) { onRefresh(); onClose(); } else alert(r.error);
-  };
-
-  return React.createElement('div', { className: 'modal-overlay' },
-    React.createElement('div', { className: 'modal' },
-      React.createElement('div', { style:{padding:20, borderBottom:'1px solid var(--border)'}, className:'modal-title' }, 'Product Configuration'),
-      React.createElement('div', { className: 'modal-body' },
-        React.createElement('div', {className:'stat-label'}, 'Product Name'),
-        React.createElement('input', { className: 'form-input', value: f.name, onChange: e => setF({ ...f, name: e.target.value }), style: { marginBottom: 20 } }),
-        
-        React.createElement('div', {className:'section-divider'}, 'Bundles & Gifts'),
-        f.bundles.map((b, i) => React.createElement('div', { className: 'bundle-item-card', key: i },
-          React.createElement('input', { className: 'form-input', placeholder: 'Bundle Name (e.g. 1 Unit + Gift)', value: b.label, onChange: e => updB(i, 'label', e.target.value), style: { marginBottom: 10 } }),
-          React.createElement('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 } },
-             React.createElement('div', null, React.createElement('div', {className:'stat-label'},'Qty'), React.createElement('input', {className:'form-input', type:'number', value:b.qty, onChange:e=>updB(i,'qty',e.target.value)})),
-             React.createElement('div', null, React.createElement('div', {className:'stat-label'},'Selling Price'), React.createElement('input', {className:'form-input', type:'number', value:b.sellingPrice, onChange:e=>updB(i,'sellingPrice',e.target.value)})),
-             React.createElement('div', null, React.createElement('div', {className:'stat-label'},'Base Item Cost'), React.createElement('input', {className:'form-input', type:'number', value:b.costPrice, onChange:e=>updB(i,'costPrice',e.target.value)}))
-          ),
-          React.createElement('div', {style:{marginTop:15}},
-             React.createElement('div', {className:'stat-label'}, 'Add Free Gift?'),
-             React.createElement('div', {className:'radio-group'},
-                React.createElement('label', {className:'radio-label'}, React.createElement('input', {type:'radio', checked:b.hasFreeGift, onChange:()=>updB(i,'hasFreeGift', true)}), 'Yes'),
-                React.createElement('label', {className:'radio-label'}, React.createElement('input', {type:'radio', checked:!b.hasFreeGift, onChange:()=>updB(i,'hasFreeGift', false)}), 'No')
-             ),
-             b.hasFreeGift && React.createElement('div', {style:{marginTop:10}}, 
-                React.createElement('div', {className:'stat-label'}, 'Gift Cost (Added to bundle cost)'),
-                React.createElement('input', {className:'form-input', type:'number', value:b.giftCost, onChange:e=>updB(i, 'giftCost', e.target.value)})
-             )
-          )
-        )),
-        React.createElement('button', { className: 'btn btn-secondary', style: { width: '100%' }, onClick: addB }, '+ Add Bundle Option')
-      ),
-      React.createElement('div', { className: 'modal-footer' }, React.createElement('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'), React.createElement('button', { className: 'btn btn-primary', onClick: save }, 'Save Product'))
-    )
-  );
-}
-
-// ═══════════════════════════════════════════════════════
-// STANDARD VIEWS
-// ═══════════════════════════════════════════════════════
 
 function DashboardPage({ user }) {
-  const [data, setData] = useState(null);
-  useEffect(() => { API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setData(r.data)); }, []);
-  return React.createElement('div', null,
-    React.createElement('h2', { style: { marginBottom: 20 } }, 'Welcome, ' + user.name),
-    React.createElement('div', { className: 'stat-grid' },
-      React.createElement('div', {className:'stat-card'}, React.createElement('div', {className:'stat-label'}, 'Revenue'), React.createElement('div', {className:'stat-value', style:{color:'var(--green)'}}, data?.revenue || 'GHC 0')),
-      React.createElement('div', {className:'stat-card'}, React.createElement('div', {className:'stat-label'}, 'Total Orders'), React.createElement('div', {className:'stat-value'}, data?.totalOrders || '0')),
-      React.createElement('div', {className:'stat-card'}, React.createElement('div', {className:'stat-label'}, 'Conversion'), React.createElement('div', {className:'stat-value', style:{color:'var(--accent)'}}, (data?.conversion || '0') + '%')),
-      React.createElement('div', {className:'stat-card'}, React.createElement('div', {className:'stat-label'}, 'Commission Due'), React.createElement('div', {className:'stat-value', style:{color:'var(--purple)'}}, '₦' + (data?.pendingPayout || '0')))
-    )
-  );
+    const [data, setData] = useState(null);
+    useEffect(() => { API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setData(r.data)); }, []);
+
+    return h('div', null,
+        h('h2', { style: { marginBottom: 20 } }, 'Welcome, ' + user.name),
+        h('div', { className: 'stat-grid' },
+            h('div', {className:'stat-card'}, h('div', {className:'stat-label'}, 'Revenue'), h('div', {className:'stat-value', style:{color:'var(--green)'}}, data?.revenue ? 'GHC ' + data.revenue : 'GHC 0')),
+            h('div', {className:'stat-card'}, h('div', {className:'stat-label'}, 'Total Orders'), h('div', {className:'stat-value'}, data?.totalOrders || '0')),
+            h('div', {className:'stat-card'}, h('div', {className:'stat-label'}, 'Conversion'), h('div', {className:'stat-value', style:{color:'var(--accent)'}}, (data?.conversion || '0') + '%')),
+            h('div', {className:'stat-card'}, h('div', {className:'stat-label'}, 'My Commission'), h('div', {className:'stat-value', style:{color:'var(--purple)'}}, '₦' + (data?.pendingPayout || '0')))
+        )
+    );
 }
 
 function OrdersPage({ user }) {
-  const [orders, setOrders] = useState([]);
-  const [prods, setProds] = useState([]);
-  const [modal, setModal] = useState(false);
-  const refresh = () => { API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data)); API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data)); };
-  useEffect(() => refresh(), []);
-  return React.createElement('div', null,
-    React.createElement('div', { style: { display:'flex', justifyContent:'space-between', marginBottom:20 } }, React.createElement('h2', null, 'Orders'), React.createElement('button', { className:'btn btn-primary', onClick:()=>setModal(true) }, '+ New Order')),
-    React.createElement('div', { className:'card' }, React.createElement('table', null, React.createElement('thead', null, React.createElement('tr', null, ['Customer','Product','Bundle','Total','Status'].map(h => React.createElement('th', null, h)))), React.createElement('tbody', null, orders.map(o => React.createElement('tr', { key:o.id }, React.createElement('td', null, o.customerName), React.createElement('td', null, o.product), React.createElement('td', null, o.bundleLabel), React.createElement('td', null, 'GHC '+o.sellingPrice), React.createElement('td', null, React.createElement('span', {className:'badge badge-processing'}, o.deliveryStatus)))))))
-    , modal && React.createElement(OrderModal, { products: prods, user, onClose: () => setModal(false), onRefresh: refresh })
-  );
+    const [orders, setOrders] = useState([]);
+    const [prods, setProds] = useState([]);
+    const [modal, setModal] = useState(false);
+    const refresh = () => { 
+        API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data)); 
+        API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data)); 
+    };
+    useEffect(() => refresh(), []);
+
+    return h('div', null,
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } }, h('h2', null, 'Orders'), h('button', { className: 'btn btn-primary', onClick: () => setModal(true) }, '+ New Order')),
+        h('div', { className: 'card' }, h('div', { className: 'table-wrap' }, h('table', null, h('thead', null, h('tr', null, ['Customer', 'Product', 'Bundle', 'Total', 'Status'].map(h => h('th', null, h)))), h('tbody', null, orders.map(o => h('tr', { key: o.id }, h('td', null, o.customerName), h('td', null, o.product), h('td', null, o.bundleLabel), h('td', null, 'GHC ' + o.sellingPrice), h('td', null, o.deliveryStatus))))))),
+        modal && h(OrderModal, { products: prods, user, onClose: () => setModal(false), onRefresh: refresh })
+    );
 }
 
-function AnalyticsPage({ user }) {
-  const [orders, setOrders] = useState([]);
-  useEffect(() => { API.call({ action: 'getOrders' }).then(r => { if(r.success) setOrders(r.data.filter(o => user.role === 'admin' || o.createdBy === user.username)); }); }, []);
-  return React.createElement('div', null, React.createElement('h2', {style:{marginBottom:20}}, user.role === 'admin' ? 'Store Analytics' : 'My Performance'), React.createElement('div', {className:'card'}, React.createElement('div', {className:'stat-label', style:{marginBottom:20}}, 'Conversion Funnel'), ['Processing', 'Delivered', 'Canceled'].map(s => {
-    const count = orders.filter(o => o.deliveryStatus === s).length;
-    const pct = orders.length ? (count / orders.length * 100).toFixed(0) : 0;
-    return React.createElement('div', { key: s, style: { marginTop: 15 } }, React.createElement('div', { style: { display:'flex', justifyContent:'space-between', fontSize:12, marginBottom:5 } }, React.createElement('span', null, s), React.createElement('span', null, count + ' ('+pct+'%)')), React.createElement('div', { style: { height:6, background:'var(--bg4)', borderRadius:3 } }, React.createElement('div', { style: { width: pct+'%', height:'100%', background:'var(--accent)', borderRadius:3 } })));
-  })));
+function OrderModal({ products, user, onClose, onRefresh }) {
+    const [f, setF] = useState({ customerName: '', phone: '', product: '', bundle: '', price: '', cost: '', qty: 1, isCustom: false, giftInfo: '' });
+    const prod = products.find(p => p.name === f.product);
+    const bundles = prod ? JSON.parse(prod.bundles || '[]') : [];
+
+    const selectBundle = (lbl) => {
+        if (lbl === 'CUSTOM') setF({ ...f, bundle: 'CUSTOM', isCustom: true, price: '', cost: '', qty: 1, giftInfo: '' });
+        else {
+            const b = bundles.find(x => x.label === lbl);
+            const cost = parseFloat(b.costPrice) + (b.hasFreeGift ? parseFloat(b.giftCost || 0) : 0);
+            setF({ ...f, bundle: lbl, isCustom: false, price: b.sellingPrice, cost: cost, qty: b.qty, giftInfo: b.hasFreeGift ? `🎁 Bundle includes free gift (${b.giftCost})` : '' });
+        }
+    };
+
+    return h('div', { className: 'modal-overlay' },
+        h('div', { className: 'modal' },
+            h('div', { style: { padding: 20, borderBottom: '1px solid var(--border)' }, className: 'modal-title' }, 'New Order'),
+            h('div', { className: 'modal-body' },
+                h('input', { className: 'form-input', placeholder: 'Customer Name', onChange: e => setF({ ...f, customerName: e.target.value }), style: { marginBottom: 10 } }),
+                h('input', { className: 'form-input', placeholder: 'Phone', onChange: e => setF({ ...f, phone: e.target.value }), style: { marginBottom: 15 } }),
+                h('select', { className: 'form-select', style: { marginBottom: 10 }, onChange: e => setF({ ...f, product: e.target.value }) }, h('option', null, '-- Select Product --'), products.map(p => h('option', { key: p.id }, p.name))),
+                h('select', { className: 'form-select', style: { marginBottom: 15 }, onChange: e => selectBundle(e.target.value) }, h('option', null, '-- Select Bundle --'), bundles.map(b => h('option', { key: b.label }, b.label)), h('option', { value: 'CUSTOM' }, '✏️ Custom Order')),
+                f.giftInfo && h('div', { className: 'locked-info', style: { color: 'var(--green)' } }, f.giftInfo),
+                !f.isCustom && f.bundle && h('div', { className: 'locked-info' }, "Pricing Locked by Bundle"),
+                h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 } },
+                    h('div', null, h('div', { className: 'stat-label' }, 'Price'), h('input', { className: 'form-input', type: 'number', value: f.price, readOnly: !f.isCustom, onChange: e => setF({ ...f, price: e.target.value }) })),
+                    h('div', null, h('div', { className: 'stat-label' }, 'Cost'), h('input', { className: 'form-input', type: 'number', value: f.cost, readOnly: !f.isCustom, onChange: e => setF({ ...f, cost: e.target.value }) })),
+                    h('div', null, h('div', { className: 'stat-label' }, 'Qty'), h('input', { className: 'form-input', type: 'number', value: f.qty, readOnly: !f.isCustom, onChange: e => setF({ ...f, qty: e.target.value }) }))
+                )
+            ),
+            h('div', { className: 'modal-footer' }, h('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'), h('button', { className: 'btn btn-primary', onClick: async () => {
+                const r = await API.call({ action: 'addOrder', order: JSON.stringify({ ...f, bundleLabel: f.bundle, sellingPrice: f.price, costOfProduct: f.cost, createdBy: user.username }) });
+                if (r.success) { onRefresh(); onClose(); } else alert(r.error);
+            } }, 'Confirm'))
+        )
+    );
 }
 
 function ProductsPage() {
-  const [list, setList] = useState([]);
-  const [modal, setModal] = useState(false);
-  const [editing, setEditing] = useState(null);
-  const refresh = () => API.call({ action: 'getProducts' }).then(r => r.success && setList(r.data));
-  useEffect(() => refresh(), []);
-  return React.createElement('div', null, React.createElement('div', { style: { display:'flex', justifyContent:'space-between', marginBottom:20 } }, React.createElement('h2', null, 'Products'), React.createElement('button', { className:'btn btn-primary', onClick:()=> { setEditing(null); setModal(true); } }, '+ Add Product')),
-    React.createElement('div', { className:'card' }, React.createElement('table', null, React.createElement('thead', null, React.createElement('tr', null, ['Name','Bundles','Status','Action'].map(h => React.createElement('th', null, h)))), React.createElement('tbody', null, list.map(p => React.createElement('tr', { key:p.id }, React.createElement('td', null, p.name), React.createElement('td', null, JSON.parse(p.bundles || '[]').length), React.createElement('td', null, React.createElement('span', {className:'badge badge-delivered'}, 'Active')), React.createElement('td', null, React.createElement('button', {className:'btn btn-secondary btn-sm', onClick:()=> { setEditing(p); setModal(true); }}, 'Edit')))))))
-    , modal && React.createElement(ProductModal, { product: editing, onClose: () => setModal(false), onRefresh: refresh })
-  );
+    const [list, setList] = useState([]);
+    const [modal, setModal] = useState(false);
+    const refresh = () => API.call({ action: 'getProducts' }).then(r => r.success && setList(r.data));
+    useEffect(() => refresh(), []);
+    return h('div', null,
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } }, h('h2', null, 'Products'), h('button', { className: 'btn btn-primary', onClick: () => setModal(true) }, '+ Add Product')),
+        h('div', { className: 'card' }, h('table', null, h('thead', null, h('tr', null, ['Product', 'Bundles', 'Status'].map(h => h('th', null, h)))), h('tbody', null, list.map(p => h('tr', { key: p.id }, h('td', null, p.name), h('td', null, JSON.parse(p.bundles || '[]').length), h('td', null, 'Active')))))),
+        modal && h(ProductModal, { onClose: () => setModal(false), onRefresh: refresh })
+    );
+}
+
+function ProductModal({ onClose, onRefresh }) {
+    const [f, setF] = useState({ name: '', bundles: [] });
+    const addB = () => setF({ ...f, bundles: [...f.bundles, { label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasFreeGift: false, giftCost: 0 }] });
+    const updB = (i, k, v) => { const b = [...f.bundles]; b[i][k] = v; setF({ ...f, bundles: b }); };
+    return h('div', { className: 'modal-overlay' },
+        h('div', { className: 'modal' },
+            h('div', { style: { padding: 20, borderBottom: '1px solid var(--border)' }, className: 'modal-title' }, 'Add Product'),
+            h('div', { className: 'modal-body' },
+                h('div', { className: 'stat-label' }, 'Product Name'), h('input', { className: 'form-input', style: { marginBottom: 20 }, onChange: e => setF({ ...f, name: e.target.value }) }),
+                h('div', { className: 'section-divider' }, 'Bundles'),
+                f.bundles.map((b, i) => h('div', { className: 'bundle-item-card', key: i },
+                    h('input', { className: 'form-input', placeholder: 'Bundle Name', style: { marginBottom: 10 }, onChange: e => updB(i, 'label', e.target.value) }),
+                    h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 } },
+                        h('div', null, h('div', { className: 'stat-label' }, 'Qty'), h('input', { className: 'form-input', type: 'number', onChange: e => updB(i, 'qty', e.target.value) })),
+                        h('div', null, h('div', { className: 'stat-label' }, 'Price'), h('input', { className: 'form-input', type: 'number', onChange: e => updB(i, 'sellingPrice', e.target.value) })),
+                        h('div', null, h('div', { className: 'stat-label' }, 'Cost'), h('input', { className: 'form-input', type: 'number', onChange: e => updB(i, 'costPrice', e.target.value) }))
+                    ),
+                    h('div', { style: { marginTop: 15 } },
+                        h('div', { className: 'stat-label' }, 'Free Gift?'),
+                        h('div', { className: 'radio-group' },
+                            h('label', { className: 'radio-label' }, h('input', { type: 'radio', checked: b.hasFreeGift, onChange: () => updB(i, 'hasFreeGift', true) }), 'Yes'),
+                            h('label', { className: 'radio-label' }, h('input', { type: 'radio', checked: !b.hasFreeGift, onChange: () => updB(i, 'hasFreeGift', false) }), 'No')
+                        ),
+                        b.hasFreeGift && h('div', { style: { marginTop: 10 } }, h('div', { className: 'stat-label' }, 'Gift Cost'), h('input', { className: 'form-input', type: 'number', onChange: e => updB(i, 'giftCost', e.target.value) }))
+                    )
+                )),
+                h('button', { className: 'btn btn-secondary', style: { width: '100%', marginTop: 10 }, onClick: addB }, '+ Add Bundle')
+            ),
+            h('div', { className: 'modal-footer' }, h('button', { className: 'btn btn-secondary', onClick: onClose }, 'Cancel'), h('button', { className: 'btn btn-primary', onClick: async () => {
+                const r = await API.call({ action: 'addProduct', product: JSON.stringify({ ...f, bundles: JSON.stringify(f.bundles) }) });
+                if (r.success) { onRefresh(); onClose(); } else alert(r.error);
+            } }, 'Save'))
+        )
+    );
+}
+
+function AnalyticsPage({ user }) {
+    const [orders, setOrders] = useState([]);
+    useEffect(() => { API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data.filter(o => user.role === 'admin' || o.createdBy === user.username))); }, []);
+    return h('div', null, h('h2', { style: { marginBottom: 20 } }, 'Analytics'), h('div', { className: 'card' }, h('div', { className: 'stat-label', style: { marginBottom: 15 } }, 'Order Breakdown'), ['Processing', 'Delivered', 'Canceled'].map(s => {
+        const count = orders.filter(o => o.deliveryStatus === s).length;
+        const pct = orders.length ? (count / orders.length * 100).toFixed(0) : 0;
+        return h('div', { key: s, style: { marginTop: 15 } }, h('div', { style: { display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 5 } }, h('span', null, s), h('span', null, count + ' (' + pct + '%)')), h('div', { style: { height: 6, background: 'var(--bg4)', borderRadius: 3 } }, h('div', { style: { width: pct + '%', height: '100%', background: 'var(--accent)', borderRadius: 3 } })));
+    })));
 }
 
 function StaffPage() {
-  const [staff, setStaff] = useState([]);
-  useEffect(() => { API.call({ action: 'getStaff' }).then(r => r.success && setStaff(r.data)); }, []);
-  return React.createElement('div', { className:'card' }, React.createElement('h2', {style:{marginBottom:15}}, 'Staff Access'), React.createElement('table', null, React.createElement('thead', null, React.createElement('tr', null, ['Name','Username','Role'].map(h => React.createElement('th', null, h)))), React.createElement('tbody', null, staff.map(s => React.createElement('tr', { key:s.id }, React.createElement('td', null, s.name), React.createElement('td', null, s.username), React.createElement('td', null, s.role))))));
+    const [staff, setStaff] = useState([]);
+    useEffect(() => { API.call({ action: 'getStaff' }).then(r => r.success && setStaff(r.data)); }, []);
+    return h('div', { className: 'card' }, h('h2', { style: { marginBottom: 15 } }, 'Staff'), h('table', null, h('thead', null, h('tr', null, ['Name', 'Role'].map(h => h('th', null, h)))), h('tbody', null, staff.map(s => h('tr', { key: s.id }, h('td', null, s.name), h('td', null, s.role))))));
 }
 
 function LoginPage({ onLogin }) {
-  const [u, setU] = useState(''); const [p, setP] = useState('');
-  const handle = async () => { const r = await API.call({ action: 'login', username: u, password: p }); if (r.success && !r.data.error) onLogin(r.data); else alert('Login Failed'); };
-  return React.createElement('div', { style: { height:'100vh', display:'grid', placeItems:'center', background:'var(--bg)' } }, React.createElement('div', { className:'card', style: { width:320, textAlign:'center' } }, React.createElement('h1', { style: { color:'var(--accent)', fontFamily:'var(--font-head)', marginBottom:20 } }, 'SHITTU STORES'), React.createElement('input', { className:'form-input', placeholder:'Username', onChange: e => setU(e.target.value), style: { marginBottom:10 } }), React.createElement('input', { className:'form-input', type:'password', placeholder:'Password', onChange: e => setP(e.target.value), style: { marginBottom:20 } }), React.createElement('button', { className:'btn btn-primary', style: { width:'100%' }, onClick: handle }, 'Sign In')));
+    const [u, setU] = useState(''); const [p, setP] = useState('');
+    return h('div', { style: { height: '100vh', display: 'grid', placeItems: 'center', background: 'var(--bg)' } }, h('div', { className: 'card', style: { width: 320, textAlign: 'center' } }, h('h1', { style: { color: 'var(--accent)', fontFamily: 'var(--font-head)', marginBottom: 20 } }, 'SHITTU STORES'), h('input', { className: 'form-input', placeholder: 'Username', style: { marginBottom: 10 }, onChange: e => setU(e.target.value) }), h('input', { className: 'form-input', type: 'password', placeholder: 'Password', style: { marginBottom: 20 }, onChange: e => setP(e.target.value) }), h('button', { className: 'btn btn-primary', style: { width: '100%' }, onClick: async () => { const r = await API.call({ action: 'login', username: u, password: p }); if (r.success && !r.data.error) onLogin(r.data); else alert('Invalid Credentials'); } }, 'Sign In')));
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(React.createElement(App));
+window.addEventListener('DOMContentLoaded', () => {
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(h(App));
+});
 </script>
 </body>
 </html>

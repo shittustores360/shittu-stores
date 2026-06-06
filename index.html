@@ -1955,20 +1955,206 @@ function SuppliersPage(){
   const [editing,setEditing]=useState(null);
 
   const load=useCallback(async()=>{
-    setLoading(true);
-    const [su,pr]=await Promise.all([API.call({action:'getSuppliers'}),API.call({action:'getProducts'})]);
-    if(su.success)setSuppliers(su.data||[]);
-    if(pr.success)setProducts(pr.data||[]);
-    setLoading(false);
+    try{
+      setLoading(true);
+
+      const [su,pr]=await Promise.all([
+        API.call({action:'getSuppliers'}),
+        API.call({action:'getProducts'})
+      ]);
+
+      setSuppliers(
+        su && su.success && Array.isArray(su.data)
+          ? su.data
+          : []
+      );
+
+      setProducts(
+        pr && pr.success && Array.isArray(pr.data)
+          ? pr.data
+          : []
+      );
+
+    }catch(err){
+      console.error('Suppliers load error:',err);
+      setSuppliers([]);
+      setProducts([]);
+    }finally{
+      setLoading(false);
+    }
   },[]);
+
   useEffect(()=>{load();},[load]);
 
   const del=async s=>{
-    if(!confirm(`Remove supplier ${s.name||s.username}?`))return;
-    const r=await API.call({action:'deleteSupplier',id:s.id});
-    if(r.success){toast('Removed');load();}else toast(r.error||'Failed','error');
+    if(!confirm(`Remove supplier ${s.name||s.username}?`)) return;
+
+    try{
+      const r=await API.call({
+        action:'deleteSupplier',
+        id:s.id
+      });
+
+      if(r.success){
+        toast('Removed');
+        load();
+      }else{
+        toast(r.error||'Failed','error');
+      }
+    }catch(err){
+      console.error(err);
+      toast('Delete failed','error');
+    }
   };
 
+  return React.createElement('div',null,
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',{className:'section-title'},'Suppliers'),
+      React.createElement('button',{
+        className:'btn btn-primary',
+        onClick:()=>{
+          setEditing(null);
+          setShowModal(true);
+        }
+      },'+ Add Supplier')
+    ),
+
+    loading
+      ? React.createElement('div',{className:'loading-full'},
+          React.createElement('div',{className:'spinner'})
+        )
+
+      : suppliers.length===0
+        ? React.createElement('div',{className:'empty-state'},
+            React.createElement('div',{className:'empty-text'},
+              'No suppliers yet'
+            )
+          )
+
+        : React.createElement('div',{className:'table-wrap'},
+            React.createElement('table',null,
+
+              React.createElement('thead',null,
+                React.createElement('tr',null,
+                  ['Name','Username','Products','Status','Actions']
+                    .map(h=>React.createElement('th',{key:h},h))
+                )
+              ),
+
+              React.createElement('tbody',null,
+
+                (Array.isArray(suppliers)?suppliers:[]).map(s=>{
+
+                  const assigned=Array.isArray(
+                    readList(
+                      s?.assignedProducts || s?.products
+                    )
+                  )
+                    ? readList(
+                        s?.assignedProducts || s?.products
+                      )
+                    : [];
+
+                  return React.createElement('tr',{
+                    key:s.id||s.username
+                  },
+
+                    React.createElement(
+                      'td',
+                      null,
+                      s?.name || '-'
+                    ),
+
+                    React.createElement(
+                      'td',
+                      {className:'td-mono'},
+                      s?.username || '-'
+                    ),
+
+                    React.createElement(
+                      'td',
+                      null,
+                      assigned.length
+                        ? assigned.join(', ')
+                        : 'None'
+                    ),
+
+                    React.createElement(
+                      'td',
+                      null,
+                      React.createElement(
+                        'span',
+                        {
+                          className:`badge ${
+                            isActive(s?.active)
+                              ? 'badge-delivered'
+                              : 'badge-canceled'
+                          }`
+                        },
+                        isActive(s?.active)
+                          ? 'Active'
+                          : 'Inactive'
+                      )
+                    ),
+
+                    React.createElement(
+                      'td',
+                      null,
+                      React.createElement(
+                        'div',
+                        {
+                          style:{
+                            display:'flex',
+                            gap:4
+                          }
+                        },
+
+                        React.createElement(
+                          'button',
+                          {
+                            className:'btn btn-secondary btn-sm',
+                            onClick:()=>{
+                              setEditing(s);
+                              setShowModal(true);
+                            }
+                          },
+                          'Edit'
+                        ),
+
+                        React.createElement(
+                          'button',
+                          {
+                            className:'btn btn-danger btn-sm',
+                            onClick:()=>del(s)
+                          },
+                          'Delete'
+                        )
+                      )
+                    )
+                  );
+                })
+              )
+            )
+          ),
+
+    showModal &&
+      React.createElement(
+        SupplierModal,
+        {
+          supplier:editing,
+          products:Array.isArray(products)
+            ? products
+            : [],
+          onSave:()=>{
+            setShowModal(false);
+            load();
+            toast('Saved');
+          },
+          onClose:()=>setShowModal(false)
+        }
+      )
+  );
+}
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Suppliers'),
@@ -2031,7 +2217,7 @@ function SupplierModal({supplier,products,onSave,onClose}){
         React.createElement('div',{className:'form-group'},
           React.createElement('label',{className:'form-label'},'Products'),
           React.createElement('div',{className:'permission-grid'},
-            products.map(p=>React.createElement('div',{key:p.name,className:`product-chip ${selected.includes(p.name)?'active':''}`,onClick:()=>toggleProduct(p.name)},p.name))
+            (products || []).map(p=>React.createElement('div',{key:p.name,className:`product-chip ${selected.includes(p.name)?'active':''}`,onClick:()=>toggleProduct(p.name)},p.name))
           )
         )
       ),

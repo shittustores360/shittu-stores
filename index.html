@@ -4,127 +4,90 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Shittu Stores | Merchant Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  /* Shopify-inspired Palette */
   --p-bg: #f1f2f4;
   --p-card: #ffffff;
   --p-text: #202223;
   --p-text-sub: #6d7175;
   --p-border: #e1e3e5;
-  --p-accent: #008060; /* Shopify Green */
+  --p-accent: #008060;
   --p-accent-dim: #f1f8f5;
   --p-critical: #d82c0d;
-  --p-info: #005bd3;
-  
-  /* Dark Mode Overrides */
-  --bg: var(--p-bg); --surface: var(--p-card); --border: var(--p-border);
-  --text: var(--p-text); --text-sec: var(--p-text-sub);
   --font-main: 'Inter', -apple-system, sans-serif;
   --font-head: 'Syne', sans-serif;
-  --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-[data-theme="dark"] {
-  --p-bg: #0b0c0d; --p-card: #1a1c1d; --p-text: #e3e3e3;
-  --p-text-sub: #8c9196; --p-border: #2f3133;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--p-bg); color: var(--p-text); font-family: var(--font-main); font-size: 14px; -webkit-font-smoothing: antialiased; }
+body { background: var(--p-bg); color: var(--p-text); font-family: var(--font-main); font-size: 14px; }
 
 /* Layout */
 .app-container { display: flex; height: 100vh; overflow: hidden; }
 .sidebar { width: 240px; background: #1a1c1d; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
 .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 
-/* Sidebar UI */
+/* Sidebar */
 .sb-header { padding: 20px; border-bottom: 1px solid #2f3133; display: flex; align-items: center; gap: 10px; }
-.sb-logo { width: 32px; height: 32px; background: var(--p-accent); border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-family: var(--font-head); }
-.sb-nav { padding: 12px; flex: 1; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #b5b5b5; font-weight: 500; transition: 0.2s; margin-bottom: 2px; }
-.nav-item:hover { background: #2f3133; color: #fff; }
-.nav-item.active { background: #2f3133; color: #fff; }
+.sb-logo { width: 32px; height: 32px; background: var(--p-accent); border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-family: var(--font-head); color: white; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; cursor: pointer; color: #b5b5b5; font-weight: 500; transition: 0.2s; }
+.nav-item:hover, .nav-item.active { background: #2f3133; color: #fff; }
 
-/* Shopify Style Cards */
-.top-bar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
-.page-header { padding: 24px 32px; display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; width: 100%; }
-.content-area { padding: 0 32px 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+/* Top Bar & Content */
+.top-bar { height: 56px; background: #fff; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+.content-area { padding: 24px 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
 
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
-.card-title { font-weight: 600; font-size: 15px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+/* Shopify Cards */
+.card { background: #fff; border: 1px solid var(--p-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi-card { background: #fff; border: 1px solid var(--p-border); padding: 16px; border-radius: var(--radius); }
+.kpi-val { font-size: 24px; font-weight: 700; font-family: var(--font-head); margin-top: 4px; }
+.kpi-label { font-size: 12px; color: var(--p-text-sub); text-transform: uppercase; font-weight: 600; }
 
-/* Dashboard Grid */
-.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.kpi-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius); }
-.kpi-val { font-size: 24px; font-weight: 700; margin: 4px 0; font-family: var(--font-head); }
-.kpi-label { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-.kpi-trend { font-size: 12px; display: flex; align-items: center; gap: 4px; }
-.up { color: var(--p-accent); } .down { color: var(--p-critical); }
-
-/* Forms & UI Elements */
-.btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+/* Buttons & Inputs */
+.btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--p-border); background: white; font-size: 13px; }
 .btn-primary { background: var(--p-accent); color: white; border: none; }
-.btn-primary:hover { background: #006e52; }
-.input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; outline: none; background: var(--surface); color: var(--text); }
-.input:focus { border-color: var(--p-info); box-shadow: 0 0 0 1px var(--p-info); }
-.input[readonly] { background: var(--p-bg); cursor: not-allowed; }
+.input { width: 100%; padding: 8px 12px; border: 1px solid var(--p-border); border-radius: 6px; outline: none; margin-top: 4px; }
 
-.badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: capitalize; }
+/* Bundle UI */
+.bundle-box { border: 1px solid var(--p-border); padding: 16px; border-radius: 8px; background: #f9fafb; margin-bottom: 12px; }
+.badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
 .badge-success { background: var(--p-accent-dim); color: var(--p-accent); }
-.badge-warning { background: #fff5ea; color: #8a6116; }
 
-/* Bundle nested UI */
-.bundle-box { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; background: var(--p-bg); position: relative; }
-.radio-group { display: flex; gap: 12px; margin: 8px 0; }
-.radio-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; }
-
-/* Table styling */
-.table-wrap { width: 100%; overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; text-align: left; }
-th { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-sec); font-size: 12px; font-weight: 600; text-transform: uppercase; }
-td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
-tr:hover td { background: var(--p-bg); }
+/* Table */
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th { text-align: left; padding: 12px; border-bottom: 1px solid var(--p-border); color: var(--p-text-sub); font-size: 12px; }
+td { padding: 12px; border-bottom: 1px solid var(--p-border); }
 
 /* Modal */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: grid; place-items: center; z-index: 100; padding: 20px; }
-.modal-card { background: var(--surface); width: 100%; max-width: 600px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+.modal-card { background: white; width: 100%; max-width: 600px; border-radius: 12px; max-height: 90vh; display: flex; flex-direction: column; }
 .modal-body { padding: 24px; overflow-y: auto; }
-.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
-
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
-}
+.modal-footer { padding: 16px; border-top: 1px solid var(--p-border); display: flex; justify-content: flex-end; gap: 10px; }
 </style>
 </head>
 <body>
 <div id="root"></div>
 
+<!-- Load React -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 
 <script>
-const { useState, useEffect, useMemo, useCallback } = React;
+const { useState, useEffect, useMemo } = React;
 
-// --- API LAYER ---
 const API = {
   url: localStorage.getItem('ss_api_url') || '',
   async call(params) {
     if (!this.url) return { success: false, error: 'No API URL' };
     try {
-      const resp = await fetch(this.url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(params)
-      });
-      return await resp.json();
+      const r = await fetch(this.url, { method: 'POST', body: JSON.stringify(params) });
+      return await r.json();
     } catch (e) { return { success: false, error: e.message }; }
   }
 };
-
-// --- COMPONENTS ---
 
 function App() {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ss_user')));
@@ -135,100 +98,64 @@ function App() {
   return (
     <div className="app-container">
       <div className="sidebar">
-        <div className="sb-header">
-          <div className="sb-logo">S</div>
-          <div style={{fontWeight:700, fontSize:16}}>Shittu Stores</div>
-        </div>
-        <div className="sb-nav">
-          <div className={`nav-item ${view==='dashboard'?'active':''}`} onClick={()=>setView('dashboard')}>Dashboard</div>
+        <div className="sb-header"><div className="sb-logo">S</div><strong>Shittu Stores</strong></div>
+        <div style={{padding:'10px 0'}}>
+          <div className={`nav-item ${view==='dashboard'?'active':''}`} onClick={()=>setView('dashboard')}>Home</div>
           <div className={`nav-item ${view==='orders'?'active':''}`} onClick={()=>setView('orders')}>Orders</div>
-          {(user.role === 'admin') && <div className={`nav-item ${view==='products'?'active':''}`} onClick={()=>setView('products')}>Products</div>}
+          {user.role === 'admin' && <div className={`nav-item ${view==='products'?'active':''}`} onClick={()=>setView('products')}>Products</div>}
           <div className={`nav-item ${view==='analytics'?'active':''}`} onClick={()=>setView('analytics')}>Analytics</div>
           <div className={`nav-item ${view==='settings'?'active':''}`} onClick={()=>setView('settings')}>Settings</div>
         </div>
-        <div style={{padding:20, borderTop:'1px solid #2f3133'}}>
-          <div style={{fontSize:12, color:'#8c9196'}}>Logged in as</div>
-          <div style={{fontSize:14, fontWeight:600}}>{user.name}</div>
-          <button onClick={()=>{localStorage.removeItem('ss_user'); setUser(null);}} style={{background:'none', border:'none', color:'#ff4d4d', cursor:'pointer', marginTop:10, fontSize:12}}>Logout</button>
+        <div style={{marginTop:'auto', padding:20, borderTop:'1px solid #2f3133'}}>
+          <div style={{fontSize:12, color:'#8c9196'}}>{user.name}</div>
+          <button onClick={()=>{localStorage.clear(); window.location.reload();}} style={{color:'#ff4d4d', background:'none', border:'none', cursor:'pointer', fontSize:11}}>Logout</button>
         </div>
       </div>
       
       <div className="main-content">
         <div className="top-bar">
-          <div style={{fontWeight:600, color:'var(--p-text-sub)'}}>{view.toUpperCase()}</div>
-          <div className="badge badge-success">Live Mode</div>
+          <div style={{fontWeight:600}}>{view.toUpperCase()}</div>
+          <div className="badge badge-success">Online</div>
         </div>
         
-        {view === 'dashboard' && <Dashboard user={user} />}
-        {view === 'orders' && <OrdersView user={user} />}
-        {view === 'products' && <ProductsView />}
-        {view === 'analytics' && <AnalyticsView user={user} />}
-        {view === 'settings' && <SettingsView />}
+        <div className="content-area">
+          {view === 'dashboard' && <Dashboard user={user} />}
+          {view === 'orders' && <OrdersView user={user} />}
+          {view === 'products' && <ProductsView />}
+          {view === 'analytics' && <AnalyticsView user={user} />}
+          {view === 'settings' && <SettingsView />}
+        </div>
       </div>
     </div>
   );
 }
 
-// --- VIEWS ---
-
 function Dashboard({ user }) {
-  const [stats, setStats] = useState(null);
-
+  const [data, setData] = useState(null);
   useEffect(() => {
-    API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setStats(r.data));
+    API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setData(r.data));
   }, []);
 
   return (
-    <div className="content-area">
-      <div className="page-header" style={{paddingLeft:0}}>
-        <div>
-          <h1 style={{fontFamily:'var(--font-head)', fontSize:28}}>Good morning, {user.name.split(' ')[0]}</h1>
-          <p style={{color:'var(--p-text-sub)'}}>Here's what's happening with your store today.</p>
-        </div>
-      </div>
-
+    <div>
+      <h2 style={{fontFamily:'var(--font-head)', fontSize:24, marginBottom:20}}>Welcome back, {user.name}</h2>
       <div className="kpi-grid">
-        <KPI card={{label:'Total Sales', val: stats?.revenue || 'GH₵ 0.00', trend:'+12%', icon:'💰'}} />
-        <KPI card={{label:'Total Orders', val: stats?.totalOrders || '0', trend:'+5%', icon:'📦'}} />
-        <KPI card={{label:'Conversion Rate', val: (stats?.conversion || '0') + '%', trend:'-2%', icon:'🎯'}} />
-        <KPI card={{label:'Pending Staff Payout', val: '₦ ' + (stats?.pendingPayout || '0'), trend:'0%', icon:'👥'}} />
+        <div className="kpi-card"><div className="kpi-label">Total Revenue</div><div className="kpi-val">{data?.revenue || 'GH₵ 0'}</div></div>
+        <div className="kpi-card"><div className="kpi-label">Orders</div><div className="kpi-val">{data?.totalOrders || '0'}</div></div>
+        <div className="kpi-card"><div className="kpi-label">Conversion</div><div className="kpi-val">{data?.conversion || '0'}%</div></div>
+        <div className="kpi-card"><div className="kpi-label">Pending Payout</div><div className="kpi-val">₦ {data?.pendingPayout || '0'}</div></div>
       </div>
-
+      
       <div className="card">
-        <div className="card-title">Recent Activity</div>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Status</th><th>Total</th></tr>
-            </thead>
-            <tbody>
-              {stats?.recentOrders?.map(o => (
-                <tr key={o.id}>
-                  <td>#{o.id.slice(-4)}</td>
-                  <td>{o.customerName}</td>
-                  <td>{o.product}</td>
-                  <td><span className="badge badge-success">{o.status}</span></td>
-                  <td style={{fontWeight:600}}>GH₵ {o.price}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function KPI({ card }) {
-  return (
-    <div className="kpi-card">
-      <div style={{display:'flex', justifyContent:'space-between'}}>
-        <span className="kpi-label">{card.label}</span>
-        <span>{card.icon}</span>
-      </div>
-      <div className="kpi-val">{card.val}</div>
-      <div className={`kpi-trend ${card.trend.startsWith('+')?'up':'down'}`}>
-        {card.trend} <span style={{color:'var(--p-text-sub)'}}>vs last 7 days</span>
+        <div style={{fontWeight:600, marginBottom:15}}>Recent Orders</div>
+        <table>
+          <thead><tr><th>ID</th><th>Customer</th><th>Product</th><th>Status</th><th>Total</th></tr></thead>
+          <tbody>
+            {data?.recentOrders?.map(o => (
+              <tr key={o.id}><td>#{o.id.slice(-4)}</td><td>{o.customerName}</td><td>{o.product}</td><td><span className="badge badge-success">{o.deliveryStatus}</span></td><td>GH₵ {o.sellingPrice}</td></tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -240,59 +167,39 @@ function ProductsView() {
   const [editing, setEditing] = useState(null);
 
   const refresh = () => API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data));
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => refresh(), []);
 
   return (
-    <div className="content-area">
-      <div className="page-header" style={{paddingLeft:0}}>
-        <h2>Products</h2>
+    <div>
+      <div style={{display:'flex', justifyContent:'space-between', marginBottom:20}}>
+        <h3>Products</h3>
         <button className="btn btn-primary" onClick={()=>{setEditing(null); setIsModal(true)}}>Add Product</button>
       </div>
-      
       <div className="card">
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Name</th><th>Bundles</th><th>Inventory</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>
-              {prods.map(p => (
-                <tr key={p.id}>
-                  <td style={{fontWeight:600}}>{p.name}</td>
-                  <td>{JSON.parse(p.bundles || '[]').length} Bundles</td>
-                  <td>In Stock</td>
-                  <td><span className="badge badge-success">Active</span></td>
-                  <td><button className="btn" onClick={()=>{setEditing(p); setIsModal(true)}}>Edit</button></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead><tr><th>Name</th><th>Bundles</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody>
+            {prods.map(p => (
+              <tr key={p.id}><td>{p.name}</td><td>{JSON.parse(p.bundles || '[]').length}</td><td>Active</td><td><button className="btn" onClick={()=>{setEditing(p); setIsModal(true)}}>Edit</button></td></tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
       {isModal && <ProductModal product={editing} onClose={()=>setIsModal(false)} onSave={()=>{setIsModal(false); refresh();}} />}
     </div>
   );
 }
 
 function ProductModal({ product, onClose, onSave }) {
-  const [form, setForm] = useState(product ? {
-    ...product, 
-    bundles: JSON.parse(product.bundles || '[]')
-  } : {
-    name: '', bundles: [{ label: 'Standard', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }]
-  });
+  const [form, setForm] = useState(product ? { ...product, bundles: JSON.parse(product.bundles || '[]') } : { name: '', bundles: [{ label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }] });
 
-  const addBundle = () => setForm({...form, bundles: [...form.bundles, { label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }]});
-  
-  const updateBundle = (index, field, val) => {
-    const newBundles = [...form.bundles];
-    newBundles[index][field] = val;
-    setForm({...form, bundles: newBundles});
+  const updateBundle = (i, k, v) => {
+    const b = [...form.bundles]; b[i][k] = v; setForm({ ...form, bundles: b });
   };
 
   const handleSave = async () => {
     const action = product ? 'updateProduct' : 'addProduct';
-    const payload = { ...form, bundles: JSON.stringify(form.bundles) };
-    const r = await API.call({ action, product: JSON.stringify(payload), id: product?.id });
+    const r = await API.call({ action, product: JSON.stringify({ ...form, bundles: JSON.stringify(form.bundles) }), id: product?.id });
     if (r.success) onSave(); else alert(r.error);
   };
 
@@ -300,61 +207,30 @@ function ProductModal({ product, onClose, onSave }) {
     <div className="modal-overlay">
       <div className="modal-card">
         <div className="modal-body">
-          <h3 style={{marginBottom:20}}>{product ? 'Edit' : 'Add'} Product</h3>
-          <div style={{marginBottom:15}}>
-            <label className="kpi-label">Product Name</label>
-            <input className="input" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} />
-          </div>
-
-          <div className="card-title" style={{fontSize:13, marginTop:20}}>Bundles & Pricing</div>
+          <h3>{product ? 'Edit' : 'Add'} Product</h3>
+          <div style={{marginTop:15}}><label className="kpi-label">Name</label><input className="input" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} /></div>
+          
+          <div style={{marginTop:20, fontWeight:600}}>Bundles</div>
           {form.bundles.map((b, i) => (
             <div className="bundle-box" key={i}>
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:10}}>
-                <div>
-                  <label className="kpi-label">Bundle Name</label>
-                  <input className="input" value={b.label} placeholder="e.g. 1 Unit + Free Watch" onChange={e=>updateBundle(i, 'label', e.target.value)} />
-                </div>
-                <div>
-                  <label className="kpi-label">Quantity</label>
-                  <input className="input" type="number" value={b.qty} onChange={e=>updateBundle(i, 'qty', e.target.value)} />
-                </div>
-              </div>
               <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10}}>
-                <div>
-                  <label className="kpi-label">Selling Price (GH₵)</label>
-                  <input className="input" type="number" value={b.sellingPrice} onChange={e=>updateBundle(i, 'sellingPrice', e.target.value)} />
-                </div>
-                <div>
-                  <label className="kpi-label">Item Cost (GH₵)</label>
-                  <input className="input" type="number" value={b.costPrice} onChange={e=>updateBundle(i, 'costPrice', e.target.value)} />
-                </div>
+                <input className="input" placeholder="Label (e.g. 1 Unit)" value={b.label} onChange={e=>updateBundle(i, 'label', e.target.value)} />
+                <input className="input" type="number" placeholder="Qty" value={b.qty} onChange={e=>updateBundle(i, 'qty', e.target.value)} />
               </div>
-
-              <div style={{marginTop:12}}>
-                <label className="kpi-label">Include Free Gift?</label>
-                <div className="radio-group">
-                  <label className="radio-label">
-                    <input type="radio" checked={b.hasGift} onChange={()=>updateBundle(i, 'hasGift', true)} /> Yes
-                  </label>
-                  <label className="radio-label">
-                    <input type="radio" checked={!b.hasGift} onChange={()=>updateBundle(i, 'hasGift', false)} /> No
-                  </label>
-                </div>
-                {b.hasGift && (
-                  <div style={{marginTop:5}}>
-                    <label className="kpi-label">Gift Cost (GH₵)</label>
-                    <input className="input" type="number" value={b.giftCost} onChange={e=>updateBundle(i, 'giftCost', e.target.value)} />
-                  </div>
-                )}
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:10}}>
+                <input className="input" type="number" placeholder="Price (GHC)" value={b.sellingPrice} onChange={e=>updateBundle(i, 'sellingPrice', e.target.value)} />
+                <input className="input" type="number" placeholder="Cost (GHC)" value={b.costPrice} onChange={e=>updateBundle(i, 'costPrice', e.target.value)} />
+              </div>
+              <div style={{marginTop:10}}>
+                <label className="kpi-label">Free Gift?</label>
+                <input type="checkbox" checked={b.hasGift} onChange={e=>updateBundle(i, 'hasGift', e.target.checked)} />
+                {b.hasGift && <input className="input" type="number" placeholder="Gift Cost (GHC)" value={b.giftCost} onChange={e=>updateBundle(i, 'giftCost', e.target.value)} />}
               </div>
             </div>
           ))}
-          <button className="btn" onClick={addBundle}>+ Add Another Bundle</button>
+          <button className="btn" style={{width:'100%'}} onClick={()=>setForm({...form, bundles: [...form.bundles, {label:'', qty:1, sellingPrice:0, costPrice:0, hasGift:false, giftCost:0}]})}>+ Add Bundle</button>
         </div>
-        <div className="modal-footer">
-          <button className="btn" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleSave}>Save Product</button>
-        </div>
+        <div className="modal-footer"><button className="btn" onClick={onClose}>Cancel</button><button className="btn btn-primary" onClick={handleSave}>Save</button></div>
       </div>
     </div>
   );
@@ -369,68 +245,42 @@ function OrdersView({ user }) {
     API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data));
     API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data));
   };
-  
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => refresh(), []);
 
   return (
-    <div className="content-area">
-      <div className="page-header" style={{paddingLeft:0}}>
-        <h2>Orders</h2>
-        <button className="btn btn-primary" onClick={()=>setIsModal(true)}>Create Order</button>
-      </div>
-
+    <div>
+      <div style={{display:'flex', justifyContent:'space-between', marginBottom:20}}><h3>Orders</h3><button className="btn btn-primary" onClick={()=>setIsModal(true)}>New Order</button></div>
       <div className="card">
-        <div className="table-wrap">
-          <table>
-            <thead><tr><th>Date</th><th>Customer</th><th>Product</th><th>Bundle</th><th>Total</th><th>Status</th></tr></thead>
-            <tbody>
-              {orders.map(o => (
-                <tr key={o.id}>
-                  <td>{o.date}</td>
-                  <td>{o.customerName}<br/><small>{o.phone}</small></td>
-                  <td>{o.product}</td>
-                  <td>{o.bundle}</td>
-                  <td style={{fontWeight:600}}>GH₵ {o.sellingPrice}</td>
-                  <td><span className="badge badge-warning">{o.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <table>
+          <thead><tr><th>Customer</th><th>Product</th><th>Bundle</th><th>Status</th><th>Total</th></tr></thead>
+          <tbody>
+            {orders.map(o => (
+              <tr key={o.id}><td>{o.customerName}</td><td>{o.product}</td><td>{o.bundleLabel}</td><td>{o.deliveryStatus}</td><td>GH₵ {o.sellingPrice}</td></tr>
+            ))}
+          </tbody>
+        </table>
       </div>
-
       {isModal && <OrderModal products={prods} user={user} onClose={()=>setIsModal(false)} onSave={()=>{setIsModal(false); refresh();}} />}
     </div>
   );
 }
 
 function OrderModal({ products, user, onClose, onSave }) {
-  const [form, setForm] = useState({
-    customerName: '', phone: '', address: '', product: '', bundle: '', 
-    sellingPrice: 0, costPrice: 0, qty: 1, giftInfo: '', isCustom: false
-  });
+  const [f, setF] = useState({ customerName: '', phone: '', product: '', bundleLabel: '', sellingPrice: 0, costOfProduct: 0, qty: 1, isCustom: false });
 
-  const selectedProd = useMemo(() => products.find(p => p.name === form.product), [form.product, products]);
-  const bundles = useMemo(() => selectedProd ? JSON.parse(selectedProd.bundles || '[]') : [], [selectedProd]);
+  const prod = useMemo(() => products.find(p => p.name === f.product), [f.product]);
+  const bundles = useMemo(() => prod ? JSON.parse(prod.bundles || '[]') : [], [prod]);
 
-  const handleBundleChange = (e) => {
-    const val = e.target.value;
-    if (val === 'CUSTOM') {
-      setForm({ ...form, bundle: 'CUSTOM', isCustom: true, sellingPrice: 0, costPrice: 0, qty: 1 });
-    } else {
-      const b = bundles.find(x => x.label === val);
-      setForm({
-        ...form, bundle: val, isCustom: false,
-        sellingPrice: b.sellingPrice,
-        costPrice: parseFloat(b.costPrice) + (b.hasGift ? parseFloat(b.giftCost) : 0),
-        qty: b.qty,
-        giftInfo: b.hasGift ? `(Includes Gift: GH₵${b.giftCost})` : ''
-      });
+  const selectBundle = (label) => {
+    if (label === 'CUSTOM') { setF({ ...f, bundleLabel: 'CUSTOM', isCustom: true, sellingPrice: 0, costOfProduct: 0 }); }
+    else {
+      const b = bundles.find(x => x.label === label);
+      setF({ ...f, bundleLabel: label, isCustom: false, sellingPrice: b.sellingPrice, costOfProduct: (parseFloat(b.costPrice) + (b.hasGift ? parseFloat(b.giftCost) : 0)) });
     }
   };
 
   const handleSave = async () => {
-    const r = await API.call({ action: 'addOrder', order: JSON.stringify({ ...form, createdBy: user.username, status: 'Processing' }) });
+    const r = await API.call({ action: 'addOrder', order: JSON.stringify({ ...f, createdBy: user.username }) });
     if (r.success) onSave(); else alert(r.error);
   };
 
@@ -438,124 +288,66 @@ function OrderModal({ products, user, onClose, onSave }) {
     <div className="modal-overlay">
       <div className="modal-card">
         <div className="modal-body">
-          <h3 style={{marginBottom:20}}>New Order</h3>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:10}}>
-            <div><label className="kpi-label">Customer Name</label><input className="input" onChange={e=>setForm({...form, customerName:e.target.value})} /></div>
-            <div><label className="kpi-label">Phone Number</label><input className="input" onChange={e=>setForm({...form, phone:e.target.value})} /></div>
-          </div>
-          <div style={{marginBottom:10}}><label className="kpi-label">Address</label><input className="input" onChange={e=>setForm({...form, address:e.target.value})} /></div>
-          
-          <div style={{marginBottom:10}}>
-            <label className="kpi-label">Select Product</label>
-            <select className="input" onChange={e=>setForm({...form, product:e.target.value})}>
-              <option>-- Select --</option>
-              {products.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
-            </select>
-          </div>
+          <h3>New Order</h3>
+          <input className="input" placeholder="Customer Name" onChange={e=>setF({...f, customerName:e.target.value})} />
+          <input className="input" placeholder="Phone" onChange={e=>setF({...f, phone:e.target.value})} />
+          <select className="input" style={{marginTop:15}} onChange={e=>setF({...f, product:e.target.value})}>
+            <option>-- Select Product --</option>
+            {products.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+          </select>
+          <select className="input" style={{marginTop:10}} onChange={e=>selectBundle(e.target.value)}>
+            <option>-- Select Bundle --</option>
+            {bundles.map(b => <option key={b.label} value={b.label}>{b.label} (GH₵{b.sellingPrice})</option>)}
+            <option value="CUSTOM">Custom Order</option>
+          </select>
 
-          <div style={{marginBottom:10}}>
-            <label className="kpi-label">Select Bundle</label>
-            <select className="input" onChange={handleBundleChange}>
-              <option>-- Select --</option>
-              {bundles.map(b => <option key={b.label} value={b.label}>{b.label} (GH₵{b.sellingPrice})</option>)}
-              <option value="CUSTOM">Special/Custom Order</option>
-            </select>
-            {form.giftInfo && <div style={{fontSize:11, color:'var(--p-accent)', marginTop:4}}>{form.giftInfo}</div>}
-          </div>
-
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, marginTop:20}}>
-            <div>
-              <label className="kpi-label">Price</label>
-              <input className="input" type="number" readOnly={!form.isCustom} value={form.sellingPrice} onChange={e=>setForm({...form, sellingPrice:e.target.value})} />
-            </div>
-            <div>
-              <label className="kpi-label">Qty</label>
-              <input className="input" type="number" readOnly={!form.isCustom} value={form.qty} onChange={e=>setForm({...form, qty:e.target.value})} />
-            </div>
-            <div>
-              <label className="kpi-label">Cost</label>
-              <input className="input" type="number" readOnly={!form.isCustom} value={form.costPrice} onChange={e=>setForm({...form, costPrice:e.target.value})} />
-            </div>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:15}}>
+            <div><label className="kpi-label">Price (GH₵)</label><input className="input" type="number" readOnly={!f.isCustom} value={f.sellingPrice} onChange={e=>setF({...f, sellingPrice:e.target.value})} /></div>
+            <div><label className="kpi-label">Cost (GH₵)</label><input className="input" type="number" readOnly={!f.isCustom} value={f.costOfProduct} onChange={e=>setF({...f, costOfProduct:e.target.value})} /></div>
           </div>
         </div>
-        <div className="modal-footer">
-          <button className="btn" onClick={onClose}>Cancel</button>
-          <button className="btn btn-primary" onClick={handleSave}>Confirm Order</button>
-        </div>
+        <div className="modal-footer"><button className="btn" onClick={onClose}>Cancel</button><button className="btn btn-primary" onClick={handleSave}>Confirm</button></div>
       </div>
     </div>
   );
 }
 
 function AnalyticsView({ user }) {
-  // Staff sees their personal performance
-  // Admin sees whole store
-  return (
-    <div className="content-area">
-      <div className="page-header" style={{paddingLeft:0}}>
-        <h2>{user.role === 'admin' ? 'Store' : 'My'} Analytics</h2>
-      </div>
-      <div className="card">
-        <p style={{color:'var(--p-text-sub)'}}>Sales trend and conversion funnel logic would be visualized here using Shopify-style charts.</p>
-      </div>
-    </div>
-  );
+  return <div className="card"><h3>Analytics Dashboard</h3><p style={{color:'var(--p-text-sub)'}}>Shopify-style advanced metrics for {user.name}...</p></div>;
 }
 
 function SettingsView() {
   const [url, setUrl] = useState(API.url);
   const save = () => { localStorage.setItem('ss_api_url', url); window.location.reload(); };
-  
   return (
-    <div className="content-area">
-      <div className="card" style={{maxWidth:500}}>
-        <h3>System Settings</h3>
-        <div style={{marginTop:20}}>
-          <label className="kpi-label">Apps Script / Supabase Edge URL</label>
-          <input className="input" value={url} onChange={e=>setUrl(e.target.value)} />
-          <button className="btn btn-primary" style={{marginTop:15}} onClick={save}>Save Connection</button>
-        </div>
-      </div>
-      
-      <div className="card" style={{maxWidth:500}}>
-        <h3>Tracking Pixel</h3>
-        <p style={{fontSize:12, color:'var(--p-text-sub)', marginBottom:10}}>Paste this in Systeme.io Head Settings</p>
-        <textarea className="input" readOnly style={{height:100, fontSize:11, fontFamily:'monospace'}}>
-          {`<script>
-  window.SS_TRACK = { url: "${url}" };
-  // Pixel tracking logic...
-</script>`}
-        </textarea>
-      </div>
+    <div className="card" style={{maxWidth:400}}>
+      <h3>Settings</h3>
+      <div style={{marginTop:15}}><label className="kpi-label">API URL</label><input className="input" value={url} onChange={e=>setUrl(e.target.value)} /></div>
+      <button className="btn btn-primary" style={{marginTop:15, width:'100%'}} onClick={save}>Save Connection</button>
     </div>
   );
 }
 
 function Login({ onLogin }) {
-  const [u, setU] = useState('');
-  const [p, setP] = useState('');
+  const [u, setU] = useState(''); const [p, setP] = useState('');
   const handle = async () => {
     const r = await API.call({ action: 'login', username: u, password: p });
-    if (r.success) onLogin(r.data); else alert('Invalid credentials');
+    if (r.success && !r.data.error) onLogin(r.data); else alert('Invalid Login');
   };
-
   return (
     <div className="modal-overlay" style={{background:'var(--p-bg)'}}>
-      <div className="card" style={{width:320}}>
-        <div style={{textAlign:'center', marginBottom:20}}>
-          <div className="sb-logo" style={{margin:'0 auto 10px'}}>S</div>
-          <h2>Shittu Stores</h2>
-        </div>
-        <div style={{marginBottom:10}}><label className="kpi-label">Username</label><input className="input" onChange={e=>setU(e.target.value)} /></div>
-        <div style={{marginBottom:20}}><label className="kpi-label">Password</label><input className="input" type="password" onChange={e=>setP(e.target.value)} /></div>
-        <button className="btn btn-primary" style={{width:'100%'}} onClick={handle}>Sign In</button>
+      <div className="card" style={{width:320, textAlign:'center'}}>
+        <div className="sb-logo" style={{margin:'0 auto 10px'}}>S</div>
+        <h2>Merchant Sign In</h2>
+        <input className="input" placeholder="Username" onChange={e=>setU(e.target.value)} style={{marginTop:20}} />
+        <input className="input" type="password" placeholder="Password" onChange={e=>setP(e.target.value)} />
+        <button className="btn btn-primary" style={{width:'100%', marginTop:20}} onClick={handle}>Login</button>
       </div>
     </div>
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>

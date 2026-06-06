@@ -15,18 +15,19 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--p-bg); color: var(--p-text); font-family: var(--font-main); font-size: 14px; overflow: hidden; }
 
-/* Sidebar & Layout */
+/* Layout */
 .app-shell { display: flex; height: 100vh; }
 .sidebar { width: 240px; background: #1a1c1d; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
-.sb-header { padding: 20px; border-bottom: 1px solid #2f3133; display: flex; align-items: center; gap: 10px; font-family: var(--font-head); }
-.sb-logo { width: 30px; height: 30px; background: var(--p-accent); border-radius: 6px; display: grid; place-items: center; font-weight: 800; color: white; }
+.sb-header { padding: 20px; border-bottom: 1px solid #2f3133; display: flex; align-items: center; gap: 10px; }
+.sb-logo { width: 30px; height: 30px; background: var(--p-accent); border-radius: 6px; display: grid; place-items: center; font-weight: 800; color: white; font-family: var(--font-head); }
 .nav-item { padding: 12px 20px; cursor: pointer; color: #b5b5b5; font-weight: 500; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
-.nav-item:hover, .nav-item.active { background: #2f3133; color: #fff; border-left: 3px solid var(--p-accent); }
+.nav-item:hover, .nav-item.active { background: #2f3133; color: #fff; }
+.nav-item.active { border-left: 3px solid var(--p-accent); }
 
 .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
 .top-bar { height: 56px; background: #fff; border-bottom: 1px solid var(--p-border); display: flex; align-items: center; padding: 0 32px; font-weight: 600; justify-content: space-between; position: sticky; top: 0; z-index: 5; }
 
-/* Cards & Grid */
+/* Dashboard UI */
 .content { padding: 24px 32px; max-width: 1200px; margin: 0 auto; width: 100%; }
 .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .card { background: #fff; border: 1px solid var(--p-border); padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 20px; }
@@ -34,18 +35,16 @@ body { background: var(--p-bg); color: var(--p-text); font-family: var(--font-ma
 .kpi-label { font-size: 11px; color: var(--p-text-sub); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
 .kpi-val { font-size: 24px; font-weight: 800; font-family: var(--font-head); margin-top: 4px; }
 
-/* Form Elements */
-.btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--p-border); background: white; font-size: 13px; transition: 0.2s; }
+/* Buttons & Inputs */
+.btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--p-border); background: white; font-size: 13px; }
 .btn-primary { background: var(--p-accent); color: white; border: none; }
-.btn-primary:hover { background: #006e52; }
-.input { width: 100%; padding: 10px 12px; border: 1px solid var(--p-border); border-radius: 6px; outline: none; margin-top: 5px; font-family: inherit; font-size: 13px; }
-.input:focus { border-color: var(--p-accent); }
+.input { width: 100%; padding: 10px 12px; border: 1px solid var(--p-border); border-radius: 6px; outline: none; margin-top: 5px; background: #fff; color: var(--p-text); }
+.input[readonly] { background: #f6f6f7; color: #8c9196; cursor: not-allowed; }
 
 /* Table */
 table { width: 100%; border-collapse: collapse; }
 th { text-align: left; padding: 12px; border-bottom: 1px solid var(--p-border); color: var(--p-text-sub); font-size: 12px; font-weight: 600; }
 td { padding: 12px; border-bottom: 1px solid var(--p-border); }
-tr:last-child td { border-bottom: none; }
 
 /* Modals */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: grid; place-items: center; z-index: 100; }
@@ -53,7 +52,6 @@ tr:last-child td { border-bottom: none; }
 .modal-body { padding: 24px; overflow-y: auto; }
 .modal-footer { padding: 16px 24px; border-top: 1px solid var(--p-border); display: flex; justify-content: flex-end; gap: 12px; }
 
-/* Bundle UI */
 .bundle-box { border: 1px solid var(--p-border); padding: 15px; border-radius: 8px; background: #f9fafb; margin-bottom: 12px; }
 .badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #eee; }
 .badge-active { background: var(--p-accent-dim); color: var(--p-accent); }
@@ -66,62 +64,48 @@ tr:last-child td { border-bottom: none; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 
 <script>
-const e = React.createElement;
+const h = React.createElement;
 const { useState, useEffect, useMemo } = React;
 
+// Integrated Apps Script URL
+const API_URL = "https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec";
+
 const API = {
-    url: localStorage.getItem('ss_api_url') || '',
     async call(params) {
-        if (!this.url) return { success: false, error: 'No API URL' };
         try {
-            const r = await fetch(this.url, { method: 'POST', body: JSON.stringify(params) });
+            const r = await fetch(API_URL, { method: 'POST', body: JSON.stringify(params) });
             return await r.json();
-        } catch (err) { return { success: false, error: 'Connection Failed' }; }
+        } catch (err) { return { success: false, error: 'Database Connection Failed' }; }
     }
 };
-
-// --- COMPONENTS ---
 
 function App() {
     const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ss_user')));
     const [view, setView] = useState('dashboard');
-    const [tempUrl, setTempUrl] = useState(API.url);
 
-    if (!API.url) {
-        return e('div', { style: { height: '100vh', display: 'grid', placeItems: 'center' } },
-            e('div', { className: 'card', style: { width: 400, textAlign: 'center' } },
-                e('h2', { style: { marginBottom: 10 } }, 'System Setup'),
-                e('input', { className: 'input', placeholder: 'Paste Apps Script Web App URL', onChange: x => setTempUrl(x.target.value) }),
-                e('button', { className: 'btn btn-primary', style: { width: '100%', marginTop: 15 }, onClick: () => { localStorage.setItem('ss_api_url', tempUrl); window.location.reload(); } }, 'Connect Database')
-            )
-        );
-    }
+    if (!user) return h(Login, { onLogin: u => { setUser(u); localStorage.setItem('ss_user', JSON.stringify(u)); } });
 
-    if (!user) {
-        return e(Login, { onLogin: u => { setUser(u); localStorage.setItem('ss_user', JSON.stringify(u)); } });
-    }
-
-    return e('div', { className: 'app-shell' },
-        e('div', { className: 'sidebar' },
-            e('div', { className: 'sb-header' }, e('div', { className: 'sb-logo' }, 'S'), 'Shittu Stores'),
-            e('div', { className: 'nav-item ' + (view === 'dashboard' ? 'active' : ''), onClick: () => setView('dashboard') }, 'Home'),
-            e('div', { className: 'nav-item ' + (view === 'orders' ? 'active' : ''), onClick: () => setView('orders') }, 'Orders'),
-            user.role === 'admin' ? e('div', { className: 'nav-item ' + (view === 'products' ? 'active' : ''), onClick: () => setView('products') }, 'Products') : null,
-            e('div', { className: 'nav-item ' + (view === 'analytics' ? 'active' : ''), onClick: () => setView('analytics') }, 'Analytics'),
-            e('div', { className: 'nav-item ' + (view === 'settings' ? 'active' : ''), onClick: () => setView('settings') }, 'Settings'),
-            e('div', { style: { marginTop: 'auto', padding: 20, borderTop: '1px solid #2f3133' } },
-                e('div', { style: { fontSize: 12, color: '#8c9196' } }, user.name),
-                e('button', { style: { color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, marginTop: 5 }, onClick: () => { localStorage.clear(); window.location.reload(); } }, 'Sign Out')
+    return h('div', { className: 'app-shell' },
+        h('div', { className: 'sidebar' },
+            h('div', { className: 'sb-header' }, h('div', { className: 'sb-logo' }, 'S'), 'Shittu Stores'),
+            h('div', { className: 'nav-item ' + (view === 'dashboard' ? 'active' : ''), onClick: () => setView('dashboard') }, 'Home'),
+            h('div', { className: 'nav-item ' + (view === 'orders' ? 'active' : ''), onClick: () => setView('orders') }, 'Orders'),
+            user.role === 'admin' ? h('div', { className: 'nav-item ' + (view === 'products' ? 'active' : ''), onClick: () => setView('products') }, 'Products') : null,
+            h('div', { className: 'nav-item ' + (view === 'analytics' ? 'active' : ''), onClick: () => setView('analytics') }, 'Analytics'),
+            h('div', { className: 'nav-item ' + (view === 'settings' ? 'active' : ''), onClick: () => setView('settings') }, 'Settings'),
+            h('div', { style: { marginTop: 'auto', padding: 20, borderTop: '1px solid #2f3133' } },
+                h('div', { style: { fontSize: 12, color: '#8c9196' } }, user.name),
+                h('button', { style: { color: '#ff4d4d', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, marginTop: 5 }, onClick: () => { localStorage.clear(); window.location.reload(); } }, 'Sign Out')
             )
         ),
-        e('div', { className: 'main-content' },
-            e('div', { className: 'top-bar' }, view.toUpperCase(), e('div', { className: 'badge badge-active' }, 'Live')),
-            e('div', { className: 'content' },
-                view === 'dashboard' ? e(Dashboard, { user }) :
-                view === 'orders' ? e(Orders, { user }) :
-                view === 'products' ? e(Products) :
-                view === 'analytics' ? e(Analytics, { user }) :
-                view === 'settings' ? e(Settings) : null
+        h('div', { className: 'main-content' },
+            h('div', { className: 'top-bar' }, view.toUpperCase(), h('div', { className: 'badge badge-active' }, 'Live')),
+            h('div', { className: 'content' },
+                view === 'dashboard' ? h(Dashboard, { user }) :
+                view === 'orders' ? h(Orders, { user }) :
+                view === 'products' ? h(Products) :
+                view === 'analytics' ? h(Analytics, { user }) :
+                view === 'settings' ? h(Settings) : null
             )
         )
     );
@@ -133,20 +117,20 @@ function Dashboard({ user }) {
         API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setData(r.data));
     }, []);
 
-    return e('div', null,
-        e('h2', { style: { fontFamily: 'var(--font-head)', marginBottom: 20 } }, 'Welcome, ' + user.name),
-        e('div', { className: 'kpi-grid' },
-            e('div', { className: 'kpi-card' }, e('div', { className: 'kpi-label' }, 'Revenue'), e('div', { className: 'kpi-val' }, data?.revenue || 'GH₵ 0')),
-            e('div', { className: 'kpi-card' }, e('div', { className: 'kpi-label' }, 'Total Orders'), e('div', { className: 'kpi-val' }, data?.totalOrders || '0')),
-            e('div', { className: 'kpi-card' }, e('div', { className: 'kpi-label' }, 'Conversion'), e('div', { className: 'kpi-val' }, (data?.conversion || '0') + '%')),
-            e('div', { className: 'kpi-card' }, e('div', { className: 'kpi-label' }, 'My Payout Due'), e('div', { className: 'kpi-val' }, '₦ ' + (data?.pendingPayout || '0')))
+    return h('div', null,
+        h('h2', { style: { fontFamily: 'var(--font-head)', marginBottom: 20 } }, 'Welcome, ' + user.name),
+        h('div', { className: 'kpi-grid' },
+            h('div', { className: 'kpi-card' }, h('div', { className: 'kpi-label' }, 'Revenue'), h('div', { className: 'kpi-val' }, data?.revenue || 'GH₵ 0')),
+            h('div', { className: 'kpi-card' }, h('div', { className: 'kpi-label' }, 'Total Orders'), h('div', { className: 'kpi-val' }, data?.totalOrders || '0')),
+            h('div', { className: 'kpi-card' }, h('div', { className: 'kpi-label' }, 'Conversion'), h('div', { className: 'kpi-val' }, (data?.conversion || '0') + '%')),
+            h('div', { className: 'kpi-card' }, h('div', { className: 'kpi-label' }, 'Payout Due'), h('div', { className: 'kpi-val' }, '₦ ' + (data?.pendingPayout || '0')))
         ),
-        e('div', { className: 'card' },
-            e('div', { style: { fontWeight: 600, marginBottom: 15 } }, 'Recent Activity'),
-            e('table', null,
-                e('thead', null, e('tr', null, e('th', null, 'Customer'), e('th', null, 'Product'), e('th', null, 'Status'), e('th', null, 'Total'))),
-                e('tbody', null, data?.recentOrders?.map(o => e('tr', { key: o.id },
-                    e('td', null, o.customerName), e('td', null, o.product), e('td', null, e('span', { className: 'badge' }, o.deliveryStatus)), e('td', null, 'GH₵ ' + o.sellingPrice)
+        h('div', { className: 'card' },
+            h('div', { style: { fontWeight: 600, marginBottom: 15 } }, 'Recent Activity'),
+            h('table', null,
+                h('thead', null, h('tr', null, h('th', null, 'Customer'), h('th', null, 'Product'), h('th', null, 'Status'), h('th', null, 'Total'))),
+                h('tbody', null, data?.recentOrders?.map(o => h('tr', { key: o.id },
+                    h('td', null, o.customerName), h('td', null, o.product), h('td', null, h('span', { className: 'badge' }, o.deliveryStatus)), h('td', null, 'GH₵ ' + o.sellingPrice)
                 )))
             )
         )
@@ -161,62 +145,57 @@ function Products() {
     const refresh = () => API.call({ action: 'getProducts' }).then(r => r.success && setList(r.data));
     useEffect(() => { refresh(); }, []);
 
-    return e('div', null,
-        e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } },
-            e('h2', null, 'Products'),
-            e('button', { className: 'btn btn-primary', onClick: () => { setEditing(null); setModal(true); } }, 'Add Product')
+    return h('div', null,
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } },
+            h('h2', null, 'Products'),
+            h('button', { className: 'btn btn-primary', onClick: () => { setEditing(null); setModal(true); } }, 'Add Product')
         ),
-        e('div', { className: 'card' },
-            e('table', null,
-                e('thead', null, e('tr', null, e('th', null, 'Name'), e('th', null, 'Bundles'), e('th', null, 'Actions'))),
-                e('tbody', null, list.map(p => e('tr', { key: p.id },
-                    e('td', { style: { fontWeight: 600 } }, p.name),
-                    e('td', null, JSON.parse(p.bundles || '[]').length + ' Bundles'),
-                    e('td', null, e('button', { className: 'btn', onClick: () => { setEditing(p); setModal(true); } }, 'Edit'))
+        h('div', { className: 'card' },
+            h('table', null,
+                h('thead', null, h('tr', null, h('th', null, 'Name'), h('th', null, 'Bundles'), h('th', null, 'Status'))),
+                h('tbody', null, list.map(p => h('tr', { key: p.id },
+                    h('td', { style: { fontWeight: 600 } }, p.name),
+                    h('td', null, JSON.parse(p.bundles || '[]').length + ' Bundles'),
+                    h('td', null, h('button', { className: 'btn', onClick: () => { setEditing(p); setModal(true); } }, 'Edit'))
                 )))
             )
         ),
-        modal ? e(ProductModal, { product: editing, onClose: () => setModal(false), onSave: () => { setModal(false); refresh(); } }) : null
+        modal ? h(ProductModal, { product: editing, onClose: () => setModal(false), onSave: () => { setModal(false); refresh(); } }) : null
     );
 }
 
 function ProductModal({ product, onClose, onSave }) {
     const [form, setForm] = useState(product ? { ...product, bundles: JSON.parse(product.bundles || '[]') } : { name: '', bundles: [{ label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }] });
-
     const upd = (i, k, v) => { const b = [...form.bundles]; b[i][k] = v; setForm({ ...form, bundles: b }); };
 
-    return e('div', { className: 'modal-overlay' },
-        e('div', { className: 'modal' },
-            e('div', { className: 'modal-body' },
-                e('h3', { style: { marginBottom: 15 } }, 'Product Details'),
-                e('label', { className: 'kpi-label' }, 'Product Name'),
-                e('input', { className: 'input', value: form.name, onChange: x => setForm({ ...form, name: x.target.value }) }),
-                
-                e('div', { style: { marginTop: 20, fontWeight: 700, marginBottom: 10 } }, 'Pricing Bundles'),
-                form.bundles.map((b, i) => e('div', { className: 'bundle-box', key: i },
-                    e('div', { style: { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 } },
-                        e('input', { className: 'input', placeholder: 'Bundle Name', value: b.label, onChange: x => upd(i, 'label', x.target.value) }),
-                        e('input', { className: 'input', type: 'number', placeholder: 'Qty', value: b.qty, onChange: x => upd(i, 'qty', x.target.value) })
+    return h('div', { className: 'modal-overlay' },
+        h('div', { className: 'modal' },
+            h('div', { className: 'modal-body' },
+                h('h3', { style: { marginBottom: 15 } }, 'Product Details'),
+                h('label', { className: 'kpi-label' }, 'Product Name'),
+                h('input', { className: 'input', value: form.name, onChange: x => setForm({ ...form, name: x.target.value }) }),
+                h('div', { style: { marginTop: 20, fontWeight: 700, marginBottom: 10 } }, 'Bundles & Gifts'),
+                form.bundles.map((b, i) => h('div', { className: 'bundle-box', key: i },
+                    h('div', { style: { display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 } },
+                        h('input', { className: 'input', placeholder: 'Bundle Name', value: b.label, onChange: x => upd(i, 'label', x.target.value) }),
+                        h('input', { className: 'input', type: 'number', placeholder: 'Qty', value: b.qty, onChange: x => upd(i, 'qty', x.target.value) })
                     ),
-                    e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 } },
-                        e('div', null, e('label', { className: 'kpi-label' }, 'Selling Price'), e('input', { className: 'input', type: 'number', value: b.sellingPrice, onChange: x => upd(i, 'sellingPrice', x.target.value) })),
-                        e('div', null, e('label', { className: 'kpi-label' }, 'Item Cost'), e('input', { className: 'input', type: 'number', value: b.costPrice, onChange: x => upd(i, 'costPrice', x.target.value) }))
+                    h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 } },
+                        h('div', null, h('label', { className: 'kpi-label' }, 'Price (GH₵)'), h('input', { className: 'input', type: 'number', value: b.sellingPrice, onChange: x => upd(i, 'sellingPrice', x.target.value) })),
+                        h('div', null, h('label', { className: 'kpi-label' }, 'Cost (GH₵)'), h('input', { className: 'input', type: 'number', value: b.costPrice, onChange: x => upd(i, 'costPrice', x.target.value) }))
                     ),
-                    e('div', { style: { marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 } },
-                        e('label', { style: { fontSize: 12 } }, 'Include Free Gift?'),
-                        e('input', { type: 'checkbox', checked: b.hasGift, onChange: x => upd(i, 'hasGift', x.target.checked) }),
-                        b.hasGift ? e('input', { className: 'input', style: { width: 120 }, placeholder: 'Gift Cost', type: 'number', value: b.giftCost, onChange: x => upd(i, 'giftCost', x.target.value) }) : null
+                    h('div', { style: { marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 } },
+                        h('label', { style: { fontSize: 12 } }, '🎁 Add Free Gift?'),
+                        h('input', { type: 'checkbox', checked: b.hasGift, onChange: x => upd(i, 'hasGift', x.target.checked) }),
+                        b.hasGift ? h('input', { className: 'input', style: { width: 120 }, placeholder: 'Gift Cost', type: 'number', value: b.giftCost, onChange: x => upd(i, 'giftCost', x.target.value) }) : null
                     )
                 )),
-                e('button', { className: 'btn', style: { width: '100%', marginTop: 10 }, onClick: () => setForm({ ...form, bundles: [...form.bundles, { label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }] }) }, '+ Add Bundle')
+                h('button', { className: 'btn', style: { width: '100%' }, onClick: () => setForm({ ...form, bundles: [...form.bundles, { label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }] }) }, '+ Add Bundle')
             ),
-            e('div', { className: 'modal-footer' },
-                e('button', { className: 'btn', onClick: onClose }, 'Cancel'),
-                e('button', { className: 'btn btn-primary', onClick: async () => {
-                    const res = await API.call({ action: product ? 'updateProduct' : 'addProduct', product: JSON.stringify({ ...form, bundles: JSON.stringify(form.bundles) }), id: product?.id });
-                    if (res.success) onSave(); else alert(res.error);
-                } }, 'Save Product')
-            )
+            h('div', { className: 'modal-footer' }, h('button', { className: 'btn', onClick: onClose }, 'Cancel'), h('button', { className: 'btn btn-primary', onClick: async () => {
+                const res = await API.call({ action: product ? 'updateProduct' : 'addProduct', product: JSON.stringify({ ...form, bundles: JSON.stringify(form.bundles) }), id: product?.id });
+                if (res.success) onSave(); else alert(res.error);
+            } }, 'Save'))
         )
     );
 }
@@ -232,101 +211,79 @@ function Orders({ user }) {
     };
     useEffect(() => { refresh(); }, []);
 
-    return e('div', null,
-        e('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } },
-            e('h2', null, 'Orders'),
-            e('button', { className: 'btn btn-primary', onClick: () => setModal(true) }, 'New Order')
-        ),
-        e('div', { className: 'card' },
-            e('table', null,
-                e('thead', null, e('tr', null, e('th', null, 'Customer'), e('th', null, 'Product'), e('th', null, 'Status'), e('th', null, 'Total'))),
-                e('tbody', null, list.map(o => e('tr', { key: o.id },
-                    e('td', null, o.customerName), e('td', null, o.product), e('td', null, e('span', { className: 'badge' }, o.deliveryStatus)), e('td', null, 'GH₵ ' + o.sellingPrice)
+    return h('div', null,
+        h('div', { style: { display: 'flex', justifyContent: 'space-between', marginBottom: 20 } }, h('h2', null, 'Orders'), h('button', { className: 'btn btn-primary', onClick: () => setModal(true) }, 'New Order')),
+        h('div', { className: 'card' },
+            h('table', null,
+                h('thead', null, h('tr', null, h('th', null, 'Customer'), h('th', null, 'Product'), h('th', null, 'Bundle'), h('th', null, 'Total'))),
+                h('tbody', null, list.map(o => h('tr', { key: o.id },
+                    h('td', null, o.customerName), h('td', null, o.product), h('td', null, o.bundleLabel), h('td', { style: { fontWeight: 600 } }, 'GH₵ ' + o.sellingPrice)
                 )))
             )
         ),
-        modal ? e(OrderModal, { products: prods, user, onClose: () => setModal(false), onSave: () => { setModal(false); refresh(); } }) : null
+        modal ? h(OrderModal, { products: prods, user, onClose: () => setModal(false), onSave: () => { setModal(false); refresh(); } }) : null
     );
 }
 
 function OrderModal({ products, user, onClose, onSave }) {
-    const [f, setF] = useState({ customerName: '', phone: '', address: '', product: '', bundleLabel: '', sellingPrice: 0, costOfProduct: 0, qty: 1, isCustom: false });
+    const [f, setF] = useState({ customerName: '', phone: '', product: '', bundleLabel: '', sellingPrice: 0, costOfProduct: 0, isCustom: false });
     const bundles = useMemo(() => {
         const p = products.find(x => x.name === f.product);
         return p ? JSON.parse(p.bundles || '[]') : [];
     }, [f.product]);
 
-    return e('div', { className: 'modal-overlay' },
-        e('div', { className: 'modal' },
-            e('div', { className: 'modal-body' },
-                e('h3', { style: { marginBottom: 15 } }, 'New Order'),
-                e('input', { className: 'input', placeholder: 'Customer Name', onChange: x => setF({ ...f, customerName: x.target.value }) }),
-                e('input', { className: 'input', placeholder: 'Phone Number', onChange: x => setF({ ...f, phone: x.target.value }) }),
-                e('input', { className: 'input', placeholder: 'Full Address', onChange: x => setF({ ...f, address: x.target.value }) }),
-                
-                e('div', { style: { marginTop: 15 } },
-                    e('label', { className: 'kpi-label' }, 'Product'),
-                    e('select', { className: 'input', onChange: x => setF({ ...f, product: x.target.value }) },
-                        e('option', null, '-- Select Product --'),
-                        products.map(p => e('option', { key: p.id, value: p.name }, p.name))
-                    )
+    return h('div', { className: 'modal-overlay' },
+        h('div', { className: 'modal' },
+            h('div', { className: 'modal-body' },
+                h('h3', { style: { marginBottom: 15 } }, 'New Order'),
+                h('input', { className: 'input', placeholder: 'Customer Name', onChange: x => setF({ ...f, customerName: x.target.value }) }),
+                h('input', { className: 'input', placeholder: 'Phone', style: { marginTop: 10 }, onChange: x => setF({ ...f, phone: x.target.value }) }),
+                h('select', { className: 'input', style: { marginTop: 15 }, onChange: x => setF({ ...f, product: x.target.value }) },
+                    h('option', null, '-- Select Product --'),
+                    products.map(p => h('option', { key: p.id, value: p.name }, p.name))
                 ),
-                e('div', { style: { marginTop: 10 } },
-                    e('label', { className: 'kpi-label' }, 'Bundle Selection'),
-                    e('select', { className: 'input', onChange: x => {
-                        const lbl = x.target.value;
-                        if (lbl === 'CUSTOM') setF({ ...f, bundleLabel: 'CUSTOM', isCustom: true });
-                        else {
-                            const b = bundles.find(v => v.label === lbl);
-                            setF({ ...f, bundleLabel: lbl, isCustom: false, sellingPrice: b.sellingPrice, qty: b.qty, costOfProduct: (parseFloat(b.costPrice) + (b.hasGift ? parseFloat(b.giftCost) : 0)) });
-                        }
-                    } },
-                        e('option', null, '-- Select Bundle --'),
-                        bundles.map(b => e('option', { key: b.label, value: b.label }, b.label + ' (GH₵ ' + b.sellingPrice + ')')),
-                        e('option', { value: 'CUSTOM' }, '✏️ Custom Order')
-                    )
+                h('select', { className: 'input', style: { marginTop: 10 }, onChange: x => {
+                    const lbl = x.target.value;
+                    if (lbl === 'CUSTOM') setF({ ...f, bundleLabel: 'CUSTOM', isCustom: true });
+                    else {
+                        const b = bundles.find(v => v.label === lbl);
+                        setF({ ...f, bundleLabel: lbl, isCustom: false, sellingPrice: b.sellingPrice, costOfProduct: (parseFloat(b.costPrice) + (b.hasGift ? parseFloat(b.giftCost) : 0)) });
+                    }
+                } },
+                    h('option', null, '-- Select Bundle --'),
+                    bundles.map(b => h('option', { key: b.label, value: b.label }, b.label + ' (GH₵ ' + b.sellingPrice + ')')),
+                    h('option', { value: 'CUSTOM' }, '✏️ Custom Order')
                 ),
-                e('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 15 } },
-                    e('div', null, e('label', { className: 'kpi-label' }, 'Price'), e('input', { className: 'input', type: 'number', readOnly: !f.isCustom, value: f.sellingPrice, onChange: x => setF({ ...f, sellingPrice: x.target.value }) })),
-                    e('div', null, e('label', { className: 'kpi-label' }, 'Cost'), e('input', { className: 'input', type: 'number', readOnly: !f.isCustom, value: f.costOfProduct, onChange: x => setF({ ...f, costOfProduct: x.target.value }) }))
+                h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 15 } },
+                    h('div', null, h('label', { className: 'kpi-label' }, 'Price'), h('input', { className: 'input', readOnly: !f.isCustom, value: f.sellingPrice, onChange: x => setF({ ...f, sellingPrice: x.target.value }) })),
+                    h('div', null, h('label', { className: 'kpi-label' }, 'Internal Cost'), h('input', { className: 'input', readOnly: !f.isCustom, value: f.costOfProduct, onChange: x => setF({ ...f, costOfProduct: x.target.value }) }))
                 )
             ),
-            e('div', { className: 'modal-footer' },
-                e('button', { className: 'btn', onClick: onClose }, 'Cancel'),
-                e('button', { className: 'btn btn-primary', onClick: async () => {
-                    const res = await API.call({ action: 'addOrder', order: JSON.stringify({ ...f, createdBy: user.username }) });
-                    if (res.success) onSave(); else alert(res.error);
-                } }, 'Place Order')
-            )
+            h('div', { className: 'modal-footer' }, h('button', { className: 'btn', onClick: onClose }, 'Cancel'), h('button', { className: 'btn btn-primary', onClick: async () => {
+                const res = await API.call({ action: 'addOrder', order: JSON.stringify({ ...f, createdBy: user.username }) });
+                if (res.success) onSave(); else alert(res.error);
+            } }, 'Confirm'))
         )
     );
 }
 
 function Analytics({ user }) {
-    return e('div', { className: 'card' }, e('h3', null, 'Advanced Analytics'), e('p', { style: { color: 'var(--p-text-sub)' } }, 'Performance tracking for ' + user.name));
+    return h('div', { className: 'card' }, h('h2', null, 'Analytics'), h('p', null, 'Merchant stats for ' + user.name));
 }
 
 function Settings() {
-    const url = localStorage.getItem('ss_api_url');
-    return e('div', { className: 'card', style: { maxWidth: 500 } },
-        e('h3', null, 'Settings'),
-        e('div', { style: { marginTop: 15 } },
-            e('label', { className: 'kpi-label' }, 'Database Connection URL'),
-            e('input', { className: 'input', defaultValue: url, readOnly: true }),
-            e('button', { className: 'btn btn-primary', style: { width: '100%', marginTop: 10 }, onClick: () => { localStorage.clear(); window.location.reload(); } }, 'Reset System Connection')
-        )
-    );
+    return h('div', { className: 'card', style: { maxWidth: 400 } }, h('h3', null, 'Settings'), h('p', { style: { marginTop: 10, color: '#6d7175' } }, 'Connected to: ' + API_URL));
 }
 
 function Login({ onLogin }) {
     const [u, setU] = useState(''); const [p, setP] = useState('');
-    return e('div', { className: 'modal-overlay', style: { background: 'var(--p-bg)' } },
-        e('div', { className: 'card', style: { width: 320, textAlign: 'center' } },
-            e('div', { className: 'sb-logo', style: { margin: '0 auto 15px' } }, 'S'),
-            e('h2', { style: { marginBottom: 20 } }, 'Merchant Login'),
-            e('input', { className: 'input', placeholder: 'Username', onChange: x => setU(x.target.value) }),
-            e('input', { className: 'input', type: 'password', placeholder: 'Password', style: { marginTop: 10 }, onChange: x => setP(x.target.value) }),
-            e('button', { className: 'btn btn-primary', style: { width: '100%', marginTop: 25 }, onClick: async () => {
+    return h('div', { className: 'modal-overlay', style: { background: 'var(--p-bg)' } },
+        h('div', { className: 'card', style: { width: 320, textAlign: 'center' } },
+            h('div', { className: 'sb-logo', style: { margin: '0 auto 15px' } }, 'S'),
+            h('h2', { style: { marginBottom: 20 } }, 'Merchant Login'),
+            h('input', { className: 'input', placeholder: 'Username', onChange: x => setU(x.target.value) }),
+            h('input', { className: 'input', type: 'password', placeholder: 'Password', style: { marginTop: 10 }, onChange: x => setP(x.target.value) }),
+            h('button', { className: 'btn btn-primary', style: { width: '100%', marginTop: 25 }, onClick: async () => {
                 const res = await API.call({ action: 'login', username: u, password: p });
                 if (res.success && !res.data.error) onLogin(res.data); else alert('Login Failed');
             } }, 'Sign In')
@@ -334,8 +291,7 @@ function Login({ onLogin }) {
     );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(e(App));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 </script>
 </body>
 </html>

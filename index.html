@@ -98,7 +98,7 @@ tr:hover td{background:var(--bg3)}
 .form-select option{background:var(--bg3)}.form-textarea{resize:vertical;min-height:70px}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:680px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow)}
-.modal-lg{max-width:820px}
+.modal-lg{max-width:860px}
 .modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:2}
 .modal-title{font-family:var(--font-head);font-size:16px;font-weight:700}
 .modal-body{padding:20px}
@@ -152,7 +152,23 @@ tr:hover td{background:var(--bg3)}
 .bar-wrap{background:var(--bg4);border-radius:3px;height:6px;overflow:hidden;margin-top:3px}
 .bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
 .chart-svg{width:100%;overflow:visible}
-.optimistic-saving{opacity:0.6;pointer-events:none}
+
+/* Bundle row in product modal */
+.bundle-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;position:relative}
+.bundle-row-header{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;margin-bottom:10px}
+.bundle-free-gift-row{display:flex;align-items:center;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.bundle-free-gift-row label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer}
+.bundle-free-gift-row input[type=radio]{accent-color:var(--accent)}
+.bundle-gift-cost{display:flex;align-items:center;gap:8px;margin-left:8px}
+
+/* Order bundle info card */
+.bundle-info-card{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;margin-top:8px}
+.bundle-info-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
+.bundle-info-row:last-child{border-bottom:none;margin-top:4px;padding-top:8px}
+.bundle-info-label{color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.4px;font-size:11px}
+.bundle-info-value{font-family:var(--font-mono);font-weight:600;color:var(--text)}
+.bundle-info-gift{color:var(--green);font-size:11px;display:flex;align-items:center;gap:4px;margin-top:6px}
+
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -163,6 +179,7 @@ tr:hover td{background:var(--bg3)}
   .content{padding:16px}
   .filters-bar{flex-direction:column;align-items:stretch}
   .search-input{width:100%}
+  .bundle-row-header{flex-direction:column}
 }
 </style>
 </head>
@@ -174,25 +191,64 @@ tr:hover td{background:var(--bg3)}
 const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext} = React;
 
 // ═══════════════════════════════════════════════════════
-// CACHE LAYER
+// SPEED LAYER — SWR-style cache with background revalidation
 // ═══════════════════════════════════════════════════════
 const _cache = {};
-const CACHE_TTL = 60000;
-function cacheGet(k){ const e=_cache[k]; if(e&&Date.now()-e.ts<CACHE_TTL)return e.v; return null; }
+const _inflight = {};
+const CACHE_TTL = 90000; // 90s stale-while-revalidate
+
+function cacheGet(k){ const e=_cache[k]; if(e)return e; return null; }
 function cacheSet(k,v){ _cache[k]={v,ts:Date.now()}; }
-function cacheBust(){ Object.keys(_cache).forEach(k=>delete _cache[k]); }
+function cacheBust(keys){ 
+  if(keys){ keys.forEach(k=>{ Object.keys(_cache).forEach(ck=>{ if(ck.includes(k))delete _cache[ck]; }); }); }
+  else { Object.keys(_cache).forEach(k=>delete _cache[k]); }
+}
+
+// Mutation → bust only related caches
+const BUST_MAP = {
+  addOrder:['getOrders','getDashboard','getMyDashboard'],
+  updateOrder:['getOrders','getDashboard','getMyDashboard'],
+  deleteOrder:['getOrders','getDashboard','getMyDashboard'],
+  addProduct:['getProducts'],updateProduct:['getProducts'],deleteProduct:['getProducts'],
+  addStaff:['getStaff'],updateStaff:['getStaff'],deleteStaff:['getStaff'],
+  addSupplier:['getSuppliers'],updateSupplier:['getSuppliers'],deleteSupplier:['getSuppliers'],
+  addExpense:['getExpenses'],deleteExpense:['getExpenses'],
+  addWithdrawal:['getWithdrawals'],
+  addPayoutRecord:['getPayoutRecords','getDashboard'],
+};
 
 // ═══════════════════════════════════════════════════════
-// API — fire-and-forget for mutations with optimistic UI
+// API — with request dedup and smart cache busting
 // ═══════════════════════════════════════════════════════
 const API = {
-  url: localStorage.getItem('apiUrl')||'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec',
+  url: localStorage.getItem('apiUrl')||'',
   setUrl(u){ this.url=u; localStorage.setItem('apiUrl',u); },
   async call(params){
     if(!this.url) return {success:false,error:'No API URL. Go to Settings.'};
     const key = JSON.stringify(params);
-    const isRead = (params.action||'').startsWith('get')||(params.action||'').startsWith('fetch');
-    if(isRead){ const c=cacheGet(key); if(c) return c; }
+    const action = params.action||'';
+    const isRead = action.startsWith('get')||action.startsWith('fetch');
+    
+    // Return cached if fresh enough
+    if(isRead){ 
+      const c=cacheGet(key); 
+      if(c && Date.now()-c.ts < CACHE_TTL) return {success:true,data:c.v,_cached:true}; 
+    }
+    
+    // Deduplicate in-flight requests (for reads)
+    if(isRead && _inflight[key]){ return _inflight[key]; }
+    
+    const promise = this._fetch(params, key, isRead);
+    if(isRead) _inflight[key] = promise;
+    
+    try {
+      const result = await promise;
+      return result;
+    } finally {
+      if(isRead) delete _inflight[key];
+    }
+  },
+  async _fetch(params, key, isRead){
     try{
       const r=await fetch(this.url,{
         method:'POST',redirect:'follow',
@@ -202,10 +258,22 @@ const API = {
       if(!r.ok) return {success:false,error:`HTTP ${r.status}`};
       const text=await r.text();
       let data; try{data=JSON.parse(text);}catch{return{success:false,error:'Bad response: '+text.slice(0,80)};}
-      if(isRead&&data.success) cacheSet(key,data);
-      if(!isRead&&data.success) cacheBust();
+      if(isRead && data.success) cacheSet(key, data.data||[]);
+      if(!isRead && data.success){ 
+        const busted=BUST_MAP[params.action];
+        cacheBust(busted);
+      }
       return data;
     }catch(e){ return {success:false,error:e.message}; }
+  },
+  // Background prefetch — fire and forget
+  prefetch(action){
+    if(!this.url) return;
+    const params={action};
+    const key=JSON.stringify(params);
+    const c=cacheGet(key);
+    if(c && Date.now()-c.ts<CACHE_TTL) return; // already fresh
+    this.call(params);
   }
 };
 
@@ -246,7 +314,6 @@ const toast=(msg,type)=>_toastFn&&_toastFn(msg,type);
 const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
 const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
-const ROLES=['staff','customer_care','manager'];
 const PERMS_LIST=['view_orders','add_orders','edit_orders','delete_orders','view_financials','view_dashboard','manage_expenses'];
 const STAFF_PAYOUT_NGN=2000;
 
@@ -282,31 +349,47 @@ function supplierOwnsOrder(order,products,user){
     product?.supplierUsername===user.username||productSuppliers.includes(user.username)||
     assigned.includes(order.product);
 }
-function daysBetween(d1,d2){
-  if(!d1||!d2)return null;
-  const diff=new Date(d2)-new Date(d1);
-  if(isNaN(diff))return null;
-  return Math.round(diff/(1000*60*60*24));
-}
 
 // ═══════════════════════════════════════════════════════
-// DATA HOOK
+// SWR-STYLE DATA HOOK
 // ═══════════════════════════════════════════════════════
 function useData(action,enabled=true){
-  const [data,setData]=useState(null);
-  const [loading,setLoading]=useState(true);
+  const [data,setData]=useState(()=>{
+    // Serve stale cache immediately if available
+    if(!enabled||!API.url) return null;
+    const cached=cacheGet(JSON.stringify({action}));
+    return cached?cached.v:null;
+  });
+  const [loading,setLoading]=useState(()=>{
+    if(!enabled||!API.url) return false;
+    const cached=cacheGet(JSON.stringify({action}));
+    return !cached; // not loading if we have cache
+  });
   const [error,setError]=useState('');
-  const load=useCallback(async()=>{
+  
+  const load=useCallback(async(forceRefresh=false)=>{
     if(!enabled){setLoading(false);return;}
     if(!API.url){setLoading(false);return;}
+    // If we have cache and not forced, background revalidate
+    const cached=cacheGet(JSON.stringify({action}));
+    if(cached && !forceRefresh){
+      setData(cached.v);
+      setLoading(false);
+      // Background refresh if stale
+      if(Date.now()-cached.ts > CACHE_TTL/2){
+        API.call({action}).then(r=>{ if(r.success&&!r._cached) setData(r.data||[]); });
+      }
+      return;
+    }
     setLoading(true);setError('');
     const r=await API.call({action});
     setLoading(false);
     if(r.success)setData(r.data||[]);
     else setError(r.error||'Failed');
   },[action,enabled]);
+  
   useEffect(()=>{load();},[load]);
-  return {data,loading,error,reload:load,setData};
+  return {data,loading,error,reload:()=>load(true),setData};
 }
 
 // ═══════════════════════════════════════════════════════
@@ -409,6 +492,11 @@ function App(){
 
 function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,toasts,children}){
   const {theme,toggleTheme}=useContext(ThemeCtx);
+  // Prefetch on hover
+  const prefetchOnHover=(id)=>{
+    const actionMap={dashboard:'getDashboard',orders:'getOrders',financials:'getOrders',analytics:'getOrders',expenses:'getExpenses',products:'getProducts',staff:'getStaff',suppliers:'getSuppliers'};
+    if(actionMap[id]) API.prefetch(actionMap[id]);
+  };
   return React.createElement('div',{className:'app'},
     React.createElement('div',{className:`sidebar-overlay ${sidebarOpen?'show':''}`,onClick:()=>setSidebarOpen(false)}),
     React.createElement('aside',{className:`sidebar ${sidebarOpen?'open':''}`},
@@ -418,7 +506,10 @@ function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,toas
       ),
       React.createElement('div',{className:'nav-section'},
         React.createElement('div',{className:'nav-section-label'},'Menu'),
-        navItems.map(n=>React.createElement('div',{key:n.id,className:`nav-item ${page===n.id?'active':''}`,onClick:()=>nav(n.id)},
+        navItems.map(n=>React.createElement('div',{key:n.id,className:`nav-item ${page===n.id?'active':''}`,
+          onClick:()=>nav(n.id),
+          onMouseEnter:()=>prefetchOnHover(n.id)
+        },
           React.createElement('span',{className:'nav-icon'},n.icon),n.label
         ))
       ),
@@ -521,7 +612,6 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
 
 function AdminDashboard({data,reload}){
   const d=data||{};
-  // Build monthly orders chart data from last 6 months
   const monthlyData=useMemo(()=>{
     const months=[];
     for(let i=5;i>=0;i--){
@@ -687,10 +777,11 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const [payFilter,setPayFilter]=useState('');
   const [contactingOrder,setContactingOrder]=useState(null);
 
-  const load=useCallback(async()=>{
+  const load=useCallback(async(force=false)=>{
     setLoading(true);
     const params={action:'getOrders'};
     if(isSupplier)params.supplierUsername=user.username;
+    // Parallel fetch all needed data
     const [or,pr,sf]=await Promise.all([
       API.call(params),
       API.call({action:'getProducts'}),
@@ -701,7 +792,18 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     if(sf.success)setStaffList(sf.data||[]);
     setLoading(false);
   },[isSupplier,user.username]);
-  useEffect(()=>{load();},[load]);
+  
+  useEffect(()=>{
+    // Serve from cache instantly if available
+    const key=JSON.stringify({action:'getOrders',...(isSupplier?{supplierUsername:user.username}:{})});
+    const cached=cacheGet(key);
+    if(cached){setOrders(cached.v);setLoading(false);}
+    const pc=cacheGet(JSON.stringify({action:'getProducts'}));
+    if(pc)setProducts(pc.v);
+    const sc=cacheGet(JSON.stringify({action:'getStaff'}));
+    if(sc)setStaffList(sc.v);
+    load();
+  },[load]);
 
   const filtered=useMemo(()=>{
     let r=orders.filter(o=>supplierOwnsOrder(o,products,user));
@@ -712,7 +814,6 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     return r;
   },[orders,statusFilter,contactFilter,payFilter,search,products,user]);
 
-  // OPTIMISTIC UPDATE: apply change to local state immediately, sync API in background
   const updateField=useCallback(async(order,updates)=>{
     const updated={...order,...updates};
     setOrders(prev=>prev.map(o=>o.id===order.id?updated:o));
@@ -765,9 +866,9 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
         React.createElement('option',{value:''},'All Payment'),
         PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s))
       ),
-      React.createElement('button',{className:'btn btn-secondary',onClick:load},'↻')
+      React.createElement('button',{className:'btn btn-secondary',onClick:()=>load(true)},'↻')
     ),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
+    loading&&orders.length===0?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
     filtered.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📦'),React.createElement('div',{className:'empty-text'},'No orders found')):
     React.createElement('div',{className:'table-wrap'},
       React.createElement('table',null,
@@ -839,8 +940,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
         if(editing){setOrders(prev=>prev.map(o=>o.id===newOrder.id?newOrder:o));}
         else{setOrders(prev=>[newOrder,...prev]);}
         setShowModal(false);setEditing(null);toast('Order saved ✓');
-        // background sync
-        load();
+        load(true);
       },
       onClose:()=>{setShowModal(false);setEditing(null);}
     }),
@@ -851,7 +951,6 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   );
 }
 
-// Separate component so input has its own local state (avoids cursor jump)
 function DeliveryPriceInput({order,onUpdate}){
   const [val,setVal]=useState(order.deliveryPrice||'');
   useEffect(()=>setVal(order.deliveryPrice||''),[order.deliveryPrice]);
@@ -889,7 +988,7 @@ function ContactedByModal({staffList,onConfirm,onClose}){
 }
 
 // ═══════════════════════════════════════════════════════
-// ORDER MODAL — redesigned
+// ORDER MODAL — cleaned up: no selling/cost/qty fields
 // ═══════════════════════════════════════════════════════
 function OrderModal({order,products,user,isAdmin,onSave,onClose}){
   const isEdit=!!order;
@@ -903,16 +1002,14 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
   const [saving,setSaving]=useState(false);
   const [showContact2,setShowContact2]=useState(!!(order?.contact2));
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const setV=k=>v=>setF(p=>({...p,[k]:v}));
 
   const prod=useMemo(()=>products.find(p=>p.name===f.product),[f.product,products]);
   const bundles=useMemo(()=>{try{return JSON.parse(prod?.bundles||'[]');}catch{return[];}},[prod]);
   const sizes=useMemo(()=>{
-    if(!prod||!(prod.hasSizes===true||prod.hasSizes==='true'))return[];
+    if(!prod||(prod.hasSizes!==true&&prod.hasSizes!=='true'))return[];
     try{return JSON.parse(prod?.sizes||'[]');}catch{return[];}
   },[prod]);
 
-  // When product changes (new order), reset bundle/prices
   const prevProduct=useRef(f.product);
   useEffect(()=>{
     if(isEdit)return;
@@ -927,6 +1024,12 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
   },[f.product,prod,isEdit]);
 
   const isCustom=f.bundleLabel==='__custom__'||f.isCustom;
+  
+  // The selected bundle object
+  const selectedBundle=useMemo(()=>{
+    if(isCustom||!f.bundleLabel)return null;
+    return bundles.find(b=>b.label===f.bundleLabel)||null;
+  },[bundles,f.bundleLabel,isCustom]);
 
   const pickBundle=sel=>{
     if(sel==='__custom__'){
@@ -935,10 +1038,13 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     }
     const b=bundles.find(x=>x.label===sel);
     if(!b)return;
-    const cost=(sp(prod?.costGHC)+sp(prod?.freeGiftCost))*sp(b.qty)||'';
     const supplierUsernames=readList(prod?.supplierUsernames||prod?.supplierUsername);
-    setF(p=>({...p,bundleLabel:b.label,qty:b.qty,sellingPrice:b.price,
-      costOfProduct:cost||p.costOfProduct,isCustom:false,
+    setF(p=>({...p,
+      bundleLabel:b.label,
+      qty:b.qty,
+      sellingPrice:b.sellingPrice||b.price||'',
+      costOfProduct:b.costPrice||b.cost||'',
+      isCustom:false,
       supplierUsername:supplierUsernames[0]||prod?.supplierUsername||p.supplierUsername||''
     }));
   };
@@ -972,13 +1078,9 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     }else toast(r.error||'Save failed','error');
   };
 
-  const inp=(lbl,k,t='text',ex={})=>React.createElement('div',{className:'form-group'},
+  const sl=(lbl,k,opts)=>React.createElement('div',{className:'form-group'},
     React.createElement('label',{className:'form-label'},lbl),
-    React.createElement('input',{className:'form-input',type:t,value:f[k]||'',onChange:set(k),...ex})
-  );
-  const sl=(lbl,k,opts,ex={})=>React.createElement('div',{className:'form-group'},
-    React.createElement('label',{className:'form-label'},lbl),
-    React.createElement('select',{className:'form-select',value:f[k]||'',onChange:set(k),...ex},
+    React.createElement('select',{className:'form-select',value:f[k]||'',onChange:set(k)},
       React.createElement('option',{value:''},'— Select —'),
       opts.map(o=>React.createElement('option',{key:o,value:o},o))
     )
@@ -993,9 +1095,15 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
       React.createElement('div',{className:'modal-body'},
         // ── Customer ──
         React.createElement('div',{className:'section-divider'},'Customer'),
-        inp('Order Date *','date','date'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginTop:12,marginBottom:14}},
-          inp('Customer Name *','customerName'),
+        React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+          React.createElement('label',{className:'form-label'},'Order Date *'),
+          React.createElement('input',{className:'form-input',type:'date',value:f.date||'',onChange:set('date')})
+        ),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Customer Name *'),
+            React.createElement('input',{className:'form-input',value:f.customerName||'',onChange:set('customerName')})
+          ),
           React.createElement('div',{className:'form-group'},
             React.createElement('label',{className:'form-label'},'Phone / Contact *'),
             React.createElement('input',{className:'form-input',value:f.contact||'',onChange:set('contact'),placeholder:'Primary phone'}),
@@ -1007,7 +1115,8 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
           React.createElement('label',{className:'form-label'},'Delivery Address *'),
           React.createElement('textarea',{className:'form-textarea',rows:2,value:f.address||'',onChange:set('address')})
         ),
-        // ── Product & Pricing ──
+
+        // ── Product & Bundle ──
         React.createElement('div',{className:'section-divider'},'Product & Bundle'),
         React.createElement('div',{className:'form-group',style:{marginBottom:12}},
           React.createElement('label',{className:'form-label'},'Product *'),
@@ -1016,49 +1125,92 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
             products.filter(p=>isActive(p.active)).map(p=>React.createElement('option',{key:p.id,value:p.name},p.name))
           )
         ),
+
         f.product&&React.createElement('div',{className:'form-group',style:{marginBottom:12}},
-          React.createElement('label',{className:'form-label'},'Bundle / Quantity *'),
+          React.createElement('label',{className:'form-label'},'Bundle *'),
           React.createElement('select',{className:'form-select',value:isCustom?'__custom__':f.bundleLabel||'',onChange:e=>pickBundle(e.target.value)},
             React.createElement('option',{value:''},'— Select Bundle —'),
-            bundles.map(b=>React.createElement('option',{key:b.label,value:b.label},`${b.label} — ${fmtGHC(b.price)}`)),
+            bundles.map(b=>React.createElement('option',{key:b.label,value:b.label},
+              `${b.label} — ${fmtGHC(b.sellingPrice||b.price||0)}`+
+              (b.hasFreeGift?` 🎁 Free Gift incl.`:'')
+            )),
             React.createElement('option',{value:'__custom__'},'✏ Custom / Special Order')
           )
         ),
-        sizes.length>0&&sl('Size *','size',sizes),
-        // Read-only price display (non-custom, non-admin)
-        !isCustom&&f.bundleLabel&&!isAdmin&&React.createElement('div',{className:'form-grid form-grid-3',style:{marginTop:12,marginBottom:14}},
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),
-            React.createElement('input',{className:'form-input',value:fmtGHC(f.sellingPrice),readOnly:true,disabled:true})
+
+        // Bundle info card (read-only for non-custom, non-admin)
+        selectedBundle&&!isCustom&&React.createElement('div',{className:'bundle-info-card',style:{marginBottom:14}},
+          React.createElement('div',{className:'bundle-info-row'},
+            React.createElement('span',{className:'bundle-info-label'},'Selling Price'),
+            React.createElement('span',{className:'bundle-info-value'},fmtGHC(selectedBundle.sellingPrice||selectedBundle.price||0))
           ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),
-            React.createElement('input',{className:'form-input',value:fmtGHC(f.costOfProduct),readOnly:true,disabled:true})
+          React.createElement('div',{className:'bundle-info-row'},
+            React.createElement('span',{className:'bundle-info-label'},'Cost Price'),
+            React.createElement('span',{className:'bundle-info-value'},fmtGHC(selectedBundle.costPrice||selectedBundle.cost||0))
           ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Quantity'),
-            React.createElement('input',{className:'form-input',value:f.qty||'',readOnly:true,disabled:true})
+          React.createElement('div',{className:'bundle-info-row'},
+            React.createElement('span',{className:'bundle-info-label'},'Quantity'),
+            React.createElement('span',{className:'bundle-info-value'},selectedBundle.qty||1)
+          ),
+          selectedBundle.hasFreeGift&&React.createElement('div',{className:'bundle-info-gift'},
+            '🎁 Free gift included',
+            selectedBundle.freeGiftCost?` — Cost: ${fmtGHC(selectedBundle.freeGiftCost)}`:'',
+            selectedBundle.freeGiftName?` (${selectedBundle.freeGiftName})`:'',
           )
         ),
-        // Admin can always edit prices
-        isAdmin&&React.createElement('div',{className:'form-grid form-grid-3',style:{marginTop:12,marginBottom:14}},
-          inp('Selling Price (GHC)','sellingPrice','number'),
-          inp('Cost Price (GHC)','costOfProduct','number'),
-          inp('Quantity','qty','number')
+
+        // Admin can edit prices even for standard bundles
+        isAdmin&&selectedBundle&&!isCustom&&React.createElement('div',null,
+          React.createElement('div',{className:'alert-info',style:{marginBottom:8}},'Admin: you can override these values for this order.'),
+          React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:f.sellingPrice||'',onChange:set('sellingPrice'),placeholder:selectedBundle.sellingPrice||selectedBundle.price||''})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:f.costOfProduct||'',onChange:set('costOfProduct'),placeholder:selectedBundle.costPrice||selectedBundle.cost||''})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Quantity'),
+              React.createElement('input',{className:'form-input',type:'number',value:f.qty||'',onChange:set('qty'),placeholder:selectedBundle.qty||1})
+            )
+          )
         ),
-        // Custom fields (active only when custom selected)
+
+        sizes.length>0&&sl('Size *','size',sizes),
+
+        // Custom order fields
         isCustom&&React.createElement('div',null,
           React.createElement('div',{className:'alert-warning',style:{marginBottom:12}},'⚡ Custom order — fill in all fields below. A note is required.'),
           React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
-            inp('Quantity *','qty','number'),
-            inp('Selling Price (GHC)','sellingPrice','number'),
-            inp('Cost Price (GHC)','costOfProduct','number')
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Quantity *'),
+              React.createElement('input',{className:'form-input',type:'number',value:f.qty||'',onChange:set('qty')})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:f.sellingPrice||'',onChange:set('sellingPrice')})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Cost Price (GHC)'},
+              React.createElement('input',{className:'form-input',type:'number',value:f.costOfProduct||'',onChange:set('costOfProduct')})
+            )
           ),
           React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-            inp('Delivery Price (GHC) *','deliveryPrice','number'),
-            sl('Payment Status','paymentStatus',PAYMENT_OPTIONS)
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Delivery Price (GHC) *'),
+              React.createElement('input',{className:'form-input',type:'number',value:f.deliveryPrice||'',onChange:set('deliveryPrice')})
+            ),
+            React.createElement('div',{className:'form-group'},
+              React.createElement('label',{className:'form-label'},'Payment Status'),
+              React.createElement('select',{className:'form-select',value:f.paymentStatus||'Unpaid',onChange:set('paymentStatus')},
+                PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s))
+              )
+            )
           )
         ),
+
         React.createElement('div',{className:'form-group',style:{marginTop:8}},
           React.createElement('label',{className:'form-label'},isCustom?'Notes * (required for custom orders)':'Notes'),
           React.createElement('textarea',{className:'form-textarea',rows:2,value:f.notes||'',onChange:set('notes'),placeholder:isCustom?'Describe the custom order…':'Optional notes'})
@@ -1071,6 +1223,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onClose}){
     )
   );
 }
+
 // ═══════════════════════════════════════════════════════
 // FINANCIALS
 // ═══════════════════════════════════════════════════════
@@ -1085,13 +1238,12 @@ function FinancialsPage({isAdmin}){
 
   const load=useCallback(async()=>{
     setLoading(true);
-    const calls=[
+    const [or,ex,wd,pr]=await Promise.all([
       API.call({action:'getOrders'}),
       API.call({action:'getExpenses'}),
       API.call({action:'getWithdrawals'}),
       API.call({action:'getPayoutRecords'}),
-    ];
-    const [or,ex,wd,pr]=await Promise.all(calls);
+    ]);
     if(or.success)setOrders(or.data||[]);
     if(ex.success)setExpenses(ex.data||[]);
     if(wd.success)setWithdrawals(wd.data||[]);
@@ -1210,12 +1362,8 @@ function StaffPayoutTable({orders,payoutRecords,isAdmin,onPaid}){
     if(isDel&&isPaid){byStaff[n].earned+=STAFF_PAYOUT_NGN;byStaff[n].count++;}
     else if(isDel&&!isPaid)byStaff[n].pending+=STAFF_PAYOUT_NGN;
   });
-  // Add payout records
   const paidOut={};
-  (payoutRecords||[]).forEach(r=>{
-    paidOut[r.staffName]=(paidOut[r.staffName]||0)+sp(r.amountNGN);
-  });
-
+  (payoutRecords||[]).forEach(r=>{paidOut[r.staffName]=(paidOut[r.staffName]||0)+sp(r.amountNGN);});
   const rows=Object.values(byStaff);
   if(rows.length===0)return React.createElement('div',{className:'text-muted',style:{padding:12}},'No payout data yet.');
   return React.createElement('div',{className:'table-wrap'},
@@ -1228,17 +1376,14 @@ function StaffPayoutTable({orders,payoutRecords,isAdmin,onPaid}){
           const paid=paidOut[r.name]||0;
           const balance=r.earned-paid;
           return React.createElement('tr',{key:r.name},
-            React.createElement('td',null,r.name),
-            React.createElement('td',null,r.count),
+            React.createElement('td',null,r.name),React.createElement('td',null,r.count),
             React.createElement('td',{className:'profit-positive'},fmtNGN(r.earned)),
             React.createElement('td',{className:r.pending>0?'profit-negative':'td-mono'},fmtNGN(r.pending)),
             React.createElement('td',{style:{color:'var(--green)',fontFamily:'var(--font-mono)',fontSize:12}},fmtNGN(paid)),
             React.createElement('td',{className:balance>0?'profit-negative':'profit-positive'},fmtNGN(balance)),
             ...(isAdmin?[React.createElement('td',{key:'act'},
-              balance>0&&React.createElement('button',{
-                className:'btn btn-success btn-sm',
-                onClick:()=>{if(confirm(`Mark ₦${balance.toLocaleString()} paid to ${r.name}?`))onPaid(r.name,balance);}
-              },'Mark Paid')
+              balance>0&&React.createElement('button',{className:'btn btn-success btn-sm',
+                onClick:()=>{if(confirm(`Mark ₦${balance.toLocaleString()} paid to ${r.name}?`))onPaid(r.name,balance);}},'Mark Paid')
             )]:[] )
           );
         })
@@ -1287,8 +1432,9 @@ function WithdrawalModal({onSave,onClose}){
     )
   );
 }
+
 // ═══════════════════════════════════════════════════════
-// ANALYTICS — with charts + conversion rates
+// ANALYTICS
 // ═══════════════════════════════════════════════════════
 function AnalyticsPage({user,isAdmin,isSupplier}){
   const [orders,setOrders]=useState([]);
@@ -1300,11 +1446,13 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
   useEffect(()=>{
     const params={action:'getOrders'};
     if(isSupplier)params.supplierUsername=user.username;
+    const key=JSON.stringify(params);
+    const c=cacheGet(key);
+    if(c){setOrders(c.v);setLoading(false);}
     API.call(params).then(r=>{if(r.success)setOrders(r.data||[]);setLoading(false);});
   },[isSupplier,user.username]);
 
   const years=useMemo(()=>{const s=new Set(orders.map(o=>(o.date||'').slice(0,4)).filter(Boolean));return [...s].sort().reverse();},[orders]);
-
   const filtered=useMemo(()=>orders.filter(o=>{
     if(!o.date)return false;
     if(period==='month')return o.date.startsWith(selMonth);
@@ -1312,21 +1460,14 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
     return true;
   }),[orders,period,selMonth,selYear]);
 
-  const byStatus=useMemo(()=>{
-    const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;
-  },[filtered]);
-
-  const byProduct=useMemo(()=>{
-    const m={};filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});
-    return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  },[filtered]);
+  const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
+  const byProduct=useMemo(()=>{const m={};filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);},[filtered]);
 
   const paid=filtered.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
   const rev=paid.reduce((s,o)=>s+sp(o.sellingPrice),0);
   const cost=paid.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);
   const convRate=filtered.length>0?Math.round((byStatus['Delivered']||0)/filtered.length*100):0;
 
-  // Monthly conversion rates for chart
   const monthlyConvData=useMemo(()=>{
     const monthMap={};
     orders.forEach(o=>{
@@ -1336,13 +1477,9 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
       monthMap[mk].total++;
       if(statusOf(o)==='Delivered')monthMap[mk].delivered++;
     });
-    return Object.entries(monthMap).sort().slice(-8).map(([k,v])=>({
-      label:k.slice(5),
-      value:v.total>0?Math.round(v.delivered/v.total*100):0
-    }));
+    return Object.entries(monthMap).sort().slice(-8).map(([k,v])=>({label:k.slice(5),value:v.total>0?Math.round(v.delivered/v.total*100):0}));
   },[orders]);
 
-  // Monthly revenue chart
   const monthlyRevData=useMemo(()=>{
     const monthMap={};
     orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid').forEach(o=>{
@@ -1351,19 +1488,10 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
       if(!monthMap[mk])monthMap[mk]=0;
       monthMap[mk]+=sp(o.sellingPrice);
     });
-    return Object.entries(monthMap).sort().slice(-8).map(([k,v])=>({
-      label:k.slice(5),
-      value:v
-    }));
+    return Object.entries(monthMap).sort().slice(-8).map(([k,v])=>({label:k.slice(5),value:v}));
   },[orders]);
 
-  // Avg conversion rate across all months
-  const avgConvRate=useMemo(()=>{
-    if(monthlyConvData.length===0)return 0;
-    return Math.round(monthlyConvData.reduce((s,m)=>s+m.value,0)/monthlyConvData.length);
-  },[monthlyConvData]);
-
-  // Current month ongoing conversion
+  const avgConvRate=useMemo(()=>{if(monthlyConvData.length===0)return 0;return Math.round(monthlyConvData.reduce((s,m)=>s+m.value,0)/monthlyConvData.length);},[monthlyConvData]);
   const curMonthConv=useMemo(()=>{
     const cur=today().slice(0,7);
     const curOrders=orders.filter(o=>(o.date||'').startsWith(cur));
@@ -1371,11 +1499,10 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
     return curOrders.length>0?Math.round(curDel/curOrders.length*100):0;
   },[orders]);
 
-  if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
+  if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
 
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Analytics')),
-    // Period filter
     React.createElement('div',{className:'card',style:{marginBottom:20}},
       React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},
         React.createElement('div',{className:'tabs',style:{margin:0}},
@@ -1387,7 +1514,6 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
         period==='year'&&React.createElement('select',{className:'form-select',style:{width:120},value:selYear,onChange:e=>setSelYear(e.target.value)},years.map(y=>React.createElement('option',{key:y,value:y},y)))
       )
     ),
-    // Stats
     React.createElement('div',{className:'stat-grid'},
       [{label:'Total Orders',value:filtered.length,cls:'blue'},
        {label:'Delivered',value:byStatus['Delivered']||0,cls:'green'},
@@ -1402,28 +1528,22 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
         React.createElement('div',{className:'stat-value'},s.value)
       ))
     ),
-    // Charts row
     React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:20}},
       React.createElement('div',{className:'card'},
         React.createElement('div',{style:{marginBottom:10,display:'flex',justifyContent:'space-between'}},
           React.createElement('div',{className:'section-title',style:{fontSize:14}},'Monthly Conversion Rate (%)'),
           React.createElement('div',{className:'text-muted'},'All time')
         ),
-        monthlyConvData.length>1
-          ?React.createElement(LineChart,{data:monthlyConvData,color:'var(--accent)',height:90})
-          :React.createElement('div',{className:'text-muted'},'Not enough data yet')
+        monthlyConvData.length>1?React.createElement(LineChart,{data:monthlyConvData,color:'var(--accent)',height:90}):React.createElement('div',{className:'text-muted'},'Not enough data yet')
       ),
       React.createElement('div',{className:'card'},
         React.createElement('div',{style:{marginBottom:10,display:'flex',justifyContent:'space-between'}},
           React.createElement('div',{className:'section-title',style:{fontSize:14}},'Monthly Revenue (GHC)'),
           React.createElement('div',{className:'text-muted'},'Paid+delivered')
         ),
-        monthlyRevData.length>0
-          ?React.createElement(BarChart,{data:monthlyRevData,color:'var(--green)',height:90})
-          :React.createElement('div',{className:'text-muted'},'No revenue data yet')
+        monthlyRevData.length>0?React.createElement(BarChart,{data:monthlyRevData,color:'var(--green)',height:90}):React.createElement('div',{className:'text-muted'},'No revenue data yet')
       )
     ),
-    // Status + product charts
     React.createElement('div',{className:'form-grid form-grid-2'},
       React.createElement('div',{className:'card'},
         React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Orders by Status'),
@@ -1431,8 +1551,7 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
           const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;
           return React.createElement('div',{key:s,style:{marginBottom:10}},
             React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
-              React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)
-            ),
+              React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),
             React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}}))
           );
         })
@@ -1445,8 +1564,7 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
           return React.createElement('div',{key:name,style:{marginBottom:10}},
             React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
               React.createElement('span',{style:{maxWidth:'65%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},name),
-              React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)
-            ),
+              React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),
             React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--blue)'}}))
           );
         })
@@ -1519,8 +1637,9 @@ function ExpensesPage({isAdmin}){
     )
   );
 }
+
 // ═══════════════════════════════════════════════════════
-// PRODUCTS
+// PRODUCTS — with bundle-level pricing + per-bundle free gift
 // ═══════════════════════════════════════════════════════
 function ProductsPage(){
   const {data,loading,reload}=useData('getProducts');
@@ -1545,21 +1664,27 @@ function ProductsPage(){
     React.createElement('div',{className:'table-wrap'},
       React.createElement('table',null,
         React.createElement('thead',null,React.createElement('tr',null,
-          ['Product','Cost (GHC)','Selling (GHC)','Profit/Unit','Bundles','Sizes','Free Gift','Suppliers','Status',''].map(h=>React.createElement('th',{key:h},h))
+          ['Product','Bundles','Sizes','Suppliers','Status',''].map(h=>React.createElement('th',{key:h},h))
         )),
         React.createElement('tbody',null,
           list.map(p=>{
             let bundles=[];try{bundles=JSON.parse(p.bundles||'[]');}catch{}
             const productSuppliers=readList(p.supplierNames||p.supplierUsernames||p.supplierUsername).join(', ');
-            const profit=sp(p.sellingPriceGHC)-sp(p.costGHC)-sp(p.freeGiftCost);
+            const bundleCount=bundles.length;
+            const priceRange=bundleCount>0?`${fmtGHC(Math.min(...bundles.map(b=>sp(b.sellingPrice||b.price||0))))} – ${fmtGHC(Math.max(...bundles.map(b=>sp(b.sellingPrice||b.price||0))))}`:null;
             return React.createElement('tr',{key:p.id},
-              React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},p.name),p.description&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},p.description)),
-              React.createElement('td',{className:'td-mono'},fmtGHC(p.costGHC)),
-              React.createElement('td',{className:'td-mono'},fmtGHC(p.sellingPriceGHC)),
-              React.createElement('td',{className:profit>=0?'profit-positive':'profit-negative'},fmtGHC(profit)),
-              React.createElement('td',null,bundles.length>0?`${bundles.length} bundles`:'—'),
+              React.createElement('td',null,
+                React.createElement('div',{style:{fontWeight:600}},p.name),
+                p.description&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},p.description),
+                priceRange&&React.createElement('div',{className:'td-mono',style:{fontSize:11,marginTop:2,color:'var(--accent)'}},priceRange)
+              ),
+              React.createElement('td',null,
+                bundleCount>0?React.createElement('div',null,
+                  React.createElement('div',null,`${bundleCount} bundle${bundleCount>1?'s':''}`),
+                  bundles.some(b=>b.hasFreeGift)&&React.createElement('div',{style:{fontSize:10,color:'var(--green)',marginTop:2}},'🎁 Some have free gifts')
+                ):'—'
+              ),
               React.createElement('td',null,(p.hasSizes===true||p.hasSizes==='true')?'✓':'—'),
-              React.createElement('td',null,(p.hasFreeGift===true||p.hasFreeGift==='true')?fmtGHC(p.freeGiftCost):'—'),
               React.createElement('td',null,productSuppliers||'None'),
               React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(p.active)?'badge-delivered':'badge-canceled'}`},isActive(p.active)?'Active':'Inactive')),
               React.createElement('td',null,
@@ -1579,26 +1704,47 @@ function ProductsPage(){
   );
 }
 
+// ═══════════════════════════════════════════════════════
+// PRODUCT MODAL — bundles own their prices + free gift radio
+// ═══════════════════════════════════════════════════════
 function ProductModal({product,onSave,onClose}){
   const isEdit=!!product;
-  const [f,setF]=useState(product?{...product}:{name:'',costGHC:'',sellingPriceGHC:'',description:'',active:true,hasSizes:false,hasFreeGift:false,freeGiftCost:''});
+  const [f,setF]=useState(product?{...product}:{name:'',description:'',active:true,hasSizes:false});
   const [saving,setSaving]=useState(false);
   const [sizes,setSizes]=useState(()=>{try{return JSON.parse(product?.sizes||'[]');}catch{return[];}});
   const [sizeInput,setSizeInput]=useState('');
-  const [bundles,setBundles]=useState(()=>{try{return JSON.parse(product?.bundles||'[]');}catch{return[];}});
+
+  // Bundles now include: label, qty, sellingPrice, costPrice, hasFreeGift, freeGiftCost, freeGiftName
+  const [bundles,setBundles]=useState(()=>{
+    try{
+      const raw=JSON.parse(product?.bundles||'[]');
+      // Migrate old format: if bundle has 'price' but not 'sellingPrice', map it
+      return raw.map(b=>({
+        label:b.label||'',
+        qty:b.qty||1,
+        sellingPrice:b.sellingPrice||b.price||'',
+        costPrice:b.costPrice||b.cost||'',
+        hasFreeGift:b.hasFreeGift||false,
+        freeGiftCost:b.freeGiftCost||'',
+        freeGiftName:b.freeGiftName||'',
+      }));
+    }catch{return[];}
+  });
+
   const {data:suppliers}=useData('getSuppliers');
   const [assignedSuppliers,setAssignedSuppliers]=useState(()=>readList(product?.supplierUsernames||product?.supplierUsername));
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
 
   const addSize=()=>{if(sizeInput.trim()){setSizes(s=>[...s,sizeInput.trim()]);setSizeInput('');}};
   const rmSize=s=>setSizes(p=>p.filter(x=>x!==s));
-  const addBundle=()=>setBundles(b=>[...b,{label:'',qty:1,price:''}]);
+  const addBundle=()=>setBundles(b=>[...b,{label:'',qty:1,sellingPrice:'',costPrice:'',hasFreeGift:false,freeGiftCost:'',freeGiftName:''}]);
   const updBundle=(i,k,v)=>setBundles(b=>b.map((x,j)=>j===i?{...x,[k]:v}:x));
   const rmBundle=i=>setBundles(b=>b.filter((_,j)=>j!==i));
   const toggleSupplier=username=>setAssignedSuppliers(prev=>prev.includes(username)?prev.filter(x=>x!==username):[...prev,username]);
 
   const save=async()=>{
     if(!f.name){toast('Name required','error');return;}
+    if(bundles.some(b=>!b.label)){toast('All bundles need a label','error');return;}
     setSaving(true);
     const supplierNames=(suppliers||[]).filter(s=>assignedSuppliers.includes(s.username)).map(s=>s.name||s.username);
     const data={...f,
@@ -1606,7 +1752,10 @@ function ProductModal({product,onSave,onClose}){
       supplierUsernames:JSON.stringify(assignedSuppliers),
       supplierNames:supplierNames.join(', '),
       sizes:JSON.stringify(sizes),
-      bundles:JSON.stringify(bundles)
+      bundles:JSON.stringify(bundles),
+      // Legacy fields for backwards compatibility
+      costGHC:bundles[0]?.costPrice||'',
+      sellingPriceGHC:bundles[0]?.sellingPrice||'',
     };
     const r=isEdit?await API.call({action:'updateProduct',id:product.id,product:JSON.stringify(data)})
                   :await API.call({action:'addProduct',product:JSON.stringify(data)});
@@ -1615,7 +1764,6 @@ function ProductModal({product,onSave,onClose}){
   };
 
   const hasSizes=f.hasSizes===true||f.hasSizes==='true';
-  const hasFreeGift=f.hasFreeGift===true||f.hasFreeGift==='true';
 
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal modal-lg'},
@@ -1624,32 +1772,88 @@ function ProductModal({product,onSave,onClose}){
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')
       ),
       React.createElement('div',{className:'modal-body'},
+
         // ── Basic Info ──
         React.createElement('div',{className:'section-divider'},'Basic Info'),
         React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Product Name *'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Description'),React.createElement('input',{className:'form-input',value:f.description||'',onChange:set('description')}))
-        ),
-        React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:f.costGHC||'',onChange:set('costGHC')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:f.sellingPriceGHC||'',onChange:set('sellingPriceGHC')})),
           React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Status'),
-            React.createElement('select',{className:'form-select',value:String(f.active),onChange:e=>setF(p=>({...p,active:e.target.value==='true'}))},
-              React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive')
-            )
+            React.createElement('label',{className:'form-label'},'Product Name *'),
+            React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})
+          ),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Description'),
+            React.createElement('input',{className:'form-input',value:f.description||'',onChange:set('description')})
           )
         ),
-        // ── Bundle/Quantity Pricing (MOVED UP) ──
-        React.createElement('div',{className:'section-divider'},'Bundle / Quantity Pricing'),
-        React.createElement('div',{className:'alert-info',style:{marginBottom:10}},'Create bundles that appear when creating orders — price auto-fills. Always include a "Custom" option is automatic.'),
-        bundles.map((b,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:8,marginBottom:8,alignItems:'flex-end'}},
-          React.createElement('div',{className:'form-group',style:{flex:2}},i===0&&React.createElement('label',{className:'form-label'},'Bundle Label'),React.createElement('input',{className:'form-input',value:b.label,onChange:e=>updBundle(i,'label',e.target.value),placeholder:'e.g. 1 Unit, 2 Units, Bulk of 5'})),
-          React.createElement('div',{className:'form-group',style:{flex:1}},i===0&&React.createElement('label',{className:'form-label'},'Qty'),React.createElement('input',{className:'form-input',type:'number',value:b.qty,onChange:e=>updBundle(i,'qty',e.target.value)})),
-          React.createElement('div',{className:'form-group',style:{flex:1}},i===0&&React.createElement('label',{className:'form-label'},'Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:b.price,onChange:e=>updBundle(i,'price',e.target.value)})),
-          React.createElement('button',{className:'btn btn-danger btn-sm',style:{marginBottom:1},onClick:()=>rmBundle(i)},'✕')
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Status'),
+          React.createElement('select',{className:'form-select',style:{width:160},value:String(f.active),onChange:e=>setF(p=>({...p,active:e.target.value==='true'}))},
+            React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive')
+          )
+        ),
+
+        // ── Bundles with prices + free gift ──
+        React.createElement('div',{className:'section-divider'},'Bundles / Pricing'),
+        React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
+          'Each bundle has its own selling price, cost price, quantity, and optional free gift. A "Custom" option is always available automatically.'
+        ),
+        bundles.map((b,i)=>React.createElement('div',{key:i,className:'bundle-row'},
+          // Remove button top-right
+          React.createElement('button',{
+            className:'btn btn-danger btn-sm',
+            style:{position:'absolute',top:8,right:8},
+            onClick:()=>rmBundle(i)
+          },'✕'),
+          // Row 1: label, qty
+          React.createElement('div',{className:'bundle-row-header'},
+            React.createElement('div',{className:'form-group',style:{flex:2,minWidth:120}},
+              i===0&&React.createElement('label',{className:'form-label'},'Bundle Label'),
+              React.createElement('input',{className:'form-input',value:b.label,onChange:e=>updBundle(i,'label',e.target.value),placeholder:'e.g. 1 Unit, 2 Units, Bulk of 5'})
+            ),
+            React.createElement('div',{className:'form-group',style:{width:80}},
+              i===0&&React.createElement('label',{className:'form-label'},'Qty'),
+              React.createElement('input',{className:'form-input',type:'number',value:b.qty,onChange:e=>updBundle(i,'qty',e.target.value)})
+            ),
+            React.createElement('div',{className:'form-group',style:{width:130}},
+              i===0&&React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:b.sellingPrice,onChange:e=>updBundle(i,'sellingPrice',e.target.value),placeholder:'0.00'})
+            ),
+            React.createElement('div',{className:'form-group',style:{width:130}},
+              i===0&&React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:b.costPrice,onChange:e=>updBundle(i,'costPrice',e.target.value),placeholder:'0.00'})
+            )
+          ),
+          // Row 2: free gift radio
+          React.createElement('div',{className:'bundle-free-gift-row'},
+            React.createElement('span',{style:{fontSize:11,fontWeight:600,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.4px',marginRight:8}},'Free Gift?'),
+            React.createElement('label',null,
+              React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',false)}),
+              React.createElement('span',{style:{marginLeft:4}},'No')
+            ),
+            React.createElement('label',null,
+              React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',true)}),
+              React.createElement('span',{style:{marginLeft:4}},'Yes — includes free gift')
+            ),
+            b.hasFreeGift&&React.createElement('div',{className:'bundle-gift-cost'},
+              React.createElement('input',{
+                className:'form-input',type:'number',
+                style:{width:110,padding:'5px 8px',fontSize:12},
+                value:b.freeGiftCost,
+                onChange:e=>updBundle(i,'freeGiftCost',e.target.value),
+                placeholder:'Gift cost GHC'
+              }),
+              React.createElement('input',{
+                className:'form-input',
+                style:{width:140,padding:'5px 8px',fontSize:12},
+                value:b.freeGiftName,
+                onChange:e=>updBundle(i,'freeGiftName',e.target.value),
+                placeholder:'Gift name (optional)'
+              })
+            )
+          )
         )),
         React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginBottom:14},onClick:addBundle},'+ Add Bundle'),
+
         // ── Sizes ──
         React.createElement('div',{className:'section-divider'},'Sizes'),
         React.createElement('div',{className:'form-group',style:{marginBottom:10}},
@@ -1667,20 +1871,7 @@ function ProductModal({product,onSave,onClose}){
             sizes.map(s=>React.createElement('div',{key:s,className:'tag'},s,React.createElement('span',{className:'tag-remove',onClick:()=>rmSize(s)},'×')))
           )
         ),
-        // ── Free Gift ──
-        React.createElement('div',{className:'section-divider'},'Free Gift'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Comes with Free Gift?'),
-            React.createElement('select',{className:'form-select',value:String(f.hasFreeGift||false),onChange:e=>setF(p=>({...p,hasFreeGift:e.target.value==='true'}))},
-              React.createElement('option',{value:'false'},'No'),React.createElement('option',{value:'true'},'Yes')
-            )
-          ),
-          hasFreeGift&&React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Free Gift Cost (GHC)'),
-            React.createElement('input',{className:'form-input',type:'number',value:f.freeGiftCost||'',onChange:set('freeGiftCost')})
-          )
-        ),
+
         // ── Supplier Assignment ──
         React.createElement('div',{className:'section-divider'},'Supplier Assignment'),
         (suppliers||[]).length===0?
@@ -1703,16 +1894,26 @@ function ProductModal({product,onSave,onClose}){
 
 function PriceHistoryModal({product,onClose}){
   let history=[];try{history=JSON.parse(product.priceHistory||'[]');}catch{}
+  let bundles=[];try{bundles=JSON.parse(product.bundles||'[]');}catch{}
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal',style:{maxWidth:500}},
+    React.createElement('div',{className:'modal',style:{maxWidth:520}},
       React.createElement('div',{className:'modal-header'},
         React.createElement('div',{className:'modal-title'},`Price History — ${product.name}`),
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')
       ),
       React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'price-history-item'},React.createElement('div',null,'Current selling price'),React.createElement('strong',null,fmtGHC(product.sellingPriceGHC))),
-        React.createElement('div',{className:'price-history-item'},React.createElement('div',null,'Current cost price'),React.createElement('strong',null,fmtGHC(product.costGHC))),
-        history.length===0?React.createElement('div',{className:'text-muted',style:{marginTop:12}},'No historical price changes recorded yet.'):
+        React.createElement('div',{className:'section-divider'},'Current Bundle Prices'),
+        bundles.length===0?React.createElement('div',{className:'text-muted',style:{marginBottom:12}},'No bundles defined.'):
+        bundles.map((b,i)=>React.createElement('div',{key:i,className:'price-history-item'},
+          React.createElement('div',null,b.label||`Bundle ${i+1}`),
+          React.createElement('div',null,
+            React.createElement('span',{className:'td-mono',style:{marginRight:10}},`Sell: ${fmtGHC(b.sellingPrice||b.price||0)}`),
+            React.createElement('span',{className:'td-mono',style:{color:'var(--text3)'}},`Cost: ${fmtGHC(b.costPrice||b.cost||0)}`),
+            b.hasFreeGift&&React.createElement('span',{style:{marginLeft:8,color:'var(--green)',fontSize:11}},'🎁')
+          )
+        )),
+        React.createElement('div',{className:'section-divider'},'Change History'),
+        history.length===0?React.createElement('div',{className:'text-muted'},'No historical price changes recorded yet.'):
         history.map((h,i)=>React.createElement('div',{key:i,className:'price-history-item'},
           React.createElement('div',null,h.date||`Change ${i+1}`),
           React.createElement('div',{className:'td-mono'},`${fmtGHC(h.costGHC)} cost / ${fmtGHC(h.sellingPriceGHC)} selling`)

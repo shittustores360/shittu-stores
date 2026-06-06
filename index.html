@@ -3,1480 +3,559 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Shittu Stores — Business Manager</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>Shittu Stores | Merchant Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#0d0f14;--bg2:#161a23;--bg3:#1e2330;--bg4:#252c3d;
-  --border:#2a3248;--border2:#3a4560;
-  --accent:#7c6af7;--accent2:#6b5de8;--accent-dim:rgba(124,106,247,0.12);
-  --green:#00c896;--green-dim:rgba(0,200,150,0.12);
-  --red:#f05252;--red-dim:rgba(240,82,82,0.12);
-  --blue:#38bdf8;--blue-dim:rgba(56,189,248,0.12);
-  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);
-  --orange:#fb923c;--orange-dim:rgba(251,146,60,0.12);
-  --text:#e2e8f8;--text2:#8892aa;--text3:#4a5470;
-  --font-head:'Syne',sans-serif;--font-body:'DM Sans',sans-serif;--font-mono:'DM Mono',monospace;
-  --radius:8px;--radius-lg:14px;--shadow:0 4px 32px rgba(0,0,0,0.5);--transition:0.15s ease;
-  --card-bg:rgba(22,26,35,0.9);
+:root {
+  /* Shopify-inspired Palette */
+  --p-bg: #f1f2f4;
+  --p-card: #ffffff;
+  --p-text: #202223;
+  --p-text-sub: #6d7175;
+  --p-border: #e1e3e5;
+  --p-accent: #008060; /* Shopify Green */
+  --p-accent-dim: #f1f8f5;
+  --p-critical: #d82c0d;
+  --p-info: #005bd3;
+  
+  /* Dark Mode Overrides */
+  --bg: var(--p-bg); --surface: var(--p-card); --border: var(--p-border);
+  --text: var(--p-text); --text-sec: var(--p-text-sub);
+  --font-main: 'Inter', -apple-system, sans-serif;
+  --font-head: 'Syne', sans-serif;
+  --radius: 8px; --shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
-[data-theme="light"]{
-  --bg:#f4f6fb;--bg2:#ffffff;--bg3:#f0f2f8;--bg4:#e8ecf5;
-  --border:#dde3f0;--border2:#c8d0e8;
-  --text:#1a1e30;--text2:#4a5272;--text3:#8890b0;
-  --shadow:0 4px 24px rgba(0,0,0,0.08);--card-bg:#ffffff;
-  --accent-dim:rgba(124,106,247,0.08);--green-dim:rgba(0,200,150,0.08);--red-dim:rgba(240,82,82,0.08);--blue-dim:rgba(56,189,248,0.08);--purple-dim:rgba(167,139,250,0.08);--orange-dim:rgba(251,146,60,0.08);
+
+[data-theme="dark"] {
+  --p-bg: #0b0c0d; --p-card: #1a1c1d; --p-text: #e3e3e3;
+  --p-text-sub: #8c9196; --p-border: #2f3133;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;transition:background 0.2s,color 0.2s}
-#root{height:100%}
-::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-.app{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:224px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform var(--transition)}
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{height:54px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
-.content{flex:1;overflow-y:auto;padding:24px}
-.sidebar-logo{padding:18px 16px 10px;border-bottom:1px solid var(--border);margin-bottom:6px}
-.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;flex-shrink:0}
-.logo-row{display:flex;align-items:center;gap:9px}
-.logo-text{font-family:var(--font-head);font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.3px}
-.logo-sub{font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:1px}
-.nav-section{padding:6px 8px 0;margin-bottom:2px}
-.nav-section-label{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;padding:0 8px;margin-bottom:4px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:all var(--transition);margin-bottom:1px;position:relative}
-.nav-item:hover{background:var(--bg3);color:var(--text)}
-.nav-item.active{background:var(--accent-dim);color:var(--accent)}
-.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
-.nav-icon{font-size:15px;width:18px;text-align:center}
-.sidebar-footer{margin-top:auto;padding:10px;border-top:1px solid var(--border)}
-.user-pill{display:flex;align-items:center;gap:9px;padding:8px;border-radius:var(--radius);background:var(--bg3)}
-.user-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0}
-.user-name{font-size:12px;font-weight:600;color:var(--text)}
-.user-role{font-size:10px;color:var(--text3);text-transform:capitalize}
-.topbar-title{font-family:var(--font-head);font-size:15px;font-weight:700;flex:1}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all var(--transition);font-family:var(--font-body)}
-.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
-.btn-secondary{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--bg4)}
-.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(240,82,82,0.2)}.btn-danger:hover{background:rgba(240,82,82,0.2)}
-.btn-success{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,200,150,0.2)}
-.btn-sm{padding:5px 10px;font-size:12px}
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:20px}
-.kpi-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;transition:border-color var(--transition)}
-.kpi-card:hover{border-color:var(--border2)}
-.kpi-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:5px}
-.kpi-value{font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.5px}
-.kpi-delta{font-size:11px;margin-top:4px;display:flex;align-items:center;gap:3px}
-.delta-up{color:var(--green)}.delta-dn{color:var(--red)}.delta-neu{color:var(--text3)}
-.chart-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px}
-.chart-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:2px}
-.chart-sub{font-size:11px;color:var(--text3);margin-bottom:14px}
-.chart-svg{width:100%;display:block;overflow:visible}
-.overview-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px}
-@media(max-width:900px){.overview-grid{grid-template-columns:1fr}}
-.table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
-table{width:100%;border-collapse:collapse}
-thead{background:var(--bg3)}
-th{padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;white-space:nowrap;border-bottom:1px solid var(--border)}
-td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--bg3)}
-.td-mono{font-family:var(--font-mono);font-size:12px}
-.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
-.badge-delivered,.badge-confirmed{background:var(--green-dim);color:var(--green)}
-.badge-canceled{background:var(--red-dim);color:var(--red)}
-.badge-rescheduled{background:var(--blue-dim);color:var(--blue)}
-.badge-notconfirmed{background:var(--purple-dim);color:var(--purple)}
-.badge-noresponse{background:rgba(74,84,112,0.15);color:var(--text3)}
-.badge-processing{background:var(--orange-dim);color:var(--orange)}
-.badge-paid{background:var(--green-dim);color:var(--green)}
-.badge-unpaid{background:var(--red-dim);color:var(--red)}
-.badge-uncontacted{background:rgba(74,84,112,0.15);color:var(--text3)}
-.badge-contacted{background:var(--blue-dim);color:var(--blue)}
-.form-grid{display:grid;gap:12px}
-.form-grid-2{grid-template-columns:1fr 1fr}.form-grid-3{grid-template-columns:1fr 1fr 1fr}
-.form-group{display:flex;flex-direction:column;gap:5px}
-.form-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
-.form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:9px 12px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;transition:border-color var(--transition);width:100%}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent)}
-.form-input[readonly]{background:var(--bg4);border-color:var(--border);color:var(--text2)}
-.form-select option{background:var(--bg2)}.form-textarea{resize:vertical;min-height:68px}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px)}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:680px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow)}
-.modal-lg{max-width:820px}
-.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:2}
-.modal-title{font-family:var(--font-head);font-size:15px;font-weight:700}
-.modal-body{padding:20px}
-.modal-footer{display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid var(--border);position:sticky;bottom:0;background:var(--bg2)}
-.close-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:20px;padding:4px;border-radius:6px;line-height:1}.close-btn:hover{color:var(--text);background:var(--bg3)}
-.filters-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
-.search-input{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 12px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;width:200px;transition:border-color var(--transition)}.search-input:focus{border-color:var(--accent)}
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);padding:16px}
-.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:18px;padding:38px;width:100%;max-width:400px;box-shadow:var(--shadow)}
-.login-logo-mark{width:44px;height:44px;background:linear-gradient(135deg,var(--accent),var(--purple));border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;color:#fff;margin-bottom:14px}
-.login-title{font-family:var(--font-head);font-size:24px;font-weight:800;color:var(--text);margin-bottom:4px}
-.login-sub{color:var(--text3);font-size:13px;margin-bottom:28px}
-.login-error{background:var(--red-dim);color:var(--red);border:1px solid rgba(240,82,82,0.25);border-radius:var(--radius);padding:10px 14px;font-size:13px;margin-bottom:14px}
-.setup-banner{background:var(--orange-dim);border:1px solid rgba(251,146,60,0.3);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:12px}
-.tabs{display:flex;gap:2px;background:var(--bg3);padding:3px;border-radius:var(--radius);width:fit-content;margin-bottom:18px;flex-wrap:wrap}
-.tab{padding:5px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);transition:all var(--transition)}.tab.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,0.25)}
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-.section-title{font-family:var(--font-head);font-size:16px;font-weight:700}
-.section-sub{font-size:11px;color:var(--text3);margin-top:2px}
-.toast-wrap{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:6px}
-.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px 15px;font-size:13px;box-shadow:var(--shadow);animation:slideIn 0.2s ease;min-width:200px}
-.toast.success{border-color:rgba(0,200,150,0.3);color:var(--green)}.toast.error{border-color:rgba(240,82,82,0.3);color:var(--red)}
-@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
-.spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block}@keyframes spin{to{transform:rotate(360deg)}}
-.loading-full{display:flex;align-items:center;justify-content:center;height:180px;gap:10px;color:var(--text3)}
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;color:var(--text3);gap:8px}
-.empty-icon{font-size:36px;opacity:0.25}.empty-text{font-size:13px}
-.profit-positive{color:var(--green);font-family:var(--font-mono);font-size:12px}
-.profit-negative{color:var(--red);font-family:var(--font-mono);font-size:12px}
-.text-muted{color:var(--text3);font-size:12px}
-.permission-grid{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}
-.perm-chip{display:flex;align-items:center;gap:5px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition)}.perm-chip.active{background:var(--accent-dim);border-color:rgba(124,106,247,0.3);color:var(--accent)}
-.tag{display:inline-flex;align-items:center;gap:4px;background:var(--accent-dim);border:1px solid rgba(124,106,247,0.25);color:var(--accent);border-radius:20px;padding:2px 8px;font-size:11px}
-.tag-remove{cursor:pointer;opacity:0.7}.tag-remove:hover{opacity:1}
-.section-divider{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin:14px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--border)}
-.alert-info{background:var(--blue-dim);border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius);padding:9px 13px;font-size:12px;color:var(--blue);margin-bottom:11px}
-.alert-warning{background:var(--orange-dim);border:1px solid rgba(251,146,60,0.25);border-radius:var(--radius);padding:9px 13px;font-size:12px;color:var(--orange);margin-bottom:11px}
-.price-history-item{background:var(--bg3);border-radius:7px;padding:7px 11px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
-.product-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition)}.product-chip.active{background:var(--accent-dim);border-color:rgba(124,106,247,0.3);color:var(--accent)}
-.theme-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 10px;cursor:pointer;color:var(--text2);font-size:12px;display:flex;align-items:center;gap:5px;transition:all var(--transition)}.theme-toggle:hover{color:var(--text)}
-.hamburger{display:none;background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;padding:4px}
-.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99}
-.bar-wrap{background:var(--bg4);border-radius:3px;height:5px;overflow:hidden;margin-top:3px}
-.bar-fill{height:100%;border-radius:3px;transition:width 0.5s ease}
-.bundle-info-card{background:var(--bg3);border:2px solid var(--border2);border-radius:var(--radius);padding:14px;margin-top:8px}
-.bundle-info-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
-.bundle-info-row:last-child{border-bottom:none}
-.bundle-info-label{color:var(--text3)}
-.bundle-info-val{font-family:var(--font-mono);color:var(--text);font-weight:600}
-.free-gift-badge{display:inline-flex;align-items:center;gap:4px;background:var(--green-dim);color:var(--green);border:1px solid rgba(0,200,150,0.25);border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600}
-.custom-order-fields{background:var(--bg3);border:1px solid var(--orange);border-radius:var(--radius);padding:14px;margin-top:8px}
-.radio-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.radio-pill{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer;transition:all var(--transition);color:var(--text2)}.radio-pill.active{background:var(--green-dim);border-color:rgba(0,200,150,0.3);color:var(--green)}
-.radio-pill input[type=radio]{display:none}
-.staff-info-box{background:var(--blue-dim);border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:12px}
-@media(max-width:768px){
-  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}
-  .sidebar-overlay.show{display:block}.hamburger{display:block}
-  .form-grid-2,.form-grid-3{grid-template-columns:1fr}
-  .kpi-grid{grid-template-columns:repeat(2,1fr)}.content{padding:14px}
-  .filters-bar{flex-direction:column;align-items:stretch}.search-input{width:100%}
-  .overview-grid{grid-template-columns:1fr}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--p-bg); color: var(--p-text); font-family: var(--font-main); font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+/* Layout */
+.app-container { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 240px; background: #1a1c1d; color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
+.main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+/* Sidebar UI */
+.sb-header { padding: 20px; border-bottom: 1px solid #2f3133; display: flex; align-items: center; gap: 10px; }
+.sb-logo { width: 32px; height: 32px; background: var(--p-accent); border-radius: 6px; display: grid; place-items: center; font-weight: 800; font-family: var(--font-head); }
+.sb-nav { padding: 12px; flex: 1; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 6px; cursor: pointer; color: #b5b5b5; font-weight: 500; transition: 0.2s; margin-bottom: 2px; }
+.nav-item:hover { background: #2f3133; color: #fff; }
+.nav-item.active { background: #2f3133; color: #fff; }
+
+/* Shopify Style Cards */
+.top-bar { height: 56px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+.page-header { padding: 24px 32px; display: flex; justify-content: space-between; align-items: flex-start; max-width: 1200px; margin: 0 auto; width: 100%; }
+.content-area { padding: 0 32px 40px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 20px; }
+.card-title { font-weight: 600; font-size: 15px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+/* Dashboard Grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: var(--radius); }
+.kpi-val { font-size: 24px; font-weight: 700; margin: 4px 0; font-family: var(--font-head); }
+.kpi-label { font-size: 12px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.kpi-trend { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+.up { color: var(--p-accent); } .down { color: var(--p-critical); }
+
+/* Forms & UI Elements */
+.btn { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid var(--border); font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: var(--p-accent); color: white; border: none; }
+.btn-primary:hover { background: #006e52; }
+.input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; outline: none; background: var(--surface); color: var(--text); }
+.input:focus { border-color: var(--p-info); box-shadow: 0 0 0 1px var(--p-info); }
+.input[readonly] { background: var(--p-bg); cursor: not-allowed; }
+
+.badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: capitalize; }
+.badge-success { background: var(--p-accent-dim); color: var(--p-accent); }
+.badge-warning { background: #fff5ea; color: #8a6116; }
+
+/* Bundle nested UI */
+.bundle-box { border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 12px; background: var(--p-bg); position: relative; }
+.radio-group { display: flex; gap: 12px; margin: 8px 0; }
+.radio-label { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; }
+
+/* Table styling */
+.table-wrap { width: 100%; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-sec); font-size: 12px; font-weight: 600; text-transform: uppercase; }
+td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:hover td { background: var(--p-bg); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: grid; place-items: center; z-index: 100; padding: 20px; }
+.modal-card { background: var(--surface); width: 100%; max-width: 600px; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+.modal-body { padding: 24px; overflow-y: auto; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; }
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
 <body>
 <div id="root"></div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+
 <script>
-const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext}=React;
+const { useState, useEffect, useMemo, useCallback } = React;
 
-// ─── CACHE ─────────────────────────────────────────────────────────────────
-const _cache={};const CACHE_TTL=60000;
-function cacheGet(k){const e=_cache[k];if(e&&Date.now()-e.ts<CACHE_TTL)return e.v;return null;}
-function cacheSet(k,v){_cache[k]={v,ts:Date.now()};}
-function cacheBust(){Object.keys(_cache).forEach(k=>delete _cache[k]);}
-
-// ─── API ───────────────────────────────────────────────────────────────────
-const API={
-  url:localStorage.getItem('apiUrl')||'',
-  setUrl(u){this.url=u;localStorage.setItem('apiUrl',u);},
-  async call(params){
-    if(!this.url)return{success:false,error:'No API URL.'};
-    const key=JSON.stringify(params);
-    const isRead=(params.action||'').startsWith('get');
-    if(isRead){const c=cacheGet(key);if(c)return c;}
-    try{
-      const r=await fetch(this.url,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(params)});
-      if(!r.ok)return{success:false,error:'HTTP '+r.status};
-      const t=await r.text();let d;
-      try{d=JSON.parse(t);}catch{return{success:false,error:'Bad JSON response'};}
-      if(isRead&&d.success)cacheSet(key,d);
-      if(!isRead&&d.success)cacheBust();
-      return d;
-    }catch(e){return{success:false,error:e.message};}
+// --- API LAYER ---
+const API = {
+  url: localStorage.getItem('ss_api_url') || '',
+  async call(params) {
+    if (!this.url) return { success: false, error: 'No API URL' };
+    try {
+      const resp = await fetch(this.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(params)
+      });
+      return await resp.json();
+    } catch (e) { return { success: false, error: e.message }; }
   }
 };
 
-// ─── THEME ─────────────────────────────────────────────────────────────────
-const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
-function ThemeProvider({children}){
-  const[theme,setTheme]=useState(()=>localStorage.getItem('ssTheme')||'dark');
-  useEffect(()=>{document.documentElement.setAttribute('data-theme',theme==='light'?'light':'');localStorage.setItem('ssTheme',theme);},[theme]);
-  const toggleTheme=useCallback(()=>setTheme(t=>t==='dark'?'light':'dark'),[]);
-  return React.createElement(ThemeCtx.Provider,{value:{theme,toggleTheme}},children);
-}
+// --- COMPONENTS ---
 
-// ─── TOAST ─────────────────────────────────────────────────────────────────
-let _toastFn=null;
-function useToast(){
-  const[toasts,setToasts]=useState([]);
-  useEffect(()=>{_toastFn=(msg,type='success')=>{const id=Date.now();setToasts(t=>[...t,{id,msg,type}]);setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),3200);};},[]);
-  return toasts;
-}
-const toast=(msg,type)=>_toastFn&&_toastFn(msg,type);
+function App() {
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('ss_user')));
+  const [view, setView] = useState('dashboard');
 
-// ─── CONSTANTS ─────────────────────────────────────────────────────────────
-const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
-const CONTACT_STATUSES=['Uncontacted','Contacted'];
-const PAYMENT_OPTIONS=['Paid','Unpaid'];
-// Staff permissions — fixed set for customer_care role
-const CC_PERMISSIONS='view_orders,add_orders,edit_orders';
-const PERMS_LIST=['view_orders','add_orders','edit_orders','delete_orders','view_financials','view_dashboard','manage_expenses'];
-const STAFF_PAYOUT_NGN=2000;
+  if (!user) return <Login onLogin={(u) => { setUser(u); localStorage.setItem('ss_user', JSON.stringify(u)); }} />;
 
-// ─── UTILS ─────────────────────────────────────────────────────────────────
-function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
-function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
-function fmtGHC(n){return'GH\u20B5'+fmt(n,2);}
-function fmtNGN(n){const v=parseFloat(n);return isNaN(v)?'—':'\u20A6'+v.toLocaleString('en-NG',{maximumFractionDigits:0});}
-function fmtK(n){const v=parseFloat(n);if(isNaN(v))return'—';if(v>=1000000)return(v/1000000).toFixed(1)+'M';if(v>=1000)return(v/1000).toFixed(1)+'k';return String(Math.round(v));}
-function today(){return new Date().toISOString().split('T')[0];}
-function statusBadge(s){const m={Delivered:'badge-delivered',Canceled:'badge-canceled',Rescheduled:'badge-rescheduled','Not Confirmed':'badge-notconfirmed','No Response':'badge-noresponse',Processing:'badge-processing',Confirmed:'badge-confirmed'};return React.createElement('span',{className:'badge '+(m[s]||'badge-noresponse')},s||'—');}
-function contactBadge(s){return React.createElement('span',{className:'badge '+(s==='Contacted'?'badge-contacted':'badge-uncontacted')},s||'Uncontacted');}
-function payBadge(s){return React.createElement('span',{className:'badge '+(s==='Paid'?'badge-paid':'badge-unpaid')},s||'Unpaid');}
-function isActive(x){return x===true||x==='TRUE'||x==='true';}
-function statusOf(o){return(o&&(o.deliveryStatus||o.status))||'Not Confirmed';}
-function paymentOf(o){return(o&&o.paymentStatus)||'Unpaid';}
-function readList(v){if(Array.isArray(v))return v;if(!v)return[];try{const p=JSON.parse(v);return Array.isArray(p)?p:[];}catch{}return String(v).split(',').map(x=>x.trim()).filter(Boolean);}
-function supplierOwnsOrder(order,products,user){
-  if(!user||user.role!=='supplier')return true;
-  const product=products.find(p=>p.name===order.product);
-  const assigned=readList(user.assignedProducts||user.products||user.productNames);
-  const productSuppliers=readList(product?product.supplierUsernames||product.suppliers:'');
-  return order.supplierUsername===user.username||order.supplier===user.username||(product&&product.supplierUsername===user.username)||productSuppliers.includes(user.username)||assigned.includes(order.product);
-}
-function parseBundles(str){try{return JSON.parse(str||'[]');}catch{return[];}}
-
-// ─── DATA HOOK ─────────────────────────────────────────────────────────────
-// BUG FIX: was stuck in loading spinner when API.url is empty
-function useData(action,enabled=true){
-  const[data,setData]=useState(null);
-  const[loading,setLoading]=useState(!!enabled);
-  const[error,setError]=useState('');
-  const load=useCallback(async()=>{
-    if(!enabled){setLoading(false);return;}
-    if(!API.url){setLoading(false);setError('No API URL configured.');return;}
-    setLoading(true);setError('');
-    const r=await API.call({action});
-    setLoading(false);
-    if(r.success)setData(r.data||[]);
-    else setError(r.error||'Failed');
-  },[action,enabled]);
-  useEffect(()=>{load();},[load]);
-  return{data,loading,error,reload:load};
-}
-
-// ─── CHARTS ────────────────────────────────────────────────────────────────
-function Sparkline({data=[],color='var(--accent)',height=32}){
-  if(!data||data.length<2)return null;
-  const max=Math.max(...data,1);
-  const pts=data.map((v,i)=>{const x=i*(100/(data.length-1));const y=height-(v/max)*(height-2)-1;return x+','+y;});
-  return React.createElement('svg',{viewBox:'0 0 100 '+height,style:{width:'100%',height,display:'block'}},
-    React.createElement('path',{d:'M'+pts.join('L'),fill:'none',stroke:color,strokeWidth:1.5,strokeLinejoin:'round'})
+  return (
+    <div className="app-container">
+      <div className="sidebar">
+        <div className="sb-header">
+          <div className="sb-logo">S</div>
+          <div style={{fontWeight:700, fontSize:16}}>Shittu Stores</div>
+        </div>
+        <div className="sb-nav">
+          <div className={`nav-item ${view==='dashboard'?'active':''}`} onClick={()=>setView('dashboard')}>Dashboard</div>
+          <div className={`nav-item ${view==='orders'?'active':''}`} onClick={()=>setView('orders')}>Orders</div>
+          {(user.role === 'admin') && <div className={`nav-item ${view==='products'?'active':''}`} onClick={()=>setView('products')}>Products</div>}
+          <div className={`nav-item ${view==='analytics'?'active':''}`} onClick={()=>setView('analytics')}>Analytics</div>
+          <div className={`nav-item ${view==='settings'?'active':''}`} onClick={()=>setView('settings')}>Settings</div>
+        </div>
+        <div style={{padding:20, borderTop:'1px solid #2f3133'}}>
+          <div style={{fontSize:12, color:'#8c9196'}}>Logged in as</div>
+          <div style={{fontSize:14, fontWeight:600}}>{user.name}</div>
+          <button onClick={()=>{localStorage.removeItem('ss_user'); setUser(null);}} style={{background:'none', border:'none', color:'#ff4d4d', cursor:'pointer', marginTop:10, fontSize:12}}>Logout</button>
+        </div>
+      </div>
+      
+      <div className="main-content">
+        <div className="top-bar">
+          <div style={{fontWeight:600, color:'var(--p-text-sub)'}}>{view.toUpperCase()}</div>
+          <div className="badge badge-success">Live Mode</div>
+        </div>
+        
+        {view === 'dashboard' && <Dashboard user={user} />}
+        {view === 'orders' && <OrdersView user={user} />}
+        {view === 'products' && <ProductsView />}
+        {view === 'analytics' && <AnalyticsView user={user} />}
+        {view === 'settings' && <SettingsView />}
+      </div>
+    </div>
   );
 }
 
-function AreaChart({data=[],color='var(--accent)',height=120}){
-  if(!data||data.length<2)return React.createElement('div',{className:'text-muted',style:{padding:'20px 0'}},(!data||data.length===0)?'No data yet':'Not enough data');
-  const vals=data.map(d=>d.value);const max=Math.max(...vals,1);
-  const W=600,H=height,pad={l:36,r:10,t:8,b:22};const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
-  const px=i=>pad.l+i*(iw/(data.length-1));const py=v=>pad.t+ih-(v/max)*ih;
-  const pts=data.map((d,i)=>[px(i),py(d.value)]);
-  const path='M'+pts.map(p=>p.join(',')).join('L');
-  const area=path+'L'+pts[pts.length-1][0]+','+(pad.t+ih)+'L'+pts[0][0]+','+(pad.t+ih)+'Z';
-  const yTicks=[0,Math.round(max/2),max];
-  return React.createElement('svg',{viewBox:'0 0 '+W+' '+H,className:'chart-svg',style:{height}},
-    React.createElement('defs',null,React.createElement('linearGradient',{id:'ag',x1:'0',y1:'0',x2:'0',y2:'1'},React.createElement('stop',{offset:'0%',stopColor:color,stopOpacity:0.25}),React.createElement('stop',{offset:'100%',stopColor:color,stopOpacity:0.01}))),
-    yTicks.map((t,i)=>React.createElement('g',{key:i},React.createElement('line',{x1:pad.l,y1:py(t),x2:W-pad.r,y2:py(t),stroke:'var(--border)',strokeWidth:0.8}),React.createElement('text',{x:pad.l-4,y:py(t)+4,textAnchor:'end',fontSize:9,fill:'var(--text3)'},fmtK(t)))),
-    React.createElement('path',{d:area,fill:'url(#ag)'}),
-    React.createElement('path',{d:path,fill:'none',stroke:color,strokeWidth:2,strokeLinejoin:'round'}),
-    data.map((d,i)=>React.createElement('text',{key:i,x:pts[i][0],y:H-4,textAnchor:'middle',fontSize:9,fill:'var(--text3)'},d.label))
+// --- VIEWS ---
+
+function Dashboard({ user }) {
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    API.call({ action: 'getDashboard', username: user.username, role: user.role }).then(r => r.success && setStats(r.data));
+  }, []);
+
+  return (
+    <div className="content-area">
+      <div className="page-header" style={{paddingLeft:0}}>
+        <div>
+          <h1 style={{fontFamily:'var(--font-head)', fontSize:28}}>Good morning, {user.name.split(' ')[0]}</h1>
+          <p style={{color:'var(--p-text-sub)'}}>Here's what's happening with your store today.</p>
+        </div>
+      </div>
+
+      <div className="kpi-grid">
+        <KPI card={{label:'Total Sales', val: stats?.revenue || 'GH₵ 0.00', trend:'+12%', icon:'💰'}} />
+        <KPI card={{label:'Total Orders', val: stats?.totalOrders || '0', trend:'+5%', icon:'📦'}} />
+        <KPI card={{label:'Conversion Rate', val: (stats?.conversion || '0') + '%', trend:'-2%', icon:'🎯'}} />
+        <KPI card={{label:'Pending Staff Payout', val: '₦ ' + (stats?.pendingPayout || '0'), trend:'0%', icon:'👥'}} />
+      </div>
+
+      <div className="card">
+        <div className="card-title">Recent Activity</div>
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Status</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+              {stats?.recentOrders?.map(o => (
+                <tr key={o.id}>
+                  <td>#{o.id.slice(-4)}</td>
+                  <td>{o.customerName}</td>
+                  <td>{o.product}</td>
+                  <td><span className="badge badge-success">{o.status}</span></td>
+                  <td style={{fontWeight:600}}>GH₵ {o.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
 
-function BarChart({data=[],color='var(--accent)',height=120}){
-  if(!data||data.length===0)return React.createElement('div',{className:'text-muted',style:{padding:'20px 0'}},'No data');
-  const max=Math.max(...data.map(d=>d.value),1);
-  const W=600,H=height,pad={l:36,r:10,t:8,b:22};const iw=W-pad.l-pad.r,ih=H-pad.t-pad.b;
-  const bw=Math.max(4,(iw/data.length)*0.6);const gap=iw/data.length;
-  return React.createElement('svg',{viewBox:'0 0 '+W+' '+H,className:'chart-svg',style:{height}},
-    data.map((d,i)=>{const bh=Math.max(2,(d.value/max)*ih);const x=pad.l+i*gap+(gap-bw)/2;return React.createElement('g',{key:i},React.createElement('rect',{x,y:pad.t+ih-bh,width:bw,height:bh,fill:color,rx:3,opacity:0.85}),React.createElement('text',{x:x+bw/2,y:H-4,textAnchor:'middle',fontSize:9,fill:'var(--text3)'},d.label));}),
-    React.createElement('line',{x1:pad.l,y1:pad.t+ih,x2:W-pad.r,y2:pad.t+ih,stroke:'var(--border)',strokeWidth:1})
+function KPI({ card }) {
+  return (
+    <div className="kpi-card">
+      <div style={{display:'flex', justifyContent:'space-between'}}>
+        <span className="kpi-label">{card.label}</span>
+        <span>{card.icon}</span>
+      </div>
+      <div className="kpi-val">{card.val}</div>
+      <div className={`kpi-trend ${card.trend.startsWith('+')?'up':'down'}`}>
+        {card.trend} <span style={{color:'var(--p-text-sub)'}}>vs last 7 days</span>
+      </div>
+    </div>
   );
 }
 
-// BUG FIX: DonutChart — guard against NaN strokeDasharray when all pcts are 0
-function DonutChart({segments=[],size=90}){
-  const r=30,circ=2*Math.PI*r,cx=size/2,cy=size/2;
-  const total=segments.reduce((s,x)=>s+x.pct,0);
-  let offset=0;
-  return React.createElement('svg',{width:size,height:size,viewBox:'0 0 '+size+' '+size},
-    React.createElement('circle',{cx,cy,r,fill:'none',stroke:'var(--border)',strokeWidth:8}),
-    total>0&&segments.map((s,i)=>{
-      const len=(s.pct/100)*circ;
-      const dashArray=len+' '+(circ-len);
-      const dashOffset=-offset*circ/100;
-      const el=React.createElement('circle',{key:i,cx,cy,r,fill:'none',stroke:s.color,strokeWidth:8,strokeDasharray:dashArray,strokeDashoffset:dashOffset,strokeLinecap:'round'});
-      offset+=s.pct;
-      return el;
-    }),
-    React.createElement('text',{x:cx,y:cy+1,textAnchor:'middle',dominantBaseline:'middle',fontSize:12,fontWeight:700,fill:'var(--text)'},(segments[0]&&total>0)?Math.round(segments[0].pct)+'%':'—')
+function ProductsView() {
+  const [prods, setProds] = useState([]);
+  const [isModal, setIsModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+
+  const refresh = () => API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data));
+  useEffect(() => { refresh(); }, []);
+
+  return (
+    <div className="content-area">
+      <div className="page-header" style={{paddingLeft:0}}>
+        <h2>Products</h2>
+        <button className="btn btn-primary" onClick={()=>{setEditing(null); setIsModal(true)}}>Add Product</button>
+      </div>
+      
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Bundles</th><th>Inventory</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              {prods.map(p => (
+                <tr key={p.id}>
+                  <td style={{fontWeight:600}}>{p.name}</td>
+                  <td>{JSON.parse(p.bundles || '[]').length} Bundles</td>
+                  <td>In Stock</td>
+                  <td><span className="badge badge-success">Active</span></td>
+                  <td><button className="btn" onClick={()=>{setEditing(p); setIsModal(true)}}>Edit</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {isModal && <ProductModal product={editing} onClose={()=>setIsModal(false)} onSave={()=>{setIsModal(false); refresh();}} />}
+    </div>
   );
 }
 
-// ─── APP ───────────────────────────────────────────────────────────────────
-function App(){
-  const toasts=useToast();
-  const[sidebarOpen,setSidebarOpen]=useState(false);
-  const[page,setPage]=useState('dashboard');
-  const[user,setUser]=useState(()=>{try{const u=localStorage.getItem('ssUser');return u?JSON.parse(u):null;}catch{return null;}});
-  const login=useCallback(u=>{setUser(u);localStorage.setItem('ssUser',JSON.stringify(u));},[]);
-  const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
-  const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
-  if(!user)return React.createElement(ThemeProvider,null,React.createElement(LoginPage,{onLogin:login}));
-  const isAdmin=user.role==='admin';
-  const isSupplier=user.role==='supplier';
-  const isCC=user.role==='customer_care'||user.role==='staff'||user.role==='manager';
-  const perms=user.permissions==='all'?['all']:(user.permissions||'').split(',').map(s=>s.trim());
-  const can=p=>isAdmin||perms.includes('all')||perms.includes(p);
-  const navItems=[
-    {id:'dashboard',icon:'◼',label:'Overview',show:true},
-    {id:'orders',icon:'📦',label:'Orders',show:isAdmin||isSupplier||can('view_orders')},
-    {id:'analytics',icon:'📈',label:'Analytics',show:true},
-    {id:'financials',icon:'💰',label:'Financials',show:isAdmin||can('view_financials')},
-    {id:'expenses',icon:'📉',label:'Expenses',show:isAdmin||can('manage_expenses')},
-    {id:'products',icon:'🏷️',label:'Products',show:isAdmin},
-    {id:'staff',icon:'👥',label:'Staff',show:isAdmin},
-    {id:'suppliers',icon:'🚚',label:'Suppliers',show:isAdmin},
-    {id:'pixel',icon:'🔬',label:'Pixel & Tracking',show:isAdmin},
-    {id:'settings',icon:'⚙️',label:'Settings',show:true},
-  ].filter(x=>x.show);
-  const ctx={user,isAdmin,isSupplier,isCC,can};
-  const pageMap={
-    dashboard:React.createElement(DashboardPage,ctx),
-    orders:React.createElement(OrdersPage,ctx),
-    analytics:React.createElement(AnalyticsPage,ctx),
-    financials:React.createElement(FinancialsPage,ctx),
-    expenses:React.createElement(ExpensesPage,ctx),
-    products:React.createElement(ProductsPage,ctx),
-    staff:React.createElement(StaffPage,ctx),
-    suppliers:React.createElement(SuppliersPage,ctx),
-    pixel:React.createElement(PixelPage,ctx),
-    settings:React.createElement(SettingsPage,ctx),
+function ProductModal({ product, onClose, onSave }) {
+  const [form, setForm] = useState(product ? {
+    ...product, 
+    bundles: JSON.parse(product.bundles || '[]')
+  } : {
+    name: '', bundles: [{ label: 'Standard', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }]
+  });
+
+  const addBundle = () => setForm({...form, bundles: [...form.bundles, { label: '', qty: 1, sellingPrice: 0, costPrice: 0, hasGift: false, giftCost: 0 }]});
+  
+  const updateBundle = (index, field, val) => {
+    const newBundles = [...form.bundles];
+    newBundles[index][field] = val;
+    setForm({...form, bundles: newBundles});
   };
-  return React.createElement(ThemeProvider,null,
-    React.createElement(AppShell,{user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,toasts},pageMap[page]||pageMap.dashboard)
-  );
-}
 
-function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,toasts,children}){
-  const{theme,toggleTheme}=useContext(ThemeCtx);
-  const topNavIds=['dashboard','orders','analytics'];
-  const topNav=navItems.filter(n=>topNavIds.includes(n.id));
-  const midNav=navItems.filter(n=>!topNavIds.includes(n.id)&&n.id!=='settings');
-  const settingsNav=navItems.find(n=>n.id==='settings');
-  const initials=(user.name||user.username||'?')[0].toUpperCase();
-  return React.createElement('div',{className:'app'},
-    React.createElement('div',{className:'sidebar-overlay '+(sidebarOpen?'show':''),onClick:()=>setSidebarOpen(false)}),
-    React.createElement('aside',{className:'sidebar '+(sidebarOpen?'open':'')},
-      React.createElement('div',{className:'sidebar-logo'},
-        React.createElement('div',{className:'logo-row'},
-          React.createElement('div',{className:'logo-mark'},'S'),
-          React.createElement('div',null,React.createElement('div',{className:'logo-text'},'Shittu Stores'),React.createElement('div',{className:'logo-sub'},'Business Manager'))
-        )
-      ),
-      React.createElement('div',{className:'nav-section'},topNav.map(n=>React.createElement('div',{key:n.id,className:'nav-item '+(page===n.id?'active':''),onClick:()=>nav(n.id)},React.createElement('span',{className:'nav-icon'},n.icon),n.label))),
-      midNav.length>0&&React.createElement('div',{className:'nav-section'},
-        React.createElement('div',{className:'nav-section-label'},'Manage'),
-        midNav.map(n=>React.createElement('div',{key:n.id,className:'nav-item '+(page===n.id?'active':''),onClick:()=>nav(n.id)},React.createElement('span',{className:'nav-icon'},n.icon),n.label))
-      ),
-      settingsNav&&React.createElement('div',{style:{margin:'4px 8px'}},React.createElement('div',{className:'nav-item '+(page==='settings'?'active':''),onClick:()=>nav('settings')},React.createElement('span',{className:'nav-icon'},'⚙️'),'Settings')),
-      React.createElement('div',{className:'sidebar-footer'},
-        React.createElement('div',{className:'user-pill'},
-          React.createElement('div',{className:'user-avatar'},initials),
-          React.createElement('div',{style:{flex:1,minWidth:0}},
-            React.createElement('div',{className:'user-name',style:{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},user.name||user.username),
-            React.createElement('div',{className:'user-role'},user.role)
-          )
-        ),
-        React.createElement('div',{style:{display:'flex',gap:6,marginTop:7}},
-          React.createElement('button',{className:'theme-toggle',style:{flex:1},onClick:toggleTheme},theme==='dark'?'☀️':'🌙'),
-          React.createElement('button',{className:'btn btn-danger btn-sm',style:{flex:1},onClick:logout},'Sign Out')
-        )
-      )
-    ),
-    React.createElement('div',{className:'main'},
-      React.createElement('div',{className:'topbar'},
-        React.createElement('button',{className:'hamburger',onClick:()=>setSidebarOpen(o=>!o)},'☰'),
-        React.createElement('div',{className:'topbar-title'},(navItems.find(n=>n.id===page)||{}).label||''),
-        !API.url&&React.createElement('span',{style:{fontSize:11,color:'var(--orange)',background:'var(--orange-dim)',padding:'3px 8px',borderRadius:20}},'⚠ Setup Required')
-      ),
-      React.createElement('div',{className:'content'},children)
-    ),
-    React.createElement('div',{className:'toast-wrap'},toasts.map(t=>React.createElement('div',{key:t.id,className:'toast '+t.type},t.msg)))
-  );
-}
-
-// ─── LOGIN ─────────────────────────────────────────────────────────────────
-function LoginPage({onLogin}){
-  const[u,setU]=useState('');const[p,setP]=useState('');const[err,setErr]=useState('');const[loading,setLoading]=useState(false);const[showPw,setShowPw]=useState(false);
-  const submit=async e=>{
-    e.preventDefault();setErr('');setLoading(true);
-    const r=await API.call({action:'login',username:u,password:p});
-    setLoading(false);
-    if(r.success&&r.data&&!r.data.error)onLogin(r.data);
-    else setErr((r.data&&r.data.error)||r.error||'Invalid credentials.');
+  const handleSave = async () => {
+    const action = product ? 'updateProduct' : 'addProduct';
+    const payload = { ...form, bundles: JSON.stringify(form.bundles) };
+    const r = await API.call({ action, product: JSON.stringify(payload), id: product?.id });
+    if (r.success) onSave(); else alert(r.error);
   };
-  return React.createElement('div',{className:'login-wrap'},
-    React.createElement('div',{className:'login-card'},
-      React.createElement('div',{className:'login-logo-mark'},'S'),
-      React.createElement('div',{className:'login-title'},'Shittu Stores'),
-      React.createElement('div',{className:'login-sub'},'Business Management Dashboard'),
-      err&&React.createElement('div',{className:'login-error'},err),
-      React.createElement('form',{onSubmit:submit},
-        React.createElement('div',{className:'form-group',style:{marginBottom:12}},
-          React.createElement('label',{className:'form-label'},'Username'),
-          React.createElement('input',{className:'form-input',value:u,onChange:e=>setU(e.target.value),placeholder:'Enter username',required:true,autoFocus:true})
-        ),
-        React.createElement('div',{className:'form-group',style:{marginBottom:20}},
-          React.createElement('label',{className:'form-label'},'Password'),
-          React.createElement('div',{style:{position:'relative'}},
-            React.createElement('input',{className:'form-input',type:showPw?'text':'password',value:p,onChange:e=>setP(e.target.value),placeholder:'••••••••',required:true,style:{paddingRight:40}}),
-            React.createElement('button',{type:'button',onClick:()=>setShowPw(v=>!v),style:{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--text3)',fontSize:14}},showPw?'🙈':'👁')
-          )
-        ),
-        React.createElement('button',{className:'btn btn-primary',type:'submit',style:{width:'100%'},disabled:loading},loading?React.createElement('span',{className:'spinner'}):null,' Sign In')
-      )
-    )
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <div className="modal-body">
+          <h3 style={{marginBottom:20}}>{product ? 'Edit' : 'Add'} Product</h3>
+          <div style={{marginBottom:15}}>
+            <label className="kpi-label">Product Name</label>
+            <input className="input" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} />
+          </div>
+
+          <div className="card-title" style={{fontSize:13, marginTop:20}}>Bundles & Pricing</div>
+          {form.bundles.map((b, i) => (
+            <div className="bundle-box" key={i}>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:10}}>
+                <div>
+                  <label className="kpi-label">Bundle Name</label>
+                  <input className="input" value={b.label} placeholder="e.g. 1 Unit + Free Watch" onChange={e=>updateBundle(i, 'label', e.target.value)} />
+                </div>
+                <div>
+                  <label className="kpi-label">Quantity</label>
+                  <input className="input" type="number" value={b.qty} onChange={e=>updateBundle(i, 'qty', e.target.value)} />
+                </div>
+              </div>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10}}>
+                <div>
+                  <label className="kpi-label">Selling Price (GH₵)</label>
+                  <input className="input" type="number" value={b.sellingPrice} onChange={e=>updateBundle(i, 'sellingPrice', e.target.value)} />
+                </div>
+                <div>
+                  <label className="kpi-label">Item Cost (GH₵)</label>
+                  <input className="input" type="number" value={b.costPrice} onChange={e=>updateBundle(i, 'costPrice', e.target.value)} />
+                </div>
+              </div>
+
+              <div style={{marginTop:12}}>
+                <label className="kpi-label">Include Free Gift?</label>
+                <div className="radio-group">
+                  <label className="radio-label">
+                    <input type="radio" checked={b.hasGift} onChange={()=>updateBundle(i, 'hasGift', true)} /> Yes
+                  </label>
+                  <label className="radio-label">
+                    <input type="radio" checked={!b.hasGift} onChange={()=>updateBundle(i, 'hasGift', false)} /> No
+                  </label>
+                </div>
+                {b.hasGift && (
+                  <div style={{marginTop:5}}>
+                    <label className="kpi-label">Gift Cost (GH₵)</label>
+                    <input className="input" type="number" value={b.giftCost} onChange={e=>updateBundle(i, 'giftCost', e.target.value)} />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+          <button className="btn" onClick={addBundle}>+ Add Another Bundle</button>
+        </div>
+        <div className="modal-footer">
+          <button className="btn" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleSave}>Save Product</button>
+        </div>
+      </div>
+    </div>
   );
 }
 
-// ─── KPI CARD ──────────────────────────────────────────────────────────────
-function KPICard({label,value,sub,color='var(--accent)',sparkData,delta,icon}){
-  return React.createElement('div',{className:'kpi-card'},
-    React.createElement('div',{className:'kpi-label'},icon&&React.createElement('span',null,icon),label),
-    React.createElement('div',{className:'kpi-value',style:{color}},value),
-    delta!=null&&React.createElement('div',{className:'kpi-delta '+(delta>=0?'delta-up':'delta-dn')},(delta>=0?'▲':'▼'),' '+Math.abs(delta)+'% vs last month'),
-    sub&&delta==null&&React.createElement('div',{className:'kpi-delta delta-neu'},sub),
-    sparkData&&sparkData.length>1&&React.createElement('div',{style:{marginTop:8}},React.createElement(Sparkline,{data:sparkData,color,height:28}))
+function OrdersView({ user }) {
+  const [orders, setOrders] = useState([]);
+  const [prods, setProds] = useState([]);
+  const [isModal, setIsModal] = useState(false);
+
+  const refresh = () => {
+    API.call({ action: 'getOrders' }).then(r => r.success && setOrders(r.data));
+    API.call({ action: 'getProducts' }).then(r => r.success && setProds(r.data));
+  };
+  
+  useEffect(() => { refresh(); }, []);
+
+  return (
+    <div className="content-area">
+      <div className="page-header" style={{paddingLeft:0}}>
+        <h2>Orders</h2>
+        <button className="btn btn-primary" onClick={()=>setIsModal(true)}>Create Order</button>
+      </div>
+
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Date</th><th>Customer</th><th>Product</th><th>Bundle</th><th>Total</th><th>Status</th></tr></thead>
+            <tbody>
+              {orders.map(o => (
+                <tr key={o.id}>
+                  <td>{o.date}</td>
+                  <td>{o.customerName}<br/><small>{o.phone}</small></td>
+                  <td>{o.product}</td>
+                  <td>{o.bundle}</td>
+                  <td style={{fontWeight:600}}>GH₵ {o.sellingPrice}</td>
+                  <td><span className="badge badge-warning">{o.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {isModal && <OrderModal products={prods} user={user} onClose={()=>setIsModal(false)} onSave={()=>{setIsModal(false); refresh();}} />}
+    </div>
   );
 }
 
-// ─── DASHBOARD ─────────────────────────────────────────────────────────────
-function DashboardPage({user,isAdmin,isSupplier,isCC}){
-  const{data,loading,reload}=useData('getDashboard',isAdmin);
-  const[myData,setMyData]=useState(null);const[myLoading,setMyLoading]=useState(false);
-  useEffect(()=>{
-    if((isCC||isSupplier)&&API.url){
-      setMyLoading(true);
-      API.call({action:'getMyDashboard',username:user.username,role:user.role}).then(r=>{if(r.success)setMyData(r.data);setMyLoading(false);});
+function OrderModal({ products, user, onClose, onSave }) {
+  const [form, setForm] = useState({
+    customerName: '', phone: '', address: '', product: '', bundle: '', 
+    sellingPrice: 0, costPrice: 0, qty: 1, giftInfo: '', isCustom: false
+  });
+
+  const selectedProd = useMemo(() => products.find(p => p.name === form.product), [form.product, products]);
+  const bundles = useMemo(() => selectedProd ? JSON.parse(selectedProd.bundles || '[]') : [], [selectedProd]);
+
+  const handleBundleChange = (e) => {
+    const val = e.target.value;
+    if (val === 'CUSTOM') {
+      setForm({ ...form, bundle: 'CUSTOM', isCustom: true, sellingPrice: 0, costPrice: 0, qty: 1 });
+    } else {
+      const b = bundles.find(x => x.label === val);
+      setForm({
+        ...form, bundle: val, isCustom: false,
+        sellingPrice: b.sellingPrice,
+        costPrice: parseFloat(b.costPrice) + (b.hasGift ? parseFloat(b.giftCost) : 0),
+        qty: b.qty,
+        giftInfo: b.hasGift ? `(Includes Gift: GH₵${b.giftCost})` : ''
+      });
     }
-  },[user.username,user.role,isCC,isSupplier]);
-  if(!API.url)return React.createElement('div',{className:'setup-banner'},React.createElement('div',null,'⚙️'),React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,color:'var(--orange)',marginBottom:4}},'Setup Required'),React.createElement('div',{style:{color:'var(--text2)',fontSize:13}},'Go to ⚙ Settings and enter your Google Apps Script URL.')));
-  if(isAdmin){if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));return React.createElement(AdminDashboard,{data:data||{},reload});}
-  if(isSupplier)return React.createElement(SupplierDashboard,{data:myData,loading:myLoading,user});
-  return React.createElement(StaffDashboard,{data:myData,loading:myLoading,user});
-}
-
-function AdminDashboard({data,reload}){
-  const d=data||{};
-  const monthlyData=useMemo(()=>{
-    const months=[];
-    for(let i=7;i>=0;i--){const dt=new Date();dt.setMonth(dt.getMonth()-i);const key=dt.toISOString().slice(0,7);const lbl=dt.toLocaleString('default',{month:'short'});months.push({key,label:lbl,orders:0,delivered:0,rev:0});}
-    (d.recentOrders||[]).forEach(o=>{const mk=(o.date||'').slice(0,7);const m=months.find(x=>x.key===mk);if(m){m.orders++;if(statusOf(o)==='Delivered'){m.delivered++;if(paymentOf(o)==='Paid')m.rev+=sp(o.sellingPrice);}}});
-    return months;
-  },[d.recentOrders]);
-  const curMonthStr=today().slice(0,7);
-  const prevMonthStr=(()=>{const dt=new Date();dt.setMonth(dt.getMonth()-1);return dt.toISOString().slice(0,7);})();
-  const cur=monthlyData.find(m=>m.key===curMonthStr)||{orders:0,rev:0};
-  const prev=monthlyData.find(m=>m.key===prevMonthStr)||{orders:0,rev:0};
-  const orderDelta=prev.orders>0?Math.round((cur.orders-prev.orders)/prev.orders*100):null;
-  const revDelta=prev.rev>0?Math.round((cur.rev-prev.rev)/prev.rev*100):null;
-  const total=Math.max(d.totalOrders||0,1);
-  const delivPct=Math.round((d.delivered||0)/total*100);
-  const pendPct=Math.round((d.pending||0)/total*100);
-  const cancPct=Math.round((d.canceled||0)/total*100);
-  const convRate=Math.round((d.delivered||0)/total*100);
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',null,React.createElement('div',{className:'section-title'},'Store Overview'),React.createElement('div',{className:'section-sub'},'Today: '+(d.todayOrders||0)+' new orders')),
-      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')
-    ),
-    React.createElement('div',{className:'kpi-grid'},
-      React.createElement(KPICard,{label:'Total Orders',value:d.totalOrders||0,color:'var(--text)',sparkData:monthlyData.map(m=>m.orders),delta:orderDelta,icon:'📦'}),
-      React.createElement(KPICard,{label:'Revenue (GHC)',value:fmtGHC(d.revenueGHC),color:'var(--green)',sparkData:monthlyData.map(m=>m.rev),delta:revDelta,icon:'💰'}),
-      React.createElement(KPICard,{label:'Net Profit (NGN)',value:fmtNGN(d.netProfitNGN),color:sp(d.netProfitNGN)>=0?'var(--green)':'var(--red)',sub:'Ads: '+fmtNGN(d.totalAdSpend),icon:'📊'}),
-      React.createElement(KPICard,{label:'Delivered',value:d.delivered||0,color:'var(--green)',sub:'Successfully fulfilled',icon:'✅'}),
-      React.createElement(KPICard,{label:'Pending',value:d.pending||0,color:'var(--orange)',sub:'Awaiting delivery',icon:'⏳'}),
-      React.createElement(KPICard,{label:'Conversion Rate',value:convRate+'%',color:'var(--accent)',sub:'Orders → Delivered',icon:'🎯'}),
-      React.createElement(KPICard,{label:'Pending Revenue',value:fmtGHC(d.pendingRevenueGHC),color:'var(--orange)',sub:'Delivered, unpaid',icon:'⏰'}),
-      React.createElement(KPICard,{label:'Last Ex. Rate',value:d.lastExRate?('₦'+d.lastExRate):'-',color:'var(--purple)',sub:'per GH₵1',icon:'💱'}),
-      React.createElement(KPICard,{label:'Staff Payouts Due',value:fmtNGN(d.pendingStaffPayout),color:'var(--purple)',sub:'Owed to staff',icon:'👥'}),
-      React.createElement(KPICard,{label:'Canceled',value:d.canceled||0,color:'var(--red)',sub:'Lost orders',icon:'❌'})
-    ),
-    React.createElement('div',{className:'overview-grid'},
-      React.createElement('div',{className:'chart-card'},React.createElement('div',{className:'chart-title'},'Revenue Over Time (GHC)'),React.createElement('div',{className:'chart-sub'},'Paid & delivered orders — last 8 months'),React.createElement(AreaChart,{data:monthlyData.map(m=>({label:m.label,value:m.rev})),color:'var(--green)',height:130})),
-      React.createElement('div',{className:'chart-card',style:{display:'flex',flexDirection:'column',gap:14}},
-        React.createElement('div',null,React.createElement('div',{className:'chart-title'},'Order Breakdown'),React.createElement('div',{className:'chart-sub'},'All time distribution')),
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:16}},
-          React.createElement(DonutChart,{segments:[{pct:delivPct,color:'var(--green)'},{pct:pendPct,color:'var(--orange)'},{pct:cancPct,color:'var(--red)'}],size:90}),
-          React.createElement('div',{style:{fontSize:12,display:'flex',flexDirection:'column',gap:6}},
-            [{label:'Delivered',pct:delivPct,color:'var(--green)'},{label:'Pending',pct:pendPct,color:'var(--orange)'},{label:'Canceled',pct:cancPct,color:'var(--red)'}].map(s=>
-              React.createElement('div',{key:s.label,style:{display:'flex',alignItems:'center',gap:7}},
-                React.createElement('div',{style:{width:8,height:8,borderRadius:'50%',background:s.color,flexShrink:0}}),
-                React.createElement('span',{style:{color:'var(--text2)'}},s.label),
-                React.createElement('span',{style:{marginLeft:'auto',fontFamily:'var(--font-mono)',color:'var(--text)',paddingLeft:10}},s.pct+'%')
-              )
-            )
-          )
-        )
-      )
-    ),
-    React.createElement('div',{className:'chart-card',style:{marginBottom:16}},
-      React.createElement('div',{className:'chart-title'},'Orders vs Deliveries'),React.createElement('div',{className:'chart-sub'},'Monthly comparison — last 8 months'),
-      React.createElement('div',{style:{display:'flex',gap:14}},
-        React.createElement('div',{style:{flex:1}},React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Orders'),React.createElement(BarChart,{data:monthlyData.map(m=>({label:m.label,value:m.orders})),color:'var(--accent)',height:100})),
-        React.createElement('div',{style:{flex:1}},React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Delivered'),React.createElement(BarChart,{data:monthlyData.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:100}))
-      )
-    ),
-    d.staffPayouts&&d.staffPayouts.length>0&&React.createElement('div',{className:'card',style:{marginBottom:14}},
-      React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Staff Payout Summary'),
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Staff','Deliveries','Earned','Pending'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,d.staffPayouts.map(s=>React.createElement('tr',{key:s.name},React.createElement('td',null,s.name),React.createElement('td',null,s.count||0),React.createElement('td',{className:'profit-positive'},fmtNGN(s.earned)),React.createElement('td',{className:sp(s.pending)>0?'profit-negative':'td-mono'},fmtNGN(s.pending)))))
-      ))
-    ),
-    d.supplierSummary&&d.supplierSummary.length>0&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Supplier Summary'),
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Supplier','Orders','Delivered','Pending','Revenue (GHC)'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,d.supplierSummary.map(s=>React.createElement('tr',{key:s.name},React.createElement('td',null,s.name),React.createElement('td',null,s.orders),React.createElement('td',null,s.delivered),React.createElement('td',null,s.pending),React.createElement('td',{className:'profit-positive'},fmtGHC(s.revenueGHC)))))
-      ))
-    )
-  );
-}
-
-function StaffDashboard({data,loading,user}){
-  if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
-  const d=data||{};
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Welcome back, '+(user.name||user.username)+' 👋'),
-    React.createElement('div',{className:'kpi-grid'},[
-      {label:'Orders Processed',value:d.ordersContacted||0,color:'var(--blue)',sub:'Orders I contacted',icon:'📞'},
-      {label:'Delivered',value:d.delivered||0,color:'var(--green)',sub:'Confirmed deliveries',icon:'✅'},
-      {label:'Pending',value:d.pending||0,color:'var(--orange)',sub:'In progress',icon:'⏳'},
-      {label:'Canceled',value:d.canceled||0,color:'var(--red)',sub:'Lost',icon:'❌'},
-      {label:'My Earnings',value:fmtNGN(d.earnedNGN),color:'var(--green)',sub:'₦2,000/delivered+paid',icon:'💰'},
-      {label:'Pending Payout',value:fmtNGN(d.pendingPayoutNGN),color:'var(--orange)',sub:'Delivered but unpaid',icon:'⏰'},
-    ].map(s=>React.createElement(KPICard,{key:s.label,...s})))
-  );
-}
-
-function SupplierDashboard({data,loading,user}){
-  if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
-  const d=data||{};
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Welcome back, '+(user.name||user.username)+' 👋'),
-    React.createElement('div',{className:'kpi-grid'},[
-      {label:'My Product Orders',value:d.totalOrders||0,color:'var(--blue)',sub:'All orders for my products',icon:'📦'},
-      {label:'Delivered',value:d.delivered||0,color:'var(--green)',sub:'Successfully delivered',icon:'✅'},
-      {label:'Pending',value:d.pending||0,color:'var(--orange)',sub:'In progress',icon:'⏳'},
-      {label:'Canceled',value:d.canceled||0,color:'var(--red)',sub:'Lost',icon:'❌'},
-      {label:'Revenue (GHC)',value:fmtGHC(d.revenueGHC),color:'var(--green)',sub:'Product cost × orders',icon:'💰'},
-    ].map(s=>React.createElement(KPICard,{key:s.label,...s})))
-  );
-}
-
-// ─── ORDERS ────────────────────────────────────────────────────────────────
-function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
-  const[orders,setOrders]=useState([]);const[loading,setLoading]=useState(true);
-  const[products,setProducts]=useState([]);const[staffList,setStaffList]=useState([]);
-  const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);
-  const[search,setSearch]=useState('');const[statusFilter,setStatusFilter]=useState('');
-  const[contactFilter,setContactFilter]=useState('');const[payFilter,setPayFilter]=useState('');
-  const[contactingOrder,setContactingOrder]=useState(null);
-
-  const load=useCallback(async()=>{
-    setLoading(true);
-    const params={action:'getOrders'};if(isSupplier)params.supplierUsername=user.username;
-    const[or,pr,sf]=await Promise.all([API.call(params),API.call({action:'getProducts'}),API.call({action:'getStaff'})]);
-    if(or.success)setOrders(or.data||[]);if(pr.success)setProducts(pr.data||[]);if(sf.success)setStaffList(sf.data||[]);
-    setLoading(false);
-  },[isSupplier,user.username]);
-  useEffect(()=>{load();},[load]);
-
-  const filtered=useMemo(()=>{
-    let r=orders.filter(o=>supplierOwnsOrder(o,products,user));
-    if(statusFilter)r=r.filter(o=>statusOf(o)===statusFilter);
-    if(contactFilter)r=r.filter(o=>(o.contactStatus||'Uncontacted')===contactFilter);
-    if(payFilter)r=r.filter(o=>o.paymentStatus===payFilter);
-    if(search){const s=search.toLowerCase();r=r.filter(o=>(o.customerName||'').toLowerCase().includes(s)||(o.contact||'').includes(s)||(o.product||'').toLowerCase().includes(s));}
-    return r;
-  },[orders,statusFilter,contactFilter,payFilter,search,products,user]);
-
-  // BUG FIX: updateField used to have stale closure issue — now rebuilds from latest orders state
-  const updateField=useCallback(async(order,updates)=>{
-    const updated={...order,...updates};
-    setOrders(prev=>prev.map(o=>o.id===order.id?updated:o));
-    const r=await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(updated)});
-    if(!r.success){setOrders(prev=>prev.map(o=>o.id===order.id?order:o));toast(r.error||'Update failed','error');}
-    else toast('Updated ✓');
-  },[]);
-
-  const del=async o=>{
-    if(!confirm('Delete order for '+o.customerName+'?'))return;
-    setOrders(prev=>prev.filter(x=>x.id!==o.id));
-    const r=await API.call({action:'deleteOrder',id:o.id});
-    if(!r.success){setOrders(prev=>[...prev,o]);toast(r.error||'Failed','error');}else toast('Deleted');
-  };
-  const markContacted=useCallback(async(order,byName)=>{await updateField(order,{contactStatus:'Contacted',contactedBy:byName});},[updateField]);
-
-  const canCreate=!isSupplier&&(isAdmin||can('add_orders'));
-  const canEdit=isAdmin||can('edit_orders');
-  const canDelete=isAdmin||can('delete_orders');
-  const canContact=(isAdmin||isCC)&&!isSupplier;
-  const canChangeDelivery=isAdmin||isSupplier;
-  const canChangePay=isAdmin||isSupplier;
-
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',null,React.createElement('div',{className:'section-title'},'Orders'),React.createElement('div',{className:'section-sub'},filtered.length+' of '+orders.length)),
-      canCreate&&React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ New Order')
-    ),
-    React.createElement('div',{className:'filters-bar'},
-      React.createElement('input',{className:'search-input',placeholder:'Search name, phone, product…',value:search,onChange:e=>setSearch(e.target.value)}),
-      React.createElement('select',{className:'form-select',style:{width:140},value:statusFilter,onChange:e=>setStatusFilter(e.target.value)},React.createElement('option',{value:''},'All Delivery'),DELIVERY_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s))),
-      React.createElement('select',{className:'form-select',style:{width:130},value:contactFilter,onChange:e=>setContactFilter(e.target.value)},React.createElement('option',{value:''},'All Contact'),CONTACT_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s))),
-      React.createElement('select',{className:'form-select',style:{width:115},value:payFilter,onChange:e=>setPayFilter(e.target.value)},React.createElement('option',{value:''},'All Payment'),PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s))),
-      React.createElement('button',{className:'btn btn-secondary',onClick:load},'↻')
-    ),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    filtered.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📦'),React.createElement('div',{className:'empty-text'},'No orders found')):
-    React.createElement('div',{className:'table-wrap'},
-      React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Date','Customer','Product','Contact','Delivery','Payment','Del. Price','Notes',''].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,filtered.map(o=>{
-          const cs=o.contactStatus||'Uncontacted';const ds=statusOf(o);
-          return React.createElement('tr',{key:o.id},
-            React.createElement('td',null,o.date||'—',o.deliveryDate&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)'}},'D: '+o.deliveryDate)),
-            React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},o.customerName),React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact),o.contact2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact2)),
-            React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},o.product),o.bundleLabel&&React.createElement('div',{style:{fontSize:11,color:'var(--accent)'}},o.bundleLabel),o.size&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},'Size: '+o.size),o.sellingPrice&&React.createElement('div',{className:'td-mono',style:{fontSize:11}},fmtGHC(o.sellingPrice))),
-            React.createElement('td',null,
-              contactBadge(cs),
-              o.contactedBy&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',marginTop:2}},'by '+o.contactedBy),
-              canContact&&cs==='Uncontacted'&&React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginTop:4,fontSize:10,padding:'2px 6px'},onClick:()=>{if(isAdmin)setContactingOrder(o);else markContacted(o,user.name||user.username);}},'Mark Contacted')
-            ),
-            React.createElement('td',null,
-              statusBadge(ds),
-              canChangeDelivery&&React.createElement('select',{className:'form-select',style:{marginTop:4,fontSize:11,padding:'3px 6px'},value:ds,onChange:e=>updateField(o,{deliveryStatus:e.target.value,...(e.target.value==='Delivered'?{deliveryDate:today()}:{})})},DELIVERY_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s)))
-            ),
-            React.createElement('td',null,
-              payBadge(paymentOf(o)),
-              canChangePay&&React.createElement('select',{className:'form-select',style:{marginTop:4,fontSize:11,padding:'3px 6px'},value:paymentOf(o),onChange:e=>updateField(o,{paymentStatus:e.target.value})},PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s)))
-            ),
-            React.createElement('td',null,
-              o.deliveryPrice?React.createElement('div',{className:'td-mono'},fmtGHC(o.deliveryPrice)):React.createElement('div',{style:{color:'var(--text3)',fontSize:12}},'—'),
-              (isAdmin||isSupplier)&&React.createElement(DPInput,{order:o,onUpdate:updateField})
-            ),
-            React.createElement('td',null,o.notes?React.createElement('div',{title:o.notes,style:{fontSize:11,color:'var(--text3)',maxWidth:80,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.notes):'—'),
-            React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:3}},
-              canEdit&&!isSupplier&&React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(o);setShowModal(true);}},'✏'),
-              canDelete&&!isSupplier&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(o)},'🗑')
-            ))
-          );
-        }))
-      )
-    ),
-    showModal&&React.createElement(OrderModal,{order:editing,products,user,isAdmin,onSave:(saved)=>{if(editing)setOrders(prev=>prev.map(o=>o.id===saved.id?saved:o));else setOrders(prev=>[saved,...prev]);setShowModal(false);setEditing(null);load();},onClose:()=>{setShowModal(false);setEditing(null);}}),
-    contactingOrder&&React.createElement(ContactedByModal,{staffList,onConfirm:(name)=>{markContacted(contactingOrder,name);setContactingOrder(null);},onClose:()=>setContactingOrder(null)})
-  );
-}
-
-// BUG FIX: DPInput — fixed stale onBlur comparison by using ref for current order value
-function DPInput({order,onUpdate}){
-  const[val,setVal]=useState(String(order.deliveryPrice||''));
-  const orderRef=useRef(order);
-  useEffect(()=>{orderRef.current=order;setVal(String(order.deliveryPrice||''));},[order.deliveryPrice,order.id]);
-  return React.createElement('input',{className:'form-input',type:'number',placeholder:'Set…',value:val,style:{marginTop:4,padding:'3px 6px',fontSize:11,width:80},
-    onChange:e=>setVal(e.target.value),
-    onBlur:()=>{if(val!==String(orderRef.current.deliveryPrice||''))onUpdate(orderRef.current,{deliveryPrice:val});}
-  });
-}
-
-function ContactedByModal({staffList,onConfirm,onClose}){
-  const[sel,setSel]=useState('');
-  return React.createElement('div',{className:'modal-overlay'},
-    React.createElement('div',{className:'modal',style:{maxWidth:380}},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Who contacted this customer?'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'form-group'},
-          React.createElement('label',{className:'form-label'},'Select Staff'),
-          React.createElement('select',{className:'form-select',value:sel,onChange:e=>setSel(e.target.value)},
-            React.createElement('option',{value:''},'— Select —'),
-            staffList.filter(s=>isActive(s.active)).map(s=>React.createElement('option',{key:s.id||s.username,value:s.name||s.username},s.name||s.username))
-          )
-        )
-      ),
-      React.createElement('div',{className:'modal-footer'},
-        React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),
-        React.createElement('button',{className:'btn btn-primary',onClick:()=>sel&&onConfirm(sel),disabled:!sel},'Confirm')
-      )
-    )
-  );
-}
-
-// ─── ORDER MODAL ───────────────────────────────────────────────────────────
-function OrderModal({order,products,user,isAdmin,onSave,onClose}){
-  const isEdit=!!order;
-  const[f,setF]=useState(()=>order?{...order}:{
-    date:today(),customerName:'',address:'',contact:'',contact2:'',
-    product:'',bundleLabel:'',size:'',sellingPrice:'',costOfProduct:'',deliveryPrice:'',
-    paymentStatus:'Unpaid',notes:'',deliveryStatus:'Not Confirmed',
-    contactStatus:'Uncontacted',contactedBy:'',createdBy:user.username,
-    supplierUsername:'',isCustom:false,qty:''
-  });
-  const[saving,setSaving]=useState(false);
-  const[showContact2,setShowContact2]=useState(!!(order&&order.contact2));
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-
-  const prod=useMemo(()=>products.find(p=>p.name===f.product),[f.product,products]);
-  const bundles=useMemo(()=>parseBundles(prod?prod.bundles:null),[prod]);
-  const sizes=useMemo(()=>{if(!prod||!(prod.hasSizes===true||prod.hasSizes==='true'))return[];try{return JSON.parse(prod.sizes||'[]');}catch{return[];}},[prod]);
-  const isCustom=!!(f.isCustom);
-  const selBundle=useMemo(()=>bundles.find(b=>b.label===f.bundleLabel),[bundles,f.bundleLabel]);
-
-  const prevProd=useRef(f.product);
-  useEffect(()=>{
-    if(isEdit||f.product===prevProd.current)return;
-    prevProd.current=f.product;
-    if(prod){const su=readList(prod.supplierUsernames||prod.supplierUsername);setF(p=>({...p,bundleLabel:'',size:'',sellingPrice:'',costOfProduct:'',isCustom:false,qty:'',supplierUsername:su[0]||''}));}
-  },[f.product,prod,isEdit]);
-
-  const pickBundle=val=>{
-    if(val==='__custom__'){setF(p=>({...p,bundleLabel:'__custom__',isCustom:true,sellingPrice:'',costOfProduct:'',qty:''}));return;}
-    const b=bundles.find(x=>x.label===val);if(!b)return;
-    const su=readList(prod?prod.supplierUsernames||prod.supplierUsername:'');
-    const bundleCost=sp(b.costPrice)+(b.hasFreeGift?sp(b.freeGiftCost):0);
-    setF(p=>({...p,bundleLabel:b.label,isCustom:false,qty:b.qty,sellingPrice:b.price,costOfProduct:bundleCost||p.costOfProduct,supplierUsername:su[0]||(prod?prod.supplierUsername:'')||p.supplierUsername||''}));
   };
 
-  const validate=()=>{
-    if(!f.customerName){toast('Customer name required','error');return false;}
-    if(!f.contact){toast('Contact/phone required','error');return false;}
-    if(!f.address){toast('Delivery address required','error');return false;}
-    if(!f.product){toast('Product required','error');return false;}
-    if(bundles.length>0&&!f.bundleLabel){toast('Please select a bundle','error');return false;}
-    if(sizes.length>0&&!f.size){toast('Please select a size','error');return false;}
-    if(isCustom){
-      if(!f.qty){toast('Quantity required','error');return false;}
-      if(!f.sellingPrice){toast('Selling price required for custom orders','error');return false;}
-      if(!f.notes){toast('Notes required for custom orders','error');return false;}
-    }
-    return true;
+  const handleSave = async () => {
+    const r = await API.call({ action: 'addOrder', order: JSON.stringify({ ...form, createdBy: user.username, status: 'Processing' }) });
+    if (r.success) onSave(); else alert(r.error);
   };
 
-  const save=async()=>{
-    if(!validate())return;setSaving(true);
-    const payload={...f,bundleLabel:isCustom?('Custom ×'+f.qty):f.bundleLabel};
-    const r=isEdit?await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(payload)}):await API.call({action:'addOrder',order:JSON.stringify(payload)});
-    setSaving(false);
-    if(r.success)onSave({...payload,id:(r.data&&r.data.id)||order&&order.id||('tmp_'+Date.now())});
-    else toast(r.error||'Save failed','error');
+  return (
+    <div className="modal-overlay">
+      <div className="modal-card">
+        <div className="modal-body">
+          <h3 style={{marginBottom:20}}>New Order</h3>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:10}}>
+            <div><label className="kpi-label">Customer Name</label><input className="input" onChange={e=>setForm({...form, customerName:e.target.value})} /></div>
+            <div><label className="kpi-label">Phone Number</label><input className="input" onChange={e=>setForm({...form, phone:e.target.value})} /></div>
+          </div>
+          <div style={{marginBottom:10}}><label className="kpi-label">Address</label><input className="input" onChange={e=>setForm({...form, address:e.target.value})} /></div>
+          
+          <div style={{marginBottom:10}}>
+            <label className="kpi-label">Select Product</label>
+            <select className="input" onChange={e=>setForm({...form, product:e.target.value})}>
+              <option>-- Select --</option>
+              {products.map(p => <option key={p.id} value={p.name}>{p.name}</option>)}
+            </select>
+          </div>
+
+          <div style={{marginBottom:10}}>
+            <label className="kpi-label">Select Bundle</label>
+            <select className="input" onChange={handleBundleChange}>
+              <option>-- Select --</option>
+              {bundles.map(b => <option key={b.label} value={b.label}>{b.label} (GH₵{b.sellingPrice})</option>)}
+              <option value="CUSTOM">Special/Custom Order</option>
+            </select>
+            {form.giftInfo && <div style={{fontSize:11, color:'var(--p-accent)', marginTop:4}}>{form.giftInfo}</div>}
+          </div>
+
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, marginTop:20}}>
+            <div>
+              <label className="kpi-label">Price</label>
+              <input className="input" type="number" readOnly={!form.isCustom} value={form.sellingPrice} onChange={e=>setForm({...form, sellingPrice:e.target.value})} />
+            </div>
+            <div>
+              <label className="kpi-label">Qty</label>
+              <input className="input" type="number" readOnly={!form.isCustom} value={form.qty} onChange={e=>setForm({...form, qty:e.target.value})} />
+            </div>
+            <div>
+              <label className="kpi-label">Cost</label>
+              <input className="input" type="number" readOnly={!form.isCustom} value={form.costPrice} onChange={e=>setForm({...form, costPrice:e.target.value})} />
+            </div>
+          </div>
+        </div>
+        <div className="modal-footer">
+          <button className="btn" onClick={onClose}>Cancel</button>
+          <button className="btn btn-primary" onClick={handleSave}>Confirm Order</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsView({ user }) {
+  // Staff sees their personal performance
+  // Admin sees whole store
+  return (
+    <div className="content-area">
+      <div className="page-header" style={{paddingLeft:0}}>
+        <h2>{user.role === 'admin' ? 'Store' : 'My'} Analytics</h2>
+      </div>
+      <div className="card">
+        <p style={{color:'var(--p-text-sub)'}}>Sales trend and conversion funnel logic would be visualized here using Shopify-style charts.</p>
+      </div>
+    </div>
+  );
+}
+
+function SettingsView() {
+  const [url, setUrl] = useState(API.url);
+  const save = () => { localStorage.setItem('ss_api_url', url); window.location.reload(); };
+  
+  return (
+    <div className="content-area">
+      <div className="card" style={{maxWidth:500}}>
+        <h3>System Settings</h3>
+        <div style={{marginTop:20}}>
+          <label className="kpi-label">Apps Script / Supabase Edge URL</label>
+          <input className="input" value={url} onChange={e=>setUrl(e.target.value)} />
+          <button className="btn btn-primary" style={{marginTop:15}} onClick={save}>Save Connection</button>
+        </div>
+      </div>
+      
+      <div className="card" style={{maxWidth:500}}>
+        <h3>Tracking Pixel</h3>
+        <p style={{fontSize:12, color:'var(--p-text-sub)', marginBottom:10}}>Paste this in Systeme.io Head Settings</p>
+        <textarea className="input" readOnly style={{height:100, fontSize:11, fontFamily:'monospace'}}>
+          {`<script>
+  window.SS_TRACK = { url: "${url}" };
+  // Pixel tracking logic...
+</script>`}
+        </textarea>
+      </div>
+    </div>
+  );
+}
+
+function Login({ onLogin }) {
+  const [u, setU] = useState('');
+  const [p, setP] = useState('');
+  const handle = async () => {
+    const r = await API.call({ action: 'login', username: u, password: p });
+    if (r.success) onLogin(r.data); else alert('Invalid credentials');
   };
 
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal modal-lg'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Order':'New Order'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'section-divider'},'Customer Details'),
-        React.createElement('div',{className:'form-group',style:{marginBottom:10}},React.createElement('label',{className:'form-label'},'Order Date'),React.createElement('input',{className:'form-input',type:'date',value:f.date||'',onChange:set('date')})),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:10}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Customer Name *'),React.createElement('input',{className:'form-input',value:f.customerName||'',onChange:set('customerName')})),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Phone *'),
-            React.createElement('input',{className:'form-input',value:f.contact||'',onChange:set('contact'),placeholder:'Primary phone'}),
-            !showContact2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginTop:5,alignSelf:'flex-start'},onClick:()=>setShowContact2(true)},'+ Add 2nd Phone'),
-            showContact2&&React.createElement('input',{className:'form-input',style:{marginTop:5},value:f.contact2||'',onChange:set('contact2'),placeholder:'2nd phone'})
-          )
-        ),
-        React.createElement('div',{className:'form-group',style:{marginBottom:12}},React.createElement('label',{className:'form-label'},'Delivery Address *'),React.createElement('textarea',{className:'form-textarea',rows:2,value:f.address||'',onChange:set('address')})),
-
-        React.createElement('div',{className:'section-divider'},'Product & Bundle'),
-        React.createElement('div',{className:'form-group',style:{marginBottom:10}},
-          React.createElement('label',{className:'form-label'},'Product *'),
-          React.createElement('select',{className:'form-select',value:f.product||'',onChange:set('product')},
-            React.createElement('option',{value:''},'— Select Product —'),
-            products.filter(p=>isActive(p.active)).map(p=>React.createElement('option',{key:p.id,value:p.name},p.name))
-          )
-        ),
-
-        f.product&&bundles.length>0&&React.createElement('div',{className:'form-group',style:{marginBottom:10}},
-          React.createElement('label',{className:'form-label'},'Bundle / Quantity *'),
-          React.createElement('select',{className:'form-select',value:isCustom?'__custom__':f.bundleLabel||'',onChange:e=>pickBundle(e.target.value)},
-            React.createElement('option',{value:''},'— Select Bundle —'),
-            bundles.map(b=>React.createElement('option',{key:b.label,value:b.label},b.label+' — '+fmtGHC(b.price)+(b.hasFreeGift?' 🎁':''))),
-            React.createElement('option',{value:'__custom__'},'✏ Custom / Special Order')
-          )
-        ),
-
-        // Bundle info card — read-only, shown when a standard bundle is selected
-        !isCustom&&selBundle&&React.createElement('div',{className:'bundle-info-card',style:{marginBottom:12}},
-          React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',marginBottom:8,textTransform:'uppercase',letterSpacing:'0.5px'}},'Bundle Details'),
-          React.createElement('div',{className:'bundle-info-row'},React.createElement('span',{className:'bundle-info-label'},'Quantity'),React.createElement('span',{className:'bundle-info-val'},selBundle.qty||1)),
-          React.createElement('div',{className:'bundle-info-row'},React.createElement('span',{className:'bundle-info-label'},'Selling Price'),React.createElement('span',{className:'bundle-info-val'},fmtGHC(selBundle.price))),
-          React.createElement('div',{className:'bundle-info-row'},React.createElement('span',{className:'bundle-info-label'},'Cost Price'),React.createElement('span',{className:'bundle-info-val'},fmtGHC(sp(selBundle.costPrice)+(selBundle.hasFreeGift?sp(selBundle.freeGiftCost):0)))),
-          React.createElement('div',{className:'bundle-info-row'},React.createElement('span',{className:'bundle-info-label'},'Gross Margin'),React.createElement('span',{className:'bundle-info-val',style:{color:'var(--green)'}},fmtGHC(sp(selBundle.price)-sp(selBundle.costPrice)-(selBundle.hasFreeGift?sp(selBundle.freeGiftCost):0)))),
-          selBundle.hasFreeGift&&React.createElement('div',{className:'bundle-info-row',style:{border:'none',paddingTop:8}},React.createElement('span',{className:'bundle-info-label'},'Free Gift'),React.createElement('span',{className:'free-gift-badge'},'🎁 Included — '+fmtGHC(selBundle.freeGiftCost||0)))
-        ),
-
-        sizes.length>0&&React.createElement('div',{className:'form-group',style:{marginBottom:10}},
-          React.createElement('label',{className:'form-label'},'Size *'),
-          React.createElement('select',{className:'form-select',value:f.size||'',onChange:set('size')},React.createElement('option',{value:''},'— Select Size —'),sizes.map(s=>React.createElement('option',{key:s,value:s},s)))
-        ),
-
-        // Custom order fields — only shown when custom is selected
-        isCustom&&React.createElement('div',{className:'custom-order-fields',style:{marginBottom:12}},
-          React.createElement('div',{className:'alert-warning',style:{marginBottom:12}},'⚡ Custom order — fill in the details below.'),
-          React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:10}},
-            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Quantity *'),React.createElement('input',{className:'form-input',type:'number',value:f.qty||'',onChange:set('qty'),placeholder:'e.g. 3'})),
-            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Selling Price (GHC) *'),React.createElement('input',{className:'form-input',type:'number',value:f.sellingPrice||'',onChange:set('sellingPrice')}))
-          ),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:f.costOfProduct||'',onChange:set('costOfProduct'),placeholder:'Enter cost price'}))
-        ),
-
-        // BUG FIX: delivery price was showing for all users — now only admin or custom order
-        (isAdmin||isCustom)&&React.createElement('div',{className:'form-group',style:{marginBottom:10}},
-          React.createElement('label',{className:'form-label'},'Delivery Price (GHC)'),
-          React.createElement('input',{className:'form-input',type:'number',value:f.deliveryPrice||'',onChange:set('deliveryPrice'),placeholder:'Set delivery price'})
-        ),
-
-        React.createElement('div',{className:'form-group'},
-          React.createElement('label',{className:'form-label'},isCustom?'Notes * (required — describe order)':'Notes'),
-          React.createElement('textarea',{className:'form-textarea',rows:2,value:f.notes||'',onChange:set('notes'),placeholder:isCustom?'Describe custom order details…':'Optional notes'})
-        )
-      ),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?'Saving…':'Save Order'))
-    )
+  return (
+    <div className="modal-overlay" style={{background:'var(--p-bg)'}}>
+      <div className="card" style={{width:320}}>
+        <div style={{textAlign:'center', marginBottom:20}}>
+          <div className="sb-logo" style={{margin:'0 auto 10px'}}>S</div>
+          <h2>Shittu Stores</h2>
+        </div>
+        <div style={{marginBottom:10}}><label className="kpi-label">Username</label><input className="input" onChange={e=>setU(e.target.value)} /></div>
+        <div style={{marginBottom:20}}><label className="kpi-label">Password</label><input className="input" type="password" onChange={e=>setP(e.target.value)} /></div>
+        <button className="btn btn-primary" style={{width:'100%'}} onClick={handle}>Sign In</button>
+      </div>
+    </div>
   );
 }
 
-// ─── ANALYTICS ─────────────────────────────────────────────────────────────
-function AnalyticsPage({user,isAdmin,isSupplier,isCC}){
-  const[orders,setOrders]=useState([]);const[loading,setLoading]=useState(true);
-  const[period,setPeriod]=useState('month');
-  const[selMonth,setSelMonth]=useState(()=>today().slice(0,7));
-  const[selYear,setSelYear]=useState(()=>today().slice(0,4));
-
-  useEffect(()=>{
-    if(!API.url){setLoading(false);return;}
-    const params={action:'getOrders'};if(isSupplier)params.supplierUsername=user.username;
-    API.call(params).then(r=>{if(r.success)setOrders(r.data||[]);setLoading(false);});
-  },[isSupplier,user.username]);
-
-  const years=useMemo(()=>{const s=new Set(orders.map(o=>(o.date||'').slice(0,4)).filter(Boolean));return[...s].sort().reverse();},[orders]);
-
-  // BUG FIX: staff filter now matches both user.username AND user.name to catch all cases
-  const myOrders=useMemo(()=>{
-    if(!isCC)return orders;
-    return orders.filter(o=>o.contactedBy===user.username||o.contactedBy===(user.name||user.username));
-  },[orders,isCC,user.username,user.name]);
-
-  const baseOrders=isCC?myOrders:orders;
-  const filtered=useMemo(()=>baseOrders.filter(o=>{
-    if(!o.date)return false;
-    if(period==='month')return o.date.startsWith(selMonth);
-    if(period==='year')return o.date.startsWith(selYear);
-    return true;
-  }),[baseOrders,period,selMonth,selYear]);
-
-  const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
-  const byProduct=useMemo(()=>{const m={};filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);},[filtered]);
-  const paid=filtered.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
-  const rev=paid.reduce((s,o)=>s+sp(o.sellingPrice),0);
-  const cost=paid.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);
-  const convRate=filtered.length>0?Math.round((byStatus['Delivered']||0)/filtered.length*100):0;
-
-  const monthlyRevData=useMemo(()=>{const m={};baseOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid').forEach(o=>{if(!o.date)return;const mk=o.date.slice(0,7);m[mk]=(m[mk]||0)+sp(o.sellingPrice);});return Object.entries(m).sort().slice(-10).map(([k,v])=>({label:k.slice(5),value:v}));},[baseOrders]);
-  const monthlyOrderData=useMemo(()=>{const m={};baseOrders.forEach(o=>{if(!o.date)return;const mk=o.date.slice(0,7);m[mk]=(m[mk]||0)+1;});return Object.entries(m).sort().slice(-10).map(([k,v])=>({label:k.slice(5),value:v}));},[baseOrders]);
-  const myEarningsData=useMemo(()=>{if(!isCC)return[];const m={};myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid').forEach(o=>{if(!o.date)return;const mk=o.date.slice(0,7);m[mk]=(m[mk]||0)+STAFF_PAYOUT_NGN;});return Object.entries(m).sort().slice(-10).map(([k,v])=>({label:k.slice(5),value:v}));},[myOrders,isCC]);
-  const myEarned=myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid').length*STAFF_PAYOUT_NGN;
-  const myPending=myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)!=='Paid').length*STAFF_PAYOUT_NGN;
-
-  if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
-
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},isCC?'My Analytics':'Analytics')),
-    React.createElement('div',{className:'card',style:{marginBottom:16}},
-      React.createElement('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}},
-        React.createElement('div',{className:'tabs',style:{margin:0}},
-          [{id:'all',label:'All Time'},{id:'year',label:'By Year'},{id:'month',label:'By Month'}].map(t=>React.createElement('div',{key:t.id,className:'tab '+(period===t.id?'active':''),onClick:()=>setPeriod(t.id)},t.label))
-        ),
-        period==='month'&&React.createElement('input',{type:'month',className:'form-input',style:{width:150},value:selMonth,onChange:e=>setSelMonth(e.target.value)}),
-        period==='year'&&React.createElement('select',{className:'form-select',style:{width:110},value:selYear,onChange:e=>setSelYear(e.target.value)},years.map(y=>React.createElement('option',{key:y,value:y},y)))
-      )
-    ),
-    React.createElement('div',{className:'kpi-grid'},
-      [
-        {label:'Total Orders',value:filtered.length,color:'var(--blue)',icon:'📦'},
-        {label:'Delivered',value:byStatus['Delivered']||0,color:'var(--green)',icon:'✅'},
-        {label:'Canceled',value:byStatus['Canceled']||0,color:'var(--red)',icon:'❌'},
-        {label:'Conversion Rate',value:convRate+'%',color:'var(--accent)',icon:'🎯'},
-        ...(!isCC?[
-          {label:'Revenue (GHC)',value:fmtGHC(rev),color:'var(--green)',icon:'💰'},
-          {label:'Gross Profit (GHC)',value:fmtGHC(rev-cost),color:'var(--orange)',icon:'📊'},
-        ]:[
-          {label:'My Earnings',value:fmtNGN(myEarned),color:'var(--green)',sub:'₦2,000 × '+(myEarned/STAFF_PAYOUT_NGN)+' orders',icon:'💰'},
-          {label:'Pending Payout',value:fmtNGN(myPending),color:'var(--orange)',sub:'Delivered, not paid',icon:'⏰'},
-        ])
-      ].map(s=>React.createElement(KPICard,{key:s.label,...s}))
-    ),
-    React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:16}},
-      React.createElement('div',{className:'chart-card'},
-        React.createElement('div',{className:'chart-title'},isCC?'My Orders Over Time':'Revenue Over Time (GHC)'),
-        React.createElement('div',{className:'chart-sub'},isCC?'Orders I contacted per month':'Paid & delivered'),
-        React.createElement(AreaChart,{data:isCC?monthlyOrderData:monthlyRevData,color:isCC?'var(--accent)':'var(--green)',height:110})
-      ),
-      isCC?
-        React.createElement('div',{className:'chart-card'},React.createElement('div',{className:'chart-title'},'My Earnings Over Time (NGN)'),React.createElement('div',{className:'chart-sub'},'₦2,000 per paid delivery'),React.createElement(AreaChart,{data:myEarningsData,color:'var(--green)',height:110})):
-        React.createElement('div',{className:'chart-card'},React.createElement('div',{className:'chart-title'},'Orders Per Month'),React.createElement('div',{className:'chart-sub'},'Volume trend'),React.createElement(BarChart,{data:monthlyOrderData,color:'var(--accent)',height:110}))
-    ),
-    React.createElement('div',{className:'form-grid form-grid-2'},
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Orders by Status'),
-        DELIVERY_STATUSES.map(s=>{const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:s,style:{marginBottom:9}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},c+' ('+pct+'%)')),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:pct+'%',background:'var(--accent)'}})));})
-      ),
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Top Products'),
-        byProduct.length===0?React.createElement('div',{className:'text-muted'},'No data'):
-        byProduct.map(([name,c])=>{const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:name,style:{marginBottom:9}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',{style:{maxWidth:'65%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},name),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},c+' ('+pct+'%)')),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:pct+'%',background:'var(--blue)'}})));})
-      )
-    )
-  );
-}
-
-// ─── FINANCIALS ────────────────────────────────────────────────────────────
-function FinancialsPage({isAdmin}){
-  const[tab,setTab]=useState('overview');const[orders,setOrders]=useState([]);const[expenses,setExpenses]=useState([]);const[withdrawals,setWithdrawals]=useState([]);const[loading,setLoading]=useState(true);const[showWDModal,setShowWDModal]=useState(false);
-  const load=useCallback(async()=>{
-    setLoading(true);
-    const[or,ex,wd]=await Promise.all([API.call({action:'getOrders'}),API.call({action:'getExpenses'}),API.call({action:'getWithdrawals'})]);
-    if(or.success)setOrders(or.data||[]);if(ex.success)setExpenses(ex.data||[]);if(wd.success)setWithdrawals(wd.data||[]);
-    setLoading(false);
-  },[]);
-  useEffect(()=>{load();},[load]);
-  const lastExRate=useMemo(()=>{const s=[...withdrawals].sort((a,b)=>new Date(b.date)-new Date(a.date));return(s[0]&&s[0].exchangeRate)||null;},[withdrawals]);
-  const paid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
-  const delivUnpaid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)!=='Paid');
-  const totalRevGHC=paid.reduce((s,o)=>s+sp(o.sellingPrice),0);
-  const totalCostGHC=paid.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);
-  const profitGHC=totalRevGHC-totalCostGHC;
-  const totalAdSpend=expenses.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
-  const totalWdNGN=withdrawals.reduce((s,w)=>s+sp(w.amountNGN),0);
-  const totalWdGHC=withdrawals.reduce((s,w)=>s+sp(w.amountGHC),0);
-  const netProfitNGN=profitGHC*sp(lastExRate)-totalAdSpend;
-  const pendRevGHC=delivUnpaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
-  const pendingStaffNGN=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)!=='Paid'&&o.contactedBy).length*STAFF_PAYOUT_NGN;
-
-  return React.createElement('div',null,
-    React.createElement('div',{className:'tabs'},
-      [{id:'overview',label:'Overview'},{id:'orders',label:'Paid Orders'},{id:'staff',label:'Staff Payouts'},{id:'withdrawals',label:'Withdrawals'}].map(t=>React.createElement('div',{key:t.id,className:'tab '+(tab===t.id?'active':''),onClick:()=>setTab(t.id)},t.label))
-    ),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    tab==='overview'?React.createElement('div',{className:'kpi-grid'},[
-      {label:'Revenue (GHC)',value:fmtGHC(totalRevGHC),color:'var(--green)',sub:'From paid+delivered orders',icon:'💰'},
-      {label:'Revenue (NGN)',value:fmtNGN(totalWdNGN),color:'var(--green)',sub:'Total withdrawn',icon:'💵'},
-      {label:'Gross Profit (GHC)',value:fmtGHC(profitGHC),color:'var(--orange)',sub:'After product+delivery costs',icon:'📊'},
-      {label:'Net Profit After Ads (NGN)',value:fmtNGN(netProfitNGN),color:netProfitNGN>=0?'var(--green)':'var(--red)',sub:'Ad spend: '+fmtNGN(totalAdSpend),icon:'📈'},
-      {label:'Pending Revenue (GHC)',value:fmtGHC(pendRevGHC),color:'var(--orange)',sub:'Delivered, unpaid',icon:'⏰'},
-      {label:'Last Exchange Rate',value:lastExRate?('₦'+lastExRate+'/GH₵'):'Not set',color:'var(--blue)',sub:'Most recent withdrawal',icon:'💱'},
-      {label:'GHC Withdrawn',value:fmtGHC(totalWdGHC),color:'var(--blue)',icon:'🏦'},
-      {label:'Pending Staff Payouts',value:fmtNGN(pendingStaffNGN),color:'var(--purple)',sub:'Owed for delivered+unpaid',icon:'👥'},
-    ].map(s=>React.createElement(KPICard,{key:s.label,...s}))):
-    tab==='orders'?React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Paid Orders Breakdown'),
-      paid.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💰'),React.createElement('div',{className:'empty-text'},'No paid orders yet')):
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Date','Customer','Product','Bundle','Selling','Cost','Delivery','Profit GHC'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,paid.map(o=>{const s2=sp(o.sellingPrice),c=sp(o.costOfProduct),d2=sp(o.deliveryPrice),p=s2-c-d2;return React.createElement('tr',{key:o.id},React.createElement('td',null,o.date),React.createElement('td',null,o.customerName),React.createElement('td',null,o.product),React.createElement('td',null,o.bundleLabel||(o.qty||1)+'×'),React.createElement('td',{className:'td-mono'},fmtGHC(s2)),React.createElement('td',{className:'td-mono'},fmtGHC(c)),React.createElement('td',{className:'td-mono'},fmtGHC(d2)),React.createElement('td',{className:p>=0?'profit-positive':'profit-negative'},fmtGHC(p)));})
-      ))
-    ):
-    tab==='staff'?React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Staff Payout Breakdown (₦2,000/delivered+paid)'),React.createElement(StaffPayoutTable,{orders})):
-    React.createElement('div',null,
-      React.createElement('div',{className:'section-header'},
-        React.createElement('div',null,React.createElement('div',{className:'section-title'},'Withdrawals'),React.createElement('div',{className:'section-sub'},'GHC → NGN conversions')),
-        isAdmin&&React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowWDModal(true)},'+ Log Withdrawal')
-      ),
-      withdrawals.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💱'),React.createElement('div',{className:'empty-text'},'No withdrawals yet')):
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Date','GHC Sent','NGN Received','Rate','Notes'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,withdrawals.map(w=>React.createElement('tr',{key:w.id},React.createElement('td',null,w.date),React.createElement('td',{className:'td-mono'},fmtGHC(w.amountGHC)),React.createElement('td',{className:'td-mono'},fmtNGN(w.amountNGN)),React.createElement('td',{style:{fontWeight:700,color:'var(--accent)',fontFamily:'var(--font-mono)'}},w.exchangeRate||'—'),React.createElement('td',null,w.notes||'—'))))
-      )),
-      showWDModal&&React.createElement(WithdrawalModal,{onSave:()=>{setShowWDModal(false);load();toast('Logged ✓');},onClose:()=>setShowWDModal(false)})
-    )
-  );
-}
-
-function StaffPayoutTable({orders}){
-  const byStaff={};
-  orders.forEach(o=>{
-    const n=o.contactedBy;if(!n)return;
-    if(!byStaff[n])byStaff[n]={name:n,earned:0,pending:0,count:0};
-    const isPaid=paymentOf(o)==='Paid';const isDel=statusOf(o)==='Delivered';
-    if(isDel&&isPaid){byStaff[n].earned+=STAFF_PAYOUT_NGN;byStaff[n].count++;}
-    else if(isDel&&!isPaid)byStaff[n].pending+=STAFF_PAYOUT_NGN;
-  });
-  const rows=Object.values(byStaff);
-  if(rows.length===0)return React.createElement('div',{className:'text-muted',style:{padding:12}},'No payout data yet. Staff are paid after orders are delivered + paid.');
-  return React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-    React.createElement('thead',null,React.createElement('tr',null,['Staff','Confirmed Deliveries','Earned (NGN)','Pending (NGN)'].map(h=>React.createElement('th',{key:h},h)))),
-    React.createElement('tbody',null,rows.map(r=>React.createElement('tr',{key:r.name},React.createElement('td',null,r.name),React.createElement('td',null,r.count),React.createElement('td',{className:'profit-positive'},fmtNGN(r.earned)),React.createElement('td',{className:r.pending>0?'profit-negative':'td-mono'},fmtNGN(r.pending)))))
-  ));
-}
-
-function WithdrawalModal({onSave,onClose}){
-  const[f,setF]=useState({date:today(),amountGHC:'',amountNGN:'',notes:''});const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const rate=f.amountGHC&&f.amountNGN?(sp(f.amountNGN)/sp(f.amountGHC)).toFixed(2):null;
-  const save=async()=>{setSaving(true);const r=await API.call({action:'addWithdrawal',withdrawal:JSON.stringify({...f,exchangeRate:rate})});setSaving(false);if(r.success)onSave();else toast(r.error||'Failed','error');};
-  return React.createElement('div',{className:'modal-overlay'},
-    React.createElement('div',{className:'modal',style:{maxWidth:460}},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Log Withdrawal'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'alert-info'},'Enter GHC sent and NGN received. Rate calculated automatically.'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:10}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Date'),React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'GHC Sent'),React.createElement('input',{className:'form-input',type:'number',value:f.amountGHC,onChange:set('amountGHC')}))
-        ),
-        React.createElement('div',{className:'form-group',style:{marginBottom:10}},React.createElement('label',{className:'form-label'},'NGN Received'),React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')})),
-        rate&&React.createElement('div',{className:'alert-info'},'📊 Rate: ₦'+rate+' per GH₵1'),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Notes'),React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes')}))
-      ),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving||!f.amountGHC||!f.amountNGN},saving?'Saving…':'Log Withdrawal'))
-    )
-  );
-}
-
-// ─── EXPENSES ──────────────────────────────────────────────────────────────
-function ExpensesPage({isAdmin}){
-  const{data,loading,reload}=useData('getExpenses');
-  const[showAdd,setShowAdd]=useState(false);
-  const[f,setF]=useState({date:today(),category:'Ad Cost',amountNGN:'',notes:''});
-  const[saving,setSaving]=useState(false);
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const add=async()=>{
-    setSaving(true);
-    const r=await API.call({action:'addExpense',expense:JSON.stringify(f)});
-    setSaving(false);
-    if(r.success){toast('Added ✓');setShowAdd(false);setF({date:today(),category:'Ad Cost',amountNGN:'',notes:''});reload();}
-    else toast(r.error||'Failed','error');
-  };
-  const del=async e=>{if(!confirm('Delete?'))return;await API.call({action:'deleteExpense',id:e.id});toast('Deleted');reload();};
-  const list=data||[];
-  const total=list.reduce((s,e)=>s+sp(e.amountNGN),0);
-  const adTotal=list.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Expenses'),isAdmin&&React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowAdd(s=>!s)},showAdd?'✕ Cancel':'+ Add Expense')),
-    React.createElement('div',{className:'kpi-grid'},[{label:'Ad Spend',value:fmtNGN(adTotal),color:'var(--red)',icon:'📣'},{label:'Other Expenses',value:fmtNGN(total-adTotal),color:'var(--orange)',icon:'📋'},{label:'Total',value:fmtNGN(total),color:'var(--red)',icon:'💸'}].map(s=>React.createElement(KPICard,{key:s.label,...s}))),
-    showAdd&&React.createElement('div',{className:'card',style:{marginBottom:14}},
-      React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:10}},
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Date'),React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Category'),React.createElement('select',{className:'form-select',value:f.category,onChange:set('category')},['Ad Cost','Logistics','Other'].map(c=>React.createElement('option',{key:c,value:c},c)))),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Amount (NGN)'),React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')})),
-        React.createElement('div',{className:'form-group',style:{gridColumn:'span 3'}},React.createElement('label',{className:'form-label'},'Notes'),React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes')}))
-      ),
-      React.createElement('div',{style:{display:'flex',justifyContent:'flex-end'}},React.createElement('button',{className:'btn btn-primary',onClick:add,disabled:saving},saving?'Saving…':'Add Expense'))
-    ),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    list.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📉'),React.createElement('div',{className:'empty-text'},'No expenses yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Date','Category','Amount (NGN)','Notes',''].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,list.map(e=>React.createElement('tr',{key:e.id},React.createElement('td',null,e.date),React.createElement('td',null,React.createElement('span',{className:'badge badge-processing'},e.category)),React.createElement('td',{className:'td-mono'},fmtNGN(e.amountNGN)),React.createElement('td',null,e.notes||'—'),React.createElement('td',null,isAdmin&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(e)},'🗑')))))
-    ))
-  );
-}
-
-// ─── PRODUCTS ──────────────────────────────────────────────────────────────
-function ProductsPage(){
-  const{data,loading,reload}=useData('getProducts');const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const[viewHist,setViewHist]=useState(null);const list=data||[];
-  const del=async p=>{if(!confirm('Delete '+p.name+'?'))return;await API.call({action:'deleteProduct',id:p.id});toast('Deleted');reload();};
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Products'),React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Product')),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    list.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🏷️'),React.createElement('div',{className:'empty-text'},'No products yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Product','Bundles','Sizes','Suppliers','Status',''].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,list.map(p=>{
-        const bundles=parseBundles(p.bundles);
-        const sup=readList(p.supplierNames||p.supplierUsernames||p.supplierUsername).join(', ');
-        return React.createElement('tr',{key:p.id},
-          React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},p.name),p.description&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},p.description)),
-          React.createElement('td',null,bundles.length>0?React.createElement('div',null,bundles.map(b=>React.createElement('div',{key:b.label,style:{fontSize:11,marginBottom:1}},b.label+': '+fmtGHC(b.price)+(b.hasFreeGift?' 🎁':'')))):React.createElement('span',{style:{color:'var(--text3)'}},'—')),
-          React.createElement('td',null,(p.hasSizes===true||p.hasSizes==='true')?'✓':'—'),
-          React.createElement('td',null,sup||'None'),
-          React.createElement('td',null,React.createElement('span',{className:'badge '+(isActive(p.active)?'badge-delivered':'badge-canceled')},isActive(p.active)?'Active':'Inactive')),
-          React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:3}},
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(p);setShowModal(true);}},'✏'),
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>setViewHist(p)},'📈'),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(p)},'🗑')
-          ))
-        );
-      }))
-    )),
-    showModal&&React.createElement(ProductModal,{product:editing,onSave:()=>{setShowModal(false);reload();toast('Saved ✓');},onClose:()=>setShowModal(false)}),
-    viewHist&&React.createElement(PriceHistoryModal,{product:viewHist,onClose:()=>setViewHist(null)})
-  );
-}
-
-function ProductModal({product,onSave,onClose}){
-  const isEdit=!!product;
-  const[f,setF]=useState(product?{...product}:{name:'',description:'',active:true,hasSizes:false});
-  const[saving,setSaving]=useState(false);
-  const[sizes,setSizes]=useState(()=>{try{return JSON.parse((product&&product.sizes)||'[]');}catch{return[];}});
-  const[sizeInput,setSizeInput]=useState('');
-  const[bundles,setBundles]=useState(()=>parseBundles(product&&product.bundles));
-  const{data:suppliers}=useData('getSuppliers');
-  const[assignedSuppliers,setAssignedSuppliers]=useState(()=>readList(product&&(product.supplierUsernames||product.supplierUsername)));
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const addSize=()=>{if(sizeInput.trim()){setSizes(s=>[...s,sizeInput.trim()]);setSizeInput('');}};
-  const rmSize=s=>setSizes(p=>p.filter(x=>x!==s));
-  const addBundle=()=>setBundles(b=>[...b,{label:'',qty:1,price:'',costPrice:'',hasFreeGift:false,freeGiftCost:''}]);
-  const updBundle=(i,k,v)=>setBundles(b=>b.map((x,j)=>j===i?{...x,[k]:v}:x));
-  const rmBundle=i=>setBundles(b=>b.filter((_,j)=>j!==i));
-  const toggleSupplier=u=>setAssignedSuppliers(prev=>prev.includes(u)?prev.filter(x=>x!==u):[...prev,u]);
-  const save=async()=>{
-    if(!f.name){toast('Name required','error');return;}setSaving(true);
-    const supplierNames=(suppliers||[]).filter(s=>assignedSuppliers.includes(s.username)).map(s=>s.name||s.username);
-    const data={...f,supplierUsername:assignedSuppliers[0]||'',supplierUsernames:JSON.stringify(assignedSuppliers),supplierNames:supplierNames.join(', '),sizes:JSON.stringify(sizes),bundles:JSON.stringify(bundles)};
-    const r=isEdit?await API.call({action:'updateProduct',id:product.id,product:JSON.stringify(data)}):await API.call({action:'addProduct',product:JSON.stringify(data)});
-    setSaving(false);if(r.success)onSave();else toast(r.error||'Failed','error');
-  };
-  const hasSizes=f.hasSizes===true||f.hasSizes==='true';
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal modal-lg'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Product':'New Product'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'section-divider'},'Basic Info'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:12}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Product Name *'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Description'),React.createElement('input',{className:'form-input',value:f.description||'',onChange:set('description')}))
-        ),
-        React.createElement('div',{className:'form-group',style:{marginBottom:12}},
-          React.createElement('label',{className:'form-label'},'Status'),
-          React.createElement('select',{className:'form-select',style:{width:140},value:String(f.active),onChange:e=>setF(p=>({...p,active:e.target.value==='true'}))},React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive'))
-        ),
-        React.createElement('div',{className:'section-divider'},'Bundle / Quantity Pricing'),
-        React.createElement('div',{className:'alert-info',style:{marginBottom:10}},'Add bundles. Each bundle has its own selling price, cost price, and optional free gift. A "Custom" option always appears automatically in order creation.'),
-        bundles.map((b,i)=>React.createElement('div',{key:i,style:{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:8,padding:14,marginBottom:10}},
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:10}},
-            React.createElement('div',{style:{fontWeight:700,fontSize:12,color:'var(--accent)'}},'Bundle '+(i+1)),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>rmBundle(i),style:{padding:'2px 8px'}},'Remove')
-          ),
-          React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:10}},
-            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Label'),React.createElement('input',{className:'form-input',value:b.label,onChange:e=>updBundle(i,'label',e.target.value),placeholder:'e.g. 1 Unit'})),
-            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Qty'),React.createElement('input',{className:'form-input',type:'number',min:1,value:b.qty,onChange:e=>updBundle(i,'qty',e.target.value)})),
-            React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:b.price,onChange:e=>updBundle(i,'price',e.target.value)}))
-          ),
-          React.createElement('div',{className:'form-group',style:{marginBottom:10}},
-            React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),
-            React.createElement('input',{className:'form-input',type:'number',value:b.costPrice||'',onChange:e=>updBundle(i,'costPrice',e.target.value),placeholder:'Cost of goods for this bundle'})
-          ),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Free Gift with this Bundle?'),
-            React.createElement('div',{className:'radio-group'},
-              React.createElement('label',{className:'radio-pill '+(b.hasFreeGift?'':'active')},React.createElement('input',{type:'radio',checked:!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',false)}),'❌ No Free Gift'),
-              React.createElement('label',{className:'radio-pill '+(b.hasFreeGift?'active':'')},React.createElement('input',{type:'radio',checked:!!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',true)}),'🎁 Yes, Includes Free Gift')
-            ),
-            b.hasFreeGift&&React.createElement('div',{style:{marginTop:8}},
-              React.createElement('label',{className:'form-label'},'Free Gift Cost (GHC) — added to bundle cost'),
-              React.createElement('input',{className:'form-input',type:'number',style:{marginTop:4},value:b.freeGiftCost||'',onChange:e=>updBundle(i,'freeGiftCost',e.target.value),placeholder:'e.g. 15'})
-            )
-          )
-        )),
-        React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginBottom:16},onClick:addBundle},'+ Add Bundle'),
-        React.createElement('div',{className:'section-divider'},'Sizes'),
-        React.createElement('div',{className:'form-group',style:{marginBottom:8}},
-          React.createElement('label',{className:'form-label'},'Requires Size Selection?'),
-          React.createElement('select',{className:'form-select',style:{width:130},value:String(f.hasSizes||false),onChange:e=>setF(p=>({...p,hasSizes:e.target.value==='true'}))},React.createElement('option',{value:'false'},'No'),React.createElement('option',{value:'true'},'Yes'))
-        ),
-        hasSizes&&React.createElement('div',{style:{marginBottom:14}},
-          React.createElement('div',{style:{display:'flex',gap:7,marginBottom:7}},
-            React.createElement('input',{className:'form-input',value:sizeInput,onChange:e=>setSizeInput(e.target.value),placeholder:'Type size, press Enter (e.g. S, M, L)',onKeyDown:e=>e.key==='Enter'&&addSize()}),
-            React.createElement('button',{className:'btn btn-secondary',onClick:addSize},'Add')
-          ),
-          React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:5}},sizes.map(s=>React.createElement('div',{key:s,className:'tag'},s,React.createElement('span',{className:'tag-remove',onClick:()=>rmSize(s)},'×'))))
-        ),
-        React.createElement('div',{className:'section-divider'},'Supplier Assignment'),
-        !(suppliers&&suppliers.length)?React.createElement('div',{className:'text-muted',style:{marginBottom:12}},'Create suppliers first in the Suppliers section.'):
-        React.createElement('div',{className:'permission-grid',style:{marginBottom:12}},
-          (suppliers||[]).filter(s=>isActive(s.active)).map(s=>React.createElement('div',{key:s.id||s.username,className:'product-chip '+(assignedSuppliers.includes(s.username)?'active':''),onClick:()=>toggleSupplier(s.username)},(assignedSuppliers.includes(s.username)?'✓ ':''),(s.name||s.username)))
-        )
-      ),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?'Saving…':'Save Product'))
-    )
-  );
-}
-
-function PriceHistoryModal({product,onClose}){
-  let history=[];try{history=JSON.parse((product&&product.priceHistory)||'[]');}catch{}
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal',style:{maxWidth:480}},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Price History — '+product.name),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        history.length===0?React.createElement('div',{className:'text-muted'},'No historical price changes recorded. Future edits will be logged here.'):
-        history.slice().reverse().map((h,i)=>React.createElement('div',{key:i,className:'price-history-item'},React.createElement('div',null,h.date||('Change '+(i+1))),React.createElement('div',{className:'td-mono'},'Cost: '+fmtGHC(h.costGHC)+' / Sell: '+fmtGHC(h.sellingPriceGHC))))
-      ),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Close'))
-    )
-  );
-}
-
-// ─── STAFF ─────────────────────────────────────────────────────────────────
-function StaffPage(){
-  const{data,loading,reload}=useData('getStaff');
-  const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const staff=data||[];
-  const del=async s=>{
-    if(s.role==='admin'){toast('Cannot delete admin','error');return;}
-    if(!confirm('Remove '+(s.name||s.username)+'?'))return;
-    const r=await API.call({action:'deleteStaff',id:s.id});
-    if(r.success){toast('Removed');reload();}else toast(r.error||'Failed','error');
-  };
-  const toggle=async s=>{
-    const r=await API.call({action:'updateStaff',id:s.id,staff:JSON.stringify({active:!isActive(s.active)})});
-    if(r.success){toast('Updated');reload();}else toast(r.error||'Failed','error');
-  };
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',null,React.createElement('div',{className:'section-title'},'Staff Access'),React.createElement('div',{className:'section-sub'},'Customer care staff logins')),
-      React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Staff')
-    ),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    staff.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No staff yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Password','Role','Permissions','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,staff.map(s=>React.createElement('tr',{key:s.id||s.username},
-        React.createElement('td',null,s.name||'-'),
-        React.createElement('td',{className:'td-mono'},s.username),
-        React.createElement('td',{className:'td-mono',style:{color:'var(--text3)'}},s.password||'—'),
-        React.createElement('td',null,React.createElement('span',{className:'badge '+(s.role==='admin'?'badge-processing':'badge-rescheduled')},s.role||'customer_care')),
-        React.createElement('td',null,React.createElement('div',{style:{fontSize:11,color:'var(--text3)',maxWidth:200}},s.permissions==='all'?'All Permissions':(s.permissions||'view_orders, add_orders, edit_orders'))),
-        React.createElement('td',null,React.createElement('span',{className:'badge '+(isActive(s.active)?'badge-delivered':'badge-canceled')},isActive(s.active)?'Active':'Inactive')),
-        React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4,flexWrap:'wrap'}},
-          React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'Edit'),
-          s.role!=='admin'&&React.createElement('button',{className:'btn btn-sm '+(isActive(s.active)?'btn-danger':'btn-success'),onClick:()=>toggle(s)},isActive(s.active)?'Deactivate':'Activate'),
-          s.role!=='admin'&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')
-        ))
-      )))
-    )),
-    showModal&&React.createElement(StaffModal,{staff:editing,onSave:()=>{setShowModal(false);reload();toast('Saved');},onClose:()=>setShowModal(false)})
-  );
-}
-
-// BUG FIX: StaffModal — role hardcoded to customer_care, permissions auto-set, no role picker needed
-function StaffModal({staff,onSave,onClose}){
-  const isEdit=!!staff;
-  const[f,setF]=useState(staff?{...staff}:{name:'',username:'',password:'',role:'customer_care',active:true,permissions:CC_PERMISSIONS});
-  const[saving,setSaving]=useState(false);
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  // For editing admins, allow full perms; for all others, auto-assign CC perms
-  const effectiveRole=isEdit&&staff&&staff.role==='admin'?'admin':'customer_care';
-  const save=async()=>{
-    if(!f.username||(!isEdit&&!f.password)){toast('Username and password required','error');return;}
-    const data={...f,role:effectiveRole,permissions:effectiveRole==='admin'?'all':CC_PERMISSIONS};
-    setSaving(true);
-    const r=await API.call(isEdit?{action:'updateStaff',id:staff.id,staff:JSON.stringify(data)}:{action:'addStaff',staff:JSON.stringify(data)});
-    setSaving(false);
-    if(r.success)onSave();else toast(r.error||'Failed','error');
-  };
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Staff':'Add Staff'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'staff-info-box'},'ℹ️ All staff are created as Customer Care with access to: view, add & edit orders, and their own analytics.'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:12}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Full Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Status'),React.createElement('select',{className:'form-select',value:String(isActive(f.active)),onChange:e=>setF(p=>({...p,active:e.target.value==='true'}))},React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive')))
-        )
-      ),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?'Saving…':'Save'))
-    )
-  );
-}
-
-// ─── SUPPLIERS ─────────────────────────────────────────────────────────────
-function SuppliersPage(){
-  const[suppliers,setSuppliers]=useState([]);const[products,setProducts]=useState([]);const[loading,setLoading]=useState(true);const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);
-  const load=useCallback(async()=>{
-    setLoading(true);
-    const[su,pr]=await Promise.all([API.call({action:'getSuppliers'}),API.call({action:'getProducts'})]);
-    if(su.success)setSuppliers(su.data||[]);if(pr.success)setProducts(pr.data||[]);
-    setLoading(false);
-  },[]);
-  useEffect(()=>{load();},[load]);
-  const toggle=async s=>{const r=await API.call({action:'updateSupplier',id:s.id,supplier:JSON.stringify({active:!isActive(s.active)})});if(r.success){toast('Updated');load();}else toast(r.error||'Failed','error');};
-  const del=async s=>{if(!confirm('Remove '+(s.name||s.username)+'?'))return;const r=await API.call({action:'deleteSupplier',id:s.id});if(r.success){toast('Removed');load();}else toast(r.error||'Failed','error');};
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',null,React.createElement('div',{className:'section-title'},'Suppliers'),React.createElement('div',{className:'section-sub'},'Separate supplier logins')),
-      React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Supplier')
-    ),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    suppliers.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No suppliers yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Supplier','Username','Password','Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,suppliers.map(s=>{
-        const assigned=readList(s.assignedProducts||s.products||s.productNames);
-        return React.createElement('tr',{key:s.id||s.username},
-          React.createElement('td',null,s.name||'-'),
-          React.createElement('td',{className:'td-mono'},s.username),
-          React.createElement('td',{className:'td-mono',style:{color:'var(--text3)'}},s.password||'—'),
-          React.createElement('td',null,assigned.length?assigned.join(', '):'None'),
-          React.createElement('td',null,React.createElement('span',{className:'badge '+(isActive(s.active)?'badge-delivered':'badge-canceled')},isActive(s.active)?'Active':'Inactive')),
-          React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'Edit'),
-            React.createElement('button',{className:'btn btn-sm '+(isActive(s.active)?'btn-danger':'btn-success'),onClick:()=>toggle(s)},isActive(s.active)?'Deactivate':'Activate'),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')
-          ))
-        );
-      }))
-    )),
-    showModal&&React.createElement(SupplierModal,{supplier:editing,products,onSave:()=>{setShowModal(false);load();toast('Saved');},onClose:()=>setShowModal(false)})
-  );
-}
-
-function SupplierModal({supplier,products,onSave,onClose}){
-  const isEdit=!!supplier;
-  const[f,setF]=useState(supplier?{...supplier}:{name:'',username:'',password:'',active:true,notes:''});
-  const[selected,setSelected]=useState(()=>readList(supplier&&(supplier.assignedProducts||supplier.products||supplier.productNames)));
-  const[saving,setSaving]=useState(false);
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const save=async()=>{
-    if(!f.username||(!isEdit&&!f.password)){toast('Username and password required','error');return;}
-    const data={...f,role:'supplier',permissions:'',assignedProducts:JSON.stringify(selected),products:selected.join(',')};
-    setSaving(true);
-    const r=await API.call(isEdit?{action:'updateSupplier',id:supplier.id,supplier:JSON.stringify(data)}:{action:'addSupplier',supplier:JSON.stringify(data)});
-    setSaving(false);if(r.success)onSave();else toast(r.error||'Failed','error');
-  };
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal modal-lg'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Supplier':'Add Supplier'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:12}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Status'),React.createElement('select',{className:'form-select',value:String(isActive(f.active)),onChange:e=>setF(p=>({...p,active:e.target.value==='true'}))},React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive')))
-        ),
-        React.createElement('div',{className:'section-divider'},'Assigned Products'),
-        products.length===0?React.createElement('div',{className:'text-muted'},'Create products first.'):
-        React.createElement('div',{className:'permission-grid'},
-          products.filter(p=>isActive(p.active)).map(p=>React.createElement('div',{key:p.id||p.name,className:'product-chip '+(selected.includes(p.name)?'active':''),onClick:()=>setSelected(prev=>prev.includes(p.name)?prev.filter(x=>x!==p.name):[...prev,p.name])},(selected.includes(p.name)?'✓ ':''),(p.name)))
-        ),
-        React.createElement('div',{className:'form-group',style:{marginTop:12}},React.createElement('label',{className:'form-label'},'Notes'),React.createElement('textarea',{className:'form-textarea',value:f.notes||'',onChange:set('notes')}))
-      ),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?'Saving…':'Save'))
-    )
-  );
-}
-
-// ─── PIXEL PAGE ────────────────────────────────────────────────────────────
-function PixelPage(){
-  const apiUrl=API.url||'YOUR_APPS_SCRIPT_URL_HERE';
-  const pixelCode='<!-- Shittu Stores Tracking Pixel -->\n<script>\n(function(){\n  var SS_URL=\''+apiUrl+'\';\n  function ssTrack(event,data){\n    var p=Object.assign({action:\'trackEvent\',event:event,url:window.location.href,referrer:document.referrer,ts:new Date().toISOString()},data||{});\n    if(window.fetch){fetch(SS_URL,{method:\'POST\',headers:{\'Content-Type\':\'text/plain\'},body:JSON.stringify(p)}).catch(function(){});}\n  }\n  ssTrack(\'pageview\',{title:document.title});\n  document.addEventListener(\'click\',function(e){var el=e.target.closest(\'a,button,[data-ss]\');if(!el)return;ssTrack(\'click\',{text:(el.innerText||\'\').slice(0,80),tag:el.tagName,href:el.href||\'\',id:el.id||\'\',ss:el.getAttribute(\'data-ss\')||\'\'});});\n  document.addEventListener(\'submit\',function(e){ssTrack(\'form_submit\',{id:e.target.id||\'\',action:e.target.action||\'\'});});\n  var t=Date.now();window.addEventListener(\'beforeunload\',function(){ssTrack(\'time_on_page\',{seconds:Math.round((Date.now()-t)/1000)});});\n  window.SSTrack=ssTrack;\n})();\n<\/script>';
-  const orderBtnCode='<a href="YOUR_ORDER_LINK" onclick="window.SSTrack&&SSTrack(\'add_to_cart\',{product:\'PRODUCT_NAME\',bundle:\'BUNDLE\',price:\'PRICE\'})" data-ss="order_btn">Order Now</a>';
-  const[copied,setCopied]=useState('');
-  const copy=(text,key)=>{navigator.clipboard&&navigator.clipboard.writeText(text).then(()=>{setCopied(key);setTimeout(()=>setCopied(''),2000);}).catch(()=>{});};
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'Tracking Pixel'),React.createElement('div',{className:'section-sub'},'Place on Systeme.io to track visitor behaviour'))),
-    React.createElement('div',{className:'setup-banner',style:{marginBottom:16}},
-      React.createElement('div',null,'🔬'),
-      React.createElement('div',null,
-        React.createElement('div',{style:{fontWeight:700,color:'var(--orange)',marginBottom:3}},'How to use'),
-        React.createElement('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.7}},'Paste the Main Pixel in the head/footer of every Systeme.io page. Use the Order Button snippet on CTA buttons to track which products get clicks. All events log to a Tracking sheet in your Google Sheet.')
-      )
-    ),
-    React.createElement('div',{className:'card',style:{marginBottom:14}},
-      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
-        React.createElement('div',null,React.createElement('div',{className:'section-title',style:{fontSize:14}},'Main Pixel Code'),React.createElement('div',{className:'text-muted'},'Paste in <head> or footer of every page')),
-        React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>copy(pixelCode,'pixel')},copied==='pixel'?'✓ Copied!':'Copy')
-      ),
-      React.createElement('textarea',{readOnly:true,style:{width:'100%',minHeight:180,background:'var(--bg)',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:11,border:'1px solid var(--border)',borderRadius:8,padding:12,resize:'vertical'},value:pixelCode})
-    ),
-    React.createElement('div',{className:'card',style:{marginBottom:14}},
-      React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
-        React.createElement('div',null,React.createElement('div',{className:'section-title',style:{fontSize:14}},'Order Button Snippet'),React.createElement('div',{className:'text-muted'},'Add to your CTA buttons')),
-        React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>copy(orderBtnCode,'btn')},copied==='btn'?'✓ Copied!':'Copy')
-      ),
-      React.createElement('textarea',{readOnly:true,style:{width:'100%',minHeight:70,background:'var(--bg)',color:'var(--text)',fontFamily:'var(--font-mono)',fontSize:11,border:'1px solid var(--border)',borderRadius:8,padding:12},value:orderBtnCode})
-    ),
-    React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Events Tracked'),
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Event','Fires When','Data Captured'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,[
-          ['pageview','Every page load','URL, title, referrer, timestamp'],
-          ['click','Any button/link click','Text, tag, href, data-ss attribute'],
-          ['add_to_cart','Order button click (manual tag)','Product, bundle, price'],
-          ['form_submit','Any form submission','Form ID, action URL'],
-          ['time_on_page','Visitor leaves page','Seconds spent']
-        ].map(([e,w,d])=>React.createElement('tr',{key:e},React.createElement('td',null,React.createElement('code',{style:{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--accent)'}},e)),React.createElement('td',null,w),React.createElement('td',{style:{fontSize:12,color:'var(--text3)'}},d))))
-      ))
-    )
-  );
-}
-
-// ─── SETTINGS ──────────────────────────────────────────────────────────────
-function SettingsPage({user}){
-  const[url,setUrl]=useState(API.url||'');
-  const[saved,setSaved]=useState(false);
-  const[pw,setPw]=useState({oldPassword:'',newPassword:'',confirmPassword:''});
-  const[savingPw,setSavingPw]=useState(false);
-  const setPwField=k=>e=>setPw(p=>({...p,[k]:e.target.value}));
-  const saveUrl=()=>{API.setUrl(url.trim());setSaved(true);toast('URL saved');setTimeout(()=>setSaved(false),1800);};
-  const changePassword=async()=>{
-    if(!pw.oldPassword||!pw.newPassword){toast('Old and new passwords required','error');return;}
-    if(pw.newPassword!==pw.confirmPassword){toast('Passwords do not match','error');return;}
-    setSavingPw(true);
-    const r=await API.call({action:'changePassword',username:user.username,role:user.role,oldPassword:pw.oldPassword,newPassword:pw.newPassword});
-    setSavingPw(false);
-    if(r.success){toast('Password changed ✓');setPw({oldPassword:'',newPassword:'',confirmPassword:''});}
-    else toast(r.error||'Failed','error');
-  };
-  return React.createElement('div',null,
-    React.createElement('div',{className:'card',style:{marginBottom:16}},
-      React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Database Connection'),
-      React.createElement('div',{className:'alert-info',style:{marginBottom:10}},'Enter your Google Apps Script web app URL. This does not erase existing sheet data.'),
-      React.createElement('div',{className:'form-group',style:{marginBottom:10}},React.createElement('label',{className:'form-label'},'Apps Script URL'),React.createElement('input',{className:'form-input',value:url,onChange:e=>setUrl(e.target.value),placeholder:'https://script.google.com/macros/s/.../exec'})),
-      React.createElement('button',{className:'btn btn-primary',onClick:saveUrl},saved?'✓ Saved':'Save URL')
-    ),
-    React.createElement('div',{className:'card',style:{marginBottom:16}},
-      React.createElement('div',{className:'section-title',style:{marginBottom:10}},'Change Password'),
-      React.createElement('div',{className:'form-grid form-grid-3'},
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Old Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.oldPassword,onChange:setPwField('oldPassword')})),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'New Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.newPassword,onChange:setPwField('newPassword')})),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Confirm New'),React.createElement('input',{className:'form-input',type:'password',value:pw.confirmPassword,onChange:setPwField('confirmPassword')}))
-      ),
-      React.createElement('div',{style:{display:'flex',justifyContent:'flex-end',marginTop:12}},React.createElement('button',{className:'btn btn-primary',onClick:changePassword,disabled:savingPw},savingPw?'Saving…':'Change Password'))
-    ),
-    React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:8}},'About'),
-      React.createElement('div',{style:{color:'var(--text2)',fontSize:13,lineHeight:1.8}},
-        'Shittu Stores Business Manager',React.createElement('br',null),
-        'Frontend: GitHub Pages · Backend: Google Sheets + Apps Script'
-      )
-    )
-  );
-}
-
-// ─── BOOT ──────────────────────────────────────────────────────────────────
-const rootEl=document.getElementById('root');
-if(rootEl){ReactDOM.createRoot(rootEl).render(React.createElement(App));}
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
 </script>
 </body>
 </html>

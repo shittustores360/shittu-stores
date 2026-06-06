@@ -1954,14 +1954,25 @@ function SuppliersPage(){
   const [showModal,setShowModal]=useState(false);
   const [editing,setEditing]=useState(null);
 
-  const load=useCallback(async()=>{
+  const load = useCallback(async () => {
+  try {
     setLoading(true);
-    const [su,pr]=await Promise.all([API.call({action:'getSuppliers'}),API.call({action:'getProducts'})]);
-    if(su.success)setSuppliers(su.data||[]);
-    if(pr.success)setProducts(pr.data||[]);
+
+    const [su, pr] = await Promise.all([
+      API.call({ action: 'getSuppliers' }),
+      API.call({ action: 'getProducts' }),
+    ]);
+
+    setSuppliers(su?.success && Array.isArray(su.data) ? su.data : []);
+    setProducts(pr?.success && Array.isArray(pr.data) ? pr.data : []);
+  } catch (err) {
+    console.error('Suppliers load error:', err);
+    setSuppliers([]);
+    setProducts([]);
+  } finally {
     setLoading(false);
-  },[]);
-  useEffect(()=>{load();},[load]);
+  }
+}, []);
 
   const del=async s=>{
     if(!confirm(`Remove supplier ${s.name||s.username}?`))return;
@@ -2090,7 +2101,53 @@ function SettingsPage({user}){
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+if (!window.React || !window.ReactDOM) {
+  document.body.innerHTML =
+    '<div style="padding:24px;font:16px sans-serif;color:#b00020">' +
+    'React failed to load. Check the CDN scripts or your internet connection.' +
+    '</div>';
+  throw new Error('React/ReactDOM not loaded');
+}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('React error boundary caught:', error, info);
+  }
+
+  render() {
+    if (this.state.error) {
+      return React.createElement(
+        'div',
+        {
+          style: {
+            padding: '24px',
+            color: 'var(--red)',
+            background: 'var(--bg)',
+            whiteSpace: 'pre-wrap',
+            fontFamily: 'monospace',
+            lineHeight: 1.6,
+          },
+        },
+        `App crashed:\n${this.state.error.message}\n\nOpen the browser console for the full stack trace.`
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  React.createElement(ErrorBoundary, null, React.createElement(App))
+);
 </script>
 </body>
 </html>

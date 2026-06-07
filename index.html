@@ -578,8 +578,19 @@ function CustomerOrderForm({productName}){
 // Old code: generated a NEW token on their device → mismatch → "Invalid link"
 // New code: if their localStorage has no token for this type yet, ADOPT the URL token.
 // This means the link works exactly as intended: share once, works anywhere.
+// ══════════════════════════════════════════════════════════════════════════════
+// SHITTU STORES — FRONTEND PATCHES
+// Apply these two fixes to your HTML file's <script> section
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PATCH 1 — SignupPage function (COMPLETE REPLACEMENT)
+// Find the entire SignupPage function and replace it with this.
+// ══════════════════════════════════════════════════════════════════════════════
+
 function SignupPage({type,token}){
-  const storedToken=getOrCreateToken(type);
+  // FIX: Do NOT call getOrCreateToken() here — it generates a random token on first
+  // visit before the URL token is adopted, causing "Invalid or expired signup link".
   const [valid,setValid]=useState(false);
   const [done,setDone]=useState(false);
   const [f,setF]=useState({name:'',username:'',password:'',phone:'',phone2:'',email:''});
@@ -587,19 +598,23 @@ function SignupPage({type,token}){
   const [saving,setSaving]=useState(false);
   const [err,setErr]=useState('');
 
-  // ▼▼▼ FIXED: cross-device token adoption ▼▼▼
+  // FIX: Cross-device token adoption
+  // Old bug: getOrCreateToken() ran at init, generating a NEW random token on any
+  // fresh device. Then useEffect checked "stored === url" → false → invalid link.
+  // New fix: if no token stored yet, adopt the URL token directly and setValid(true).
   useEffect(()=>{
-    if(token&&token.length>=8){
-      const t=getSignupTokens();
-      if(!t[type]){
-        // First visit on this device — adopt the URL token as canonical
-        t[type]=token;
-        saveSignupTokens(t);
-      }
-      if(token===getSignupTokens()[type])setValid(true);
+    if(!token||token.length<8) return;
+    const t=getSignupTokens();
+    if(!t[type]){
+      // First visit on this device — adopt the URL token as canonical
+      t[type]=token;
+      saveSignupTokens(t);
+      setValid(true);
+      return;
     }
+    // Token already stored — must match URL token
+    if(t[type]===token) setValid(true);
   },[token,type]);
-  // ▲▲▲ END FIX ▲▲▲
 
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const submit=async e=>{
@@ -629,6 +644,22 @@ function SignupPage({type,token}){
     )
   );
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PATCH 2 — AdminDashboard monthlyData (already has String() — confirmed safe)
+// The date bug on the frontend is actually caused by the BACKEND returning Date
+// objects. Since we fixed the GAS backend with normalizeOrder(), the frontend
+// will now always receive proper "YYYY-MM-DD" strings. No frontend change needed
+// beyond what's already in the original (String(o.date||'')).
+// ══════════════════════════════════════════════════════════════════════════════
+
+// SUMMARY OF ALL CHANGES:
+// 1. SignupPage: removed getOrCreateToken() from initialization, rewrote useEffect
+//    so new devices adopt the URL token directly → cross-device links now work
+// 2. GAS backend: added safeDateStr() + normalizeOrder() functions
+//    → all date fields from Sheets are converted to "YYYY-MM-DD" strings
+//    → getDashboard(), getMyDashboard(), getOrders() all use getAllOrders()
+//    → .startsWith() TypeError is permanently fixed
 
 function App(){
   const [sidebarOpen,setSidebarOpen]=useState(false);

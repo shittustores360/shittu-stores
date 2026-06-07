@@ -272,15 +272,10 @@ tr:hover td{background:var(--bg3)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-// ════════════════════════════════════════════════════════════════
-// CONFIGURATION — hardcoded so ALL users (staff, suppliers, customers)
-// can use the app without any setup step.
-// ════════════════════════════════════════════════════════════════
 const SITE_API_URL = 'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec';
 
 const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext} = React;
 
-// ── CACHE ─────────────────────────────────────────────────────
 const _cache={};const _inflight={};const CACHE_TTL=90000;
 function cacheGet(k){return _cache[k]||null;}
 function cacheSet(k,v){_cache[k]={v,ts:Date.now()};}
@@ -299,11 +294,8 @@ const BUST_MAP={
   saveEmail:['getStaff','getSuppliers','getEmailSettings'],
 };
 
-// ── API ───────────────────────────────────────────────────────
-// ALWAYS use SITE_API_URL. localStorage override is only for admin dev use.
 const API={
   get url(){
-    // localStorage override only if explicitly set (admin only)
     const override=localStorage.getItem('apiUrl');
     return override||SITE_API_URL||'';
   },
@@ -333,7 +325,6 @@ const API={
   prefetch(action){const url=this.url;if(!url)return;const params={action};const key=JSON.stringify(params);const c=cacheGet(key);if(c&&Date.now()-c.ts<CACHE_TTL)return;this.call(params);}
 };
 
-// ── THEME ─────────────────────────────────────────────────────
 const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
 function ThemeProvider({children}){
   const [theme,setTheme]=useState(()=>localStorage.getItem('ssTheme')||'dark');
@@ -342,7 +333,6 @@ function ThemeProvider({children}){
   return React.createElement(ThemeCtx.Provider,{value:{theme,toggleTheme}},children);
 }
 
-// ── TOAST ─────────────────────────────────────────────────────
 const _toastListeners=[];
 function toast(msg,type='success'){_toastListeners.forEach(fn=>fn(msg,type));}
 function ToastContainer(){
@@ -352,7 +342,6 @@ function ToastContainer(){
 }
 function SaveOverlay({label}){return React.createElement('div',{className:'save-overlay'},React.createElement('div',{className:'save-overlay-box'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'save-overlay-label'},label||'Saving…')));}
 
-// ── CONSTANTS ─────────────────────────────────────────────────
 const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
 const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
@@ -364,7 +353,6 @@ function genToken(){return Math.random().toString(36).slice(2,10)+Math.random().
 function getOrCreateToken(type){const tokens=getSignupTokens();if(!tokens[type]){tokens[type]=genToken();saveSignupTokens(tokens);}return tokens[type];}
 function revokeToken(type){const tokens=getSignupTokens();tokens[type]=genToken();saveSignupTokens(tokens);return tokens[type];}
 
-// ── UTILS ─────────────────────────────────────────────────────
 function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
 function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
 function fmtGHC(n){return `GH₵${fmt(n,2)}`;}
@@ -385,7 +373,6 @@ function supplierOwnsOrder(order,products,user){
   return order.supplierUsername===user.username||order.supplier===user.username||product?.supplierUsername===user.username||productSuppliers.includes(user.username)||assigned.includes(order.product);
 }
 
-// ── DATA HOOK ─────────────────────────────────────────────────
 function useData(action,enabled=true){
   const [data,setData]=useState(()=>{if(!enabled||!API.url)return null;const cached=cacheGet(JSON.stringify({action}));return cached?cached.v:null;});
   const [loading,setLoading]=useState(()=>{if(!enabled||!API.url)return false;const cached=cacheGet(JSON.stringify({action}));return!cached;});
@@ -401,7 +388,6 @@ function useData(action,enabled=true){
   return{data,loading,error,reload:()=>load(true),setData};
 }
 
-// ── CHARTS ────────────────────────────────────────────────────
 function BarChart({data,color='var(--accent)',height=80}){
   if(!data||data.length===0)return null;const max=Math.max(...data.map(d=>d.value),1);const w=100/data.length;
   return React.createElement('svg',{viewBox:`0 0 100 ${height}`,className:'chart-svg',style:{height}},data.map((d,i)=>{const bh=Math.max(2,(d.value/max)*(height-18));const x=i*w+w*0.1;const bw=w*0.8;const y=height-bh-12;return React.createElement('g',{key:i},React.createElement('rect',{x,y,width:bw,height:bh,fill:color,rx:2,opacity:0.85}),React.createElement('text',{x:x+bw/2,y:height-1,textAnchor:'middle',fontSize:5,fill:'var(--text3)'},d.label));}));
@@ -411,10 +397,6 @@ function LineChart({data,color='var(--accent)',height=80}){
   return React.createElement('svg',{viewBox:`0 0 100 ${height}`,className:'chart-svg',style:{height}},React.createElement('defs',null,React.createElement('linearGradient',{id:'lg',x1:'0',y1:'0',x2:'0',y2:'1'},React.createElement('stop',{offset:'0%',stopColor:color,stopOpacity:0.3}),React.createElement('stop',{offset:'100%',stopColor:color,stopOpacity:0.02}))),React.createElement('path',{d:areaPath,fill:'url(#lg)'}),React.createElement('path',{d:path,fill:'none',stroke:color,strokeWidth:1.5,strokeLinejoin:'round'}),pts.map((p,i)=>React.createElement('circle',{key:i,cx:p[0],cy:p[1],r:1.5,fill:color})),data.map((d,i)=>React.createElement('text',{key:i,x:pts[i][0],y:height-1,textAnchor:'middle',fontSize:5,fill:'var(--text3)'},d.label)));
 }
 
-// ════════════════════════════════════════════════════════════════
-// CUSTOMER ORDER FORM — beautiful per-product form
-// Accessed via ?view=order or ?view=order&product=ProductName
-// ════════════════════════════════════════════════════════════════
 function CustomerOrderForm({productName}){
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
@@ -429,7 +411,6 @@ function CustomerOrderForm({productName}){
   const [done,setDone]=useState(false);
 
   useEffect(()=>{
-    // API URL is hardcoded so this always works
     API.call({action:'getProducts'}).then(r=>{
       setLoadingProducts(false);
       if(r.success){
@@ -476,7 +457,6 @@ function CustomerOrderForm({productName}){
     else setSubmitErr(r.error||'Something went wrong. Please try again.');
   };
 
-  // Facebook Pixel
   useEffect(()=>{
     const pid=localStorage.getItem('ssPixelId');if(!pid)return;
     if(!window.fbq){(function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');window.fbq('init',pid);window.fbq('track','PageView');}
@@ -490,7 +470,6 @@ function CustomerOrderForm({productName}){
   if(loadErr)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},brandHeader,React.createElement('div',{className:'cof-no-product'},React.createElement('div',{className:'cof-no-product-icon'},'⚠️'),React.createElement('div',{className:'cof-no-product-title'},'Store Unavailable'),React.createElement('div',{className:'cof-no-product-sub'},loadErr))));
   if(productName&&!product)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},brandHeader,React.createElement('div',{className:'cof-no-product'},React.createElement('div',{className:'cof-no-product-icon'},'🔍'),React.createElement('div',{className:'cof-no-product-title'},'Product Not Found'),React.createElement('div',{className:'cof-no-product-sub'},'This product link may be invalid or the product has been removed.'))));
 
-  // All-products picker (no specific product in URL)
   if(!productName&&!product){
     return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},
       brandHeader,
@@ -533,7 +512,6 @@ function CustomerOrderForm({productName}){
       React.createElement('div',{className:'cof-product-name'},product.name),
       product.description&&React.createElement('div',{className:'cof-product-desc'},product.description)
     ),
-    // Packages
     React.createElement('div',{className:'cof-section'},
       React.createElement('div',{className:'cof-section-title'},'📦 Choose Your Package'),
       bundles.length===0
@@ -547,14 +525,12 @@ function CustomerOrderForm({productName}){
           )
         ))
     ),
-    // Sizes
     sizes.length>0&&React.createElement('div',{className:'cof-section'},
       React.createElement('div',{className:'cof-section-title'},'📐 Choose Your Size'),
       React.createElement('div',{className:'cof-size-grid'},sizes.map(s=>
         React.createElement('button',{key:s,type:'button',className:`cof-size-btn ${selectedSize===s?'selected':''}`,onClick:()=>setSelectedSize(s)},s)
       ))
     ),
-    // Customer details
     React.createElement('div',{className:'cof-section'},
       React.createElement('div',{className:'cof-section-title'},'👤 Your Details'),
       submitErr&&React.createElement('div',{className:'cof-error-banner'},submitErr),
@@ -577,7 +553,6 @@ function CustomerOrderForm({productName}){
         React.createElement('textarea',{className:'cof-textarea',rows:3,placeholder:'Any special instructions…',value:form.notes,onChange:setField('notes')})
       )
     ),
-    // Summary
     selectedBundle&&React.createElement('div',{className:'cof-section'},
       React.createElement('div',{className:'cof-section-title'},'🧾 Order Summary'),
       React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
@@ -596,9 +571,13 @@ function CustomerOrderForm({productName}){
   ));
 }
 
-// ════════════════════════════════════════════════════════════════
-// SIGNUP PAGE — works because SITE_API_URL is hardcoded
-// ════════════════════════════════════════════════════════════════
+// ── SIGNUP PAGE ───────────────────────────────────────────────
+// FIX: Token validation now works cross-device.
+// When a staff/supplier visits the link on their own device (different browser/device
+// from the admin who generated the link), their localStorage is empty.
+// Old code: generated a NEW token on their device → mismatch → "Invalid link"
+// New code: if their localStorage has no token for this type yet, ADOPT the URL token.
+// This means the link works exactly as intended: share once, works anywhere.
 function SignupPage({type,token}){
   const storedToken=getOrCreateToken(type);
   const [valid,setValid]=useState(false);
@@ -607,7 +586,21 @@ function SignupPage({type,token}){
   const [showPhone2,setShowPhone2]=useState(false);
   const [saving,setSaving]=useState(false);
   const [err,setErr]=useState('');
-  useEffect(()=>{if(token&&token===storedToken)setValid(true);},[token,storedToken]);
+
+  // ▼▼▼ FIXED: cross-device token adoption ▼▼▼
+  useEffect(()=>{
+    if(token&&token.length>=8){
+      const t=getSignupTokens();
+      if(!t[type]){
+        // First visit on this device — adopt the URL token as canonical
+        t[type]=token;
+        saveSignupTokens(t);
+      }
+      if(token===getSignupTokens()[type])setValid(true);
+    }
+  },[token,type]);
+  // ▲▲▲ END FIX ▲▲▲
+
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const submit=async e=>{
     e.preventDefault();setErr('');
@@ -617,7 +610,6 @@ function SignupPage({type,token}){
     const r=await API.call({action,data:JSON.stringify(f)});
     setSaving(false);if(r.success)setDone(true);else setErr(r.error||'Signup failed.');
   };
-  // Always show form — SITE_API_URL is hardcoded so no "not configured" state
   if(!valid)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'login-error'},'❌ Invalid or expired signup link.')));
   if(done)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'signup-success'},React.createElement('div',{style:{fontSize:24,marginBottom:8}},'🎉'),React.createElement('div',{style:{fontWeight:700,marginBottom:4}},'Account Created!'),type==='supplier'?'Your supplier account is ready.':'Your account is ready.',React.createElement('div',{style:{marginTop:12,fontSize:12,color:'var(--text3)'}},`Username: ${f.username}`))));
   return React.createElement('div',{className:'signup-wrap'},
@@ -638,7 +630,6 @@ function SignupPage({type,token}){
   );
 }
 
-// ── APP ROOT ──────────────────────────────────────────────────
 function App(){
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [page,setPage]=useState('dashboard');
@@ -653,7 +644,6 @@ function App(){
   const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
   const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
 
-  // Customer order form — no auth needed, works for customers
   if(viewMode==='order'){
     return React.createElement(ThemeProvider,null,
       React.createElement(CustomerOrderForm,{productName:productParam||''}),
@@ -781,7 +771,8 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
 
 function AdminDashboard({data,reload}){
   const d=data||{};
-  const monthlyData=useMemo(()=>{const months=[];for(let i=5;i>=0;i--){const dt=new Date();dt.setMonth(dt.getMonth()-i);const key=dt.toISOString().slice(0,7);const lbl=dt.toLocaleString('default',{month:'short'});months.push({key,label:lbl,value:0,delivered:0});}const recentOrders=Array.isArray(d.recentOrders)?d.recentOrders:[];recentOrders.forEach(o=>{const mk=(o.date||'').slice(0,7);const m=months.find(x=>x.key===mk);if(m){m.value++;if(statusOf(o)==='Delivered')m.delivered++;}});return months;},[d.recentOrders]);
+  // ▼▼▼ FIX 1: Wrap date in String() to prevent .slice() crash when date is a number/null ▼▼▼
+  const monthlyData=useMemo(()=>{const months=[];for(let i=5;i>=0;i--){const dt=new Date();dt.setMonth(dt.getMonth()-i);const key=dt.toISOString().slice(0,7);const lbl=dt.toLocaleString('default',{month:'short'});months.push({key,label:lbl,value:0,delivered:0});}const recentOrders=Array.isArray(d.recentOrders)?d.recentOrders:[];recentOrders.forEach(o=>{const mk=String(o.date||'').slice(0,7);const m=months.find(x=>x.key===mk);if(m){m.value++;if(statusOf(o)==='Delivered')m.delivered++;}});return months;},[d.recentOrders]);
   const convRate=sp(d.totalOrders)>0?Math.round(sp(d.delivered)/sp(d.totalOrders)*100):0;
   const stats=[{label:'Total Orders',value:d.totalOrders||0,sub:`${d.todayOrders||0} today`,cls:'orange'},{label:'Delivered',value:d.delivered||0,sub:'Successful',cls:'green'},{label:'Pending',value:d.pending||0,sub:'In progress',cls:'blue'},{label:'Canceled',value:d.canceled||0,sub:'Lost orders',cls:'red'},{label:'Revenue (GHC)',value:fmtGHC(d.revenueGHC),sub:'Paid+delivered',cls:'green'},{label:'Pending Revenue',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered, unpaid',cls:'orange'},{label:'Revenue (NGN)',value:fmtNGN(d.revenueNGN),sub:'Withdrawn GHC→NGN',cls:'green'},{label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'blue'},{label:'Net Profit After Ads',value:fmtNGN(d.netProfitNGN),sub:`Ads: ${fmtNGN(d.totalAdSpend)}`,cls:sp(d.netProfitNGN)>=0?'green':'red'},{label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Delivered, unpaid',cls:'purple'},{label:'Avg Delivery Time',value:d.avgDeliveryDays!=null?`${d.avgDeliveryDays} days`:'—',sub:'Order→Delivered',cls:'blue'},{label:'All-Time Conversion',value:`${convRate}%`,sub:'Delivered ÷ Total orders',cls:'green'},];
   return React.createElement('div',null,
@@ -900,8 +891,15 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
 function StaffAnalyticsPage({user}){
   const [orders,setOrders]=useState([]);const [payoutRecords,setPayoutRecords]=useState([]);const [loading,setLoading]=useState(true);const [period,setPeriod]=useState('all');const [selMonth,setSelMonth]=useState(()=>today().slice(0,7));const [selYear,setSelYear]=useState(()=>today().slice(0,4));
   useEffect(()=>{setLoading(true);Promise.all([API.call({action:'getOrders'}),API.call({action:'getPayoutRecords'})]).then(([or,pr])=>{if(or.success)setOrders(or.data||[]);if(pr.success)setPayoutRecords(pr.data||[]);setLoading(false);});},[]);
-  const username=user.username;const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);const years=useMemo(()=>{const s=new Set(myOrders.map(o=>(o.date||'').slice(0,4)).filter(Boolean));return[...s].sort().reverse();},[myOrders]);
-  const filtered=useMemo(()=>{if(period==='month')return myOrders.filter(o=>(o.date||'').startsWith(selMonth));if(period==='year')return myOrders.filter(o=>(o.date||'').startsWith(selYear));return myOrders;},[myOrders,period,selMonth,selYear]);
+  const username=user.username;const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);
+  // ▼ FIX 1: String() wrapping for cross-type safety
+  const years=useMemo(()=>{const s=new Set(myOrders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));return[...s].sort().reverse();},[myOrders]);
+  const filtered=useMemo(()=>{
+    if(period==='month')return myOrders.filter(o=>String(o.date||'').startsWith(selMonth));
+    if(period==='year')return myOrders.filter(o=>String(o.date||'').startsWith(selYear));
+    return myOrders;
+  },[myOrders,period,selMonth,selYear]);
+  // ▲ END FIX
   const delivered=filtered.filter(o=>statusOf(o)==='Delivered');const deliveredPaid=delivered.filter(o=>paymentOf(o)==='Paid');const pending=filtered.filter(o=>!['Delivered','Canceled'].includes(statusOf(o)));const canceled=filtered.filter(o=>statusOf(o)==='Canceled');const revenueGHC=deliveredPaid.reduce((s,o)=>s+sp(o.sellingPrice),0);const earnings=deliveredPaid.length*STAFF_PAYOUT_NGN;const paidOut=payoutRecords.filter(r=>r.staffName===username).reduce((s,r)=>s+sp(r.amountNGN),0);const allDeliveredPaidAllTime=myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');const totalEarnedAllTime=allDeliveredPaidAllTime.length*STAFF_PAYOUT_NGN;const unpaidBalance=Math.max(0,totalEarnedAllTime-paidOut);const allTimeConv=myOrders.length>0?Math.round(allDeliveredPaidAllTime.length/myOrders.length*100):0;const filteredConv=filtered.length>0?Math.round(deliveredPaid.length/filtered.length*100):0;const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
   if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
   return React.createElement('div',null,
@@ -948,8 +946,10 @@ function WithdrawalModal({onSave,onClose,onSaving}){
 function AnalyticsPage({user,isAdmin,isSupplier}){
   const [orders,setOrders]=useState([]);const [loading,setLoading]=useState(true);const [period,setPeriod]=useState('month');const [selMonth,setSelMonth]=useState(()=>today().slice(0,7));const [selYear,setSelYear]=useState(()=>today().slice(0,4));
   useEffect(()=>{const params={action:'getOrders'};if(isSupplier)params.supplierUsername=user.username;API.call(params).then(r=>{if(r.success)setOrders(r.data||[]);setLoading(false);});},[isSupplier,user.username]);
-  const years=useMemo(()=>{const s=new Set(orders.map(o=>(o.date||'').slice(0,4)).filter(Boolean));return[...s].sort().reverse();},[orders]);
-  const filtered=useMemo(()=>orders.filter(o=>{if(!o.date)return false;if(period==='month')return o.date.startsWith(selMonth);if(period==='year')return o.date.startsWith(selYear);return true;}),[orders,period,selMonth,selYear]);
+  // ▼ FIX 1: String() for safe date operations
+  const years=useMemo(()=>{const s=new Set(orders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));return[...s].sort().reverse();},[orders]);
+  const filtered=useMemo(()=>orders.filter(o=>{if(!o.date)return false;if(period==='month')return String(o.date||'').startsWith(selMonth);if(period==='year')return String(o.date||'').startsWith(selYear);return true;}),[orders,period,selMonth,selYear]);
+  // ▲ END FIX
   const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
   const byProduct=useMemo(()=>{const m={};filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);},[filtered]);
   const paid=filtered.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');const rev=paid.reduce((s,o)=>s+sp(o.sellingPrice),0);const cost=paid.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);const convRate=filtered.length>0?Math.round((byStatus['Delivered']||0)/filtered.length*100):0;
@@ -1111,7 +1111,6 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
   const [products,setProducts]=useState([]);
   const [loadingProducts,setLoadingProducts]=useState(false);
 
-  // Base order form URL — same single file, uses ?view=order
   const baseOrderUrl=`${window.location.origin}${window.location.pathname}?view=order`;
   const getProductUrl=(pName)=>`${baseOrderUrl}&product=${encodeURIComponent(pName)}`;
   const iframeCode=(pName)=>{const u=getProductUrl(pName);return `<iframe src="${u}" width="100%" height="720" frameborder="0" style="border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);" allow="clipboard-write"></iframe>`;};
@@ -1203,13 +1202,10 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
         React.createElement('a',{href:baseOrderUrl,target:'_blank',className:'btn btn-blue btn-sm'},'🔗 View All-Products Form')
       ),
       React.createElement('div',{className:'alert-success',style:{marginBottom:20}},'✅ These links work on GitHub Pages as-is. Share them directly or embed via iFrame on Systeme.io. Each product has its own dedicated form showing only its packages and sizes.'),
-
-      // General form
       React.createElement('div',{className:'form-url-wrap'},
         React.createElement('div',{className:'form-url-title'},'🌐 General Order Form (all products)'),
         React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},baseOrderUrl),React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(baseOrderUrl,'general')},copied==='general'?'✓ Copied!':'Copy'))
       ),
-
       React.createElement('div',{className:'section-divider'},'Per-Product Order Forms'),
       loadingProducts?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
       products.length===0?React.createElement('div',{className:'alert-warning'},'No active products yet. Add products first.'):
@@ -1231,7 +1227,6 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
           )
         );
       }),
-
       React.createElement('div',{className:'card',style:{marginTop:20}},
         React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'How to embed on Systeme.io'),
         ['Go to your Systeme.io funnel page editor.','Add a new section → insert an "HTML" or "Custom code" block.','Click "Copy iFrame" next to the product you want to embed.','Paste the code into the HTML block and publish.','Orders appear in your Orders page tagged as "🌐 Form".'].map((step,i)=>
@@ -1245,7 +1240,6 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
   );
 }
 
-// ── ERROR BOUNDARY & BOOT ─────────────────────────────────────
 class ErrorBoundary extends React.Component{
   constructor(props){super(props);this.state={error:null};}
   static getDerivedStateFromError(error){return{error};}

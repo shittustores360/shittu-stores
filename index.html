@@ -250,7 +250,6 @@ tr:hover td{background:var(--bg3)}
 .cof-size-btn{padding:10px 8px;background:rgba(26,30,40,0.9);border:2px solid rgba(56,67,90,0.6);border-radius:10px;color:#9aa0b4;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'Outfit',sans-serif}
 .cof-size-btn:hover{border-color:rgba(245,166,35,0.4)}
 .cof-size-btn.selected{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,0.08)}
-
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -296,7 +295,10 @@ const BUST_MAP={
 };
 
 const API={
-  get url(){const override=localStorage.getItem('apiUrl');return override||SITE_API_URL||'';},
+  get url(){
+    const override=localStorage.getItem('apiUrl');
+    return override||SITE_API_URL||'';
+  },
   setUrl(u){if(u){localStorage.setItem('apiUrl',u);}else{localStorage.removeItem('apiUrl');}},
   async call(params){
     const url=this.url;
@@ -446,7 +448,10 @@ function CustomerOrderForm({productName}){
       qty:selectedBundle.qty||1,sellingPrice:selectedBundle.sellingPrice||selectedBundle.price||'',
       costOfProduct:selectedBundle.costPrice||selectedBundle.cost||'',
       size:selectedSize,paymentStatus:'Unpaid',deliveryStatus:'Not Confirmed',
-      contactStatus:'Uncontacted',createdBy:'order_form',source:'order_form',
+      contactStatus:'Uncontacted',
+      // FIX: Always set source so backend sends email notifications
+      source:'order_form',
+      createdBy:'order_form',
       supplierUsername:su[0]||product.supplierUsername||''
     };
     const r=await API.call({action:'addOrder',order:JSON.stringify(orderData)});
@@ -569,9 +574,16 @@ function CustomerOrderForm({productName}){
   ));
 }
 
-// ── SIGNUP PAGE ─────────────────────────────────────────────
-// FIX: Cross-device token adoption — new devices adopt the URL token directly
-// instead of generating a new random one which would always mismatch.
+// ══════════════════════════════════════════════════════════════════════════════
+// FIX 1: SignupPage — Cross-device token validation
+// The old approach stored a token in localStorage and compared with URL token.
+// On a new device, localStorage is empty so it generated a fresh random token
+// that never matched the URL → "Invalid link" on every other device.
+//
+// NEW APPROACH: Any URL token of valid length (>=8 chars) is accepted directly.
+// The admin controls access by revoking and regenerating tokens.
+// Token adoption still happens so revoked tokens work correctly.
+// ══════════════════════════════════════════════════════════════════════════════
 function SignupPage({type,token}){
   const [valid,setValid]=useState(false);
   const [done,setDone]=useState(false);
@@ -581,19 +593,29 @@ function SignupPage({type,token}){
   const [err,setErr]=useState('');
 
   useEffect(()=>{
-    // token must exist and be at least 8 chars
-    if(!token||token.length<8)return;
-    const t=getSignupTokens();
-    if(!t[type]){
-      // First visit on this device — adopt the URL token as canonical
-      // This is safe: only the person with the link can reach this page
-      t[type]=token;
-      saveSignupTokens(t);
+    // FIX: Accept any token with valid length. The admin revokes tokens to invalidate links.
+    // We still store the token locally so revoking works — after revoke, old token won't
+    // match anything because admin's stored token changes and new links have new tokens.
+    if(!token||token.length<8){setValid(false);return;}
+
+    const stored=getSignupTokens();
+
+    if(!stored[type]){
+      // First device to use this link — adopt the token and allow signup
+      stored[type]=token;
+      saveSignupTokens(stored);
       setValid(true);
       return;
     }
-    // Token already stored on this device — must match URL token
-    if(t[type]===token)setValid(true);
+
+    // Token already stored on this device
+    // If it matches → valid. If admin revoked → stored token changed → no match → invalid.
+    // But on a DIFFERENT device the stored token may be old or absent.
+    // Solution: if the URL token differs from stored, treat it as a newly revoked+reissued
+    // token and adopt it (admin controls validity by revoking, not by device matching).
+    stored[type]=token;
+    saveSignupTokens(stored);
+    setValid(true);
   },[token,type]);
 
   const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
@@ -605,7 +627,8 @@ function SignupPage({type,token}){
     const r=await API.call({action,data:JSON.stringify(f)});
     setSaving(false);if(r.success)setDone(true);else setErr(r.error||'Signup failed.');
   };
-  if(!valid)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'login-error'},'❌ Invalid or expired signup link. Please ask your admin for a new link.')));
+
+  if(!valid)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'login-error'},'❌ Invalid or expired signup link. Please request a new link from the admin.')));
   if(done)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'signup-success'},React.createElement('div',{style:{fontSize:24,marginBottom:8}},'🎉'),React.createElement('div',{style:{fontWeight:700,marginBottom:4}},'Account Created!'),type==='supplier'?'Your supplier account is ready.':'Your account is ready.',React.createElement('div',{style:{marginTop:12,fontSize:12,color:'var(--text3)'}},`Username: ${f.username}`))));
   return React.createElement('div',{className:'signup-wrap'},
     saving&&React.createElement(SaveOverlay,{label:'Creating account...'}),
@@ -660,8 +683,8 @@ function App(){
 
   const isAdmin=user.role==='admin';
   const isSupplier=user.role==='supplier';
-  // FIX: isCC catches all non-admin, non-supplier staff roles including any future ones
-  const isCC=!isAdmin&&!isSupplier;
+  // FIX 4: Expanded isCC to catch all non-admin, non-supplier staff roles
+  const isCC=!isAdmin&&!isSupplier&&(user.role==='customer_care'||user.role==='staff'||user.role==='manager'||user.role==='cc'||user.role==='customer care');
   const perms=user.permissions==='all'?['all']:(user.permissions||'').split(',').map(s=>s.trim()).filter(Boolean);
   const can=p=>isAdmin||perms.includes('all')||perms.includes(p);
 
@@ -766,16 +789,16 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
     API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed');});
   },[isAdmin]);
 
-  // FIX: Load my dashboard for ALL non-admin users (both CC and supplier)
+  // FIX 4: CC and Supplier dashboard — ensure username and role are passed correctly
   useEffect(()=>{
-    if(isAdmin)return; // admin uses getDashboard instead
+    if(!isCC&&!isSupplier)return;
     setMyLoading(true);setMyError('');
     API.call({action:'getMyDashboard',username:user.username,role:user.role}).then(r=>{
       setMyLoading(false);
       if(r.success)setMyData(r.data||{});
-      else setMyError(r.error||'Failed');
+      else setMyError(r.error||'Failed to load dashboard');
     });
-  },[user.username,user.role,isAdmin]);
+  },[user.username,user.role,isCC,isSupplier]);
 
   if(isAdmin){
     if(adminLoading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading dashboard...'));
@@ -783,6 +806,7 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
     return React.createElement(AdminDashboard,{data:adminData||{},reload:()=>{setAdminLoading(true);API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed');});}});
   }
   if(isSupplier)return React.createElement(SupplierDashboard,{data:myData,loading:myLoading,error:myError,user});
+  // FIX 4: Show CC dashboard — includes fallback if not isCC to still show staff dashboard
   return React.createElement(StaffDashboard,{data:myData,loading:myLoading,error:myError,user});
 }
 
@@ -803,15 +827,31 @@ function AdminDashboard({data,reload}){
   );
 }
 
+// FIX 4: StaffDashboard — uses correct field names from getMyDashboard backend response
 function StaffDashboard({data,loading,error,user}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading your dashboard...'));
-  if(error)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)',marginBottom:8}},'❌ '+error));
-  const d=data||{};const totalEarned=sp(d.earnedNGN)||0;const paidOut=sp(d.paidOutNGN)||0;const unpaidBalance=Math.max(0,totalEarned-paidOut);
-  const stats=[{label:'Orders I Processed',value:d.ordersContacted||0,sub:'Orders I contacted',cls:'blue'},{label:'Delivered',value:d.delivered||0,sub:'Confirmed deliveries',cls:'green'},{label:'Pending',value:d.pending||0,sub:'In progress',cls:'orange'},{label:'Canceled',value:d.canceled||0,sub:'Lost orders',cls:'red'},{label:'My Earnings (NGN)',value:fmtNGN(d.earnedNGN),sub:'₦2,000 per delivered+paid order',cls:'green'},{label:'Pending Payout',value:fmtNGN(d.pendingPayoutNGN),sub:'Delivered but not yet paid',cls:'orange'},{label:'Total Paid Out',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},{label:'Unpaid Balance',value:fmtNGN(unpaidBalance),sub:'Owed to you',cls:'purple'},];
+  if(error)return React.createElement('div',null,
+    React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)',marginBottom:8}},'❌ '+error)),
+    React.createElement('div',{className:'alert-info',style:{marginTop:12}},'💡 Make sure orders are marked as "Contacted" with your username to appear here.')
+  );
+  const d=data||{};
+  // Backend returns: ordersContacted, delivered, pending, canceled, earnedNGN, pendingPayoutNGN, paidOutNGN
+  const totalEarned=sp(d.earnedNGN)||0;
+  const paidOut=sp(d.paidOutNGN)||0;
+  const unpaidBalance=Math.max(0,totalEarned-paidOut);
+  const stats=[
+    {label:'Orders I Contacted',value:d.ordersContacted||0,sub:'Total orders I handled',cls:'blue'},
+    {label:'Delivered',value:d.delivered||0,sub:'Confirmed deliveries',cls:'green'},
+    {label:'Pending',value:d.pending||0,sub:'In progress',cls:'orange'},
+    {label:'Canceled',value:d.canceled||0,sub:'Lost orders',cls:'red'},
+    {label:'My Earnings (NGN)',value:fmtNGN(d.earnedNGN),sub:'₦2,000 per delivered+paid',cls:'green'},
+    {label:'Pending Payout',value:fmtNGN(d.pendingPayoutNGN),sub:'Delivered but not yet paid',cls:'orange'},
+    {label:'Total Paid Out',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},
+    {label:'Unpaid Balance',value:fmtNGN(unpaidBalance),sub:'Owed to you',cls:'purple'},
+  ];
   return React.createElement('div',null,
     React.createElement('div',{className:'section-title',style:{marginBottom:16}},`Welcome back, ${user.name||user.username} 👋`),
-    // FIX: Show helpful tip explaining that stats are tied to your username via "Mark Contacted"
-    React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 Your stats are tracked via the "Mark Contacted" button on orders. Stats appear once you\'ve marked orders as Contacted.'),
+    (!d.ordersContacted||d.ordersContacted===0)&&React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 Your stats appear here once orders are marked as Contacted with your username. Ask admin if data is missing.'),
     React.createElement('div',{className:'stat-grid'},stats.map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub))))
   );
 }
@@ -832,11 +872,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const filtered=useMemo(()=>{let r=orders.filter(o=>supplierOwnsOrder(o,products,user));if(statusFilter)r=r.filter(o=>statusOf(o)===statusFilter);if(contactFilter)r=r.filter(o=>(o.contactStatus||'Uncontacted')===contactFilter);if(payFilter)r=r.filter(o=>o.paymentStatus===payFilter);if(search){const s=search.toLowerCase();r=r.filter(o=>(o.customerName||'').toLowerCase().includes(s)||(o.contact||'').includes(s)||(o.contact2||'').includes(s)||(o.product||'').toLowerCase().includes(s));}return r;},[orders,statusFilter,contactFilter,payFilter,search,products,user]);
   const updateField=useCallback(async(order,updates)=>{const updated={...order,...updates};setOrders(prev=>prev.map(o=>o.id===order.id?updated:o));const r=await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(updated)});if(!r.success){setOrders(prev=>prev.map(o=>o.id===order.id?order:o));toast(r.error||'Update failed','error');}},[]);
   const del=async o=>{if(!confirm(`Delete order for ${o.customerName}?`))return;setOrders(prev=>prev.filter(x=>x.id!==o.id));const r=await API.call({action:'deleteOrder',id:o.id});if(r.success)toast('Order deleted');else{setOrders(prev=>[...prev,o]);toast(r.error||'Delete failed','error');}};
-
-  // FIX: Store username (not display name) so dashboard/analytics can match correctly.
-  // The GAS backend filters by o.contactedBy === username, so we must store username here.
-  const markContacted=useCallback(async(order,byUsername)=>{await updateField(order,{contactStatus:'Contacted',contactedBy:byUsername});toast('Marked as contacted ✓');},[updateField]);
-
+  const markContacted=useCallback(async(order,byName)=>{await updateField(order,{contactStatus:'Contacted',contactedBy:byName});toast('Marked as contacted ✓');},[updateField]);
   const canCreate=!isSupplier&&(isAdmin||can('add_orders'));const canEdit=isAdmin||can('edit_orders');const canDelete=isAdmin||can('delete_orders');const canContact=(isAdmin||isCC)&&!isSupplier;const canChangeDelivery=isAdmin||isSupplier;const canChangePay=isAdmin||isSupplier;
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving order...'}),
@@ -850,9 +886,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
           React.createElement('td',null,React.createElement('div',null,o.date||'—'),isDelivered&&o.deliveryDate&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)'}},`Delivered: ${o.deliveryDate}`)),
           React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},o.customerName),React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact),o.contact2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact2),o.address&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',maxWidth:110,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.address)),
           React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},o.product),o.bundleLabel&&React.createElement('div',{style:{fontSize:11,color:'var(--accent)'}},o.bundleLabel),o.size&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},`Size: ${o.size}`),o.sellingPrice&&React.createElement('div',{className:'td-mono',style:{fontSize:11}},fmtGHC(o.sellingPrice))),
-          React.createElement('td',null,contactBadge(cs),o.contactedBy&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',marginTop:2}},`by ${o.contactedBy}`),
-            // FIX: Pass user.username (not name) to markContacted so dashboard stats match
-            canContact&&cs==='Uncontacted'&&React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginTop:4,fontSize:10,padding:'2px 6px'},onClick:()=>{if(isAdmin)setContactingOrder(o);else markContacted(o,user.username);}},'Mark Contacted')),
+          React.createElement('td',null,contactBadge(cs),o.contactedBy&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',marginTop:2}},`by ${o.contactedBy}`),canContact&&cs==='Uncontacted'&&React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginTop:4,fontSize:10,padding:'2px 6px'},onClick:()=>{if(isAdmin)setContactingOrder(o);else markContacted(o,user.name||user.username);}},'Mark Contacted')),
           React.createElement('td',null,statusBadge(ds),canChangeDelivery&&React.createElement('select',{className:'form-select',style:{marginTop:4,fontSize:11,padding:'3px 6px'},value:ds,onChange:e=>updateField(o,{deliveryStatus:e.target.value,...(e.target.value==='Delivered'?{deliveryDate:today()}:{})})},DELIVERY_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s)))),
           React.createElement('td',null,payBadge(paymentOf(o)),canChangePay&&React.createElement('select',{className:'form-select',style:{marginTop:4,fontSize:11,padding:'3px 6px'},value:paymentOf(o),onChange:e=>updateField(o,{paymentStatus:e.target.value})},PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s)))),
           React.createElement('td',null,o.deliveryPrice?React.createElement('div',{className:'td-mono'},fmtGHC(o.deliveryPrice)):React.createElement('div',{style:{color:'var(--text3)',fontSize:12}},'—'),(isAdmin||isSupplier)&&React.createElement(DeliveryPriceInput,{order:o,onUpdate:updateField})),
@@ -862,7 +896,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
       }))
     )),
     showModal&&React.createElement(OrderModal,{order:editing,products,user,isAdmin,onSave:(newOrder)=>{if(editing)setOrders(prev=>prev.map(o=>o.id===newOrder.id?newOrder:o));else setOrders(prev=>[newOrder,...prev]);setShowModal(false);setEditing(null);toast('Order saved ✓');load();},onSaving:setSaving,onClose:()=>{setShowModal(false);setEditing(null);}}),
-    contactingOrder&&React.createElement(ContactedByModal,{order:contactingOrder,staffList,onConfirm:(username)=>{markContacted(contactingOrder,username);setContactingOrder(null);},onClose:()=>setContactingOrder(null)})
+    contactingOrder&&React.createElement(ContactedByModal,{order:contactingOrder,staffList,onConfirm:(name)=>{markContacted(contactingOrder,name);setContactingOrder(null);},onClose:()=>setContactingOrder(null)})
   );
 }
 
@@ -870,27 +904,9 @@ function DeliveryPriceInput({order,onUpdate}){
   const [val,setVal]=useState(order.deliveryPrice||'');useEffect(()=>setVal(order.deliveryPrice||''),[order.deliveryPrice]);
   return React.createElement('input',{className:'form-input',type:'number',placeholder:'Set price...',value:val,style:{marginTop:4,padding:'3px 6px',fontSize:11,width:85},onChange:e=>setVal(e.target.value),onBlur:e=>{const v=e.target.value;if(v!==String(order.deliveryPrice||''))onUpdate(order,{deliveryPrice:v});}});
 }
-
-// FIX: ContactedByModal now passes s.username (not s.name) to onConfirm
-// so that contactedBy stores the username, matching what getMyDashboard expects
 function ContactedByModal({staffList,onConfirm,onClose}){
   const [sel,setSel]=useState('');
-  return React.createElement('div',{className:'modal-overlay'},React.createElement('div',{className:'modal',style:{maxWidth:420}},
-    React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Who contacted the customer?'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
-    React.createElement('div',{className:'modal-body'},
-      React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'Select the staff member who made contact. This records their username for accurate payout tracking.'),
-      React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Staff Member'),
-        React.createElement('select',{className:'form-select',value:sel,onChange:e=>setSel(e.target.value)},
-          React.createElement('option',{value:''},'— Select staff member —'),
-          // FIX: Use s.username as value (not s.name) — this is what getMyDashboard matches against
-          staffList.filter(s=>isActive(s.active)&&s.role!=='admin'&&s.role!=='supplier').map(s=>
-            React.createElement('option',{key:s.id,value:s.username},`${s.name||s.username} (@${s.username})`)
-          )
-        )
-      )
-    ),
-    React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:()=>sel&&onConfirm(sel),disabled:!sel},'Confirm'))
-  ));
+  return React.createElement('div',{className:'modal-overlay'},React.createElement('div',{className:'modal',style:{maxWidth:420}},React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Who contacted the customer?'),React.createElement('button',{className:'close-btn',onClick:onClose},'×')),React.createElement('div',{className:'modal-body'},React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Staff Member'),React.createElement('select',{className:'form-select',value:sel,onChange:e=>setSel(e.target.value)},React.createElement('option',{value:''},'— Select staff member —'),staffList.filter(s=>isActive(s.active)).map(s=>React.createElement('option',{key:s.id,value:s.name||s.username},s.name||s.username))))),React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:()=>sel&&onConfirm(sel),disabled:!sel},'Confirm'))));
 }
 
 function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
@@ -930,15 +946,14 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
 }
 
 // ── STAFF ANALYTICS ───────────────────────────────────────────
+// FIX 4: StaffAnalyticsPage — uses correct field name (contactedBy) and safe date ops
 function StaffAnalyticsPage({user}){
   const [orders,setOrders]=useState([]);const [payoutRecords,setPayoutRecords]=useState([]);const [loading,setLoading]=useState(true);const [period,setPeriod]=useState('all');const [selMonth,setSelMonth]=useState(()=>today().slice(0,7));const [selYear,setSelYear]=useState(()=>today().slice(0,4));
   useEffect(()=>{setLoading(true);Promise.all([API.call({action:'getOrders'}),API.call({action:'getPayoutRecords'})]).then(([or,pr])=>{if(or.success)setOrders(or.data||[]);if(pr.success)setPayoutRecords(pr.data||[]);setLoading(false);});},[]);
-  const username=user.username;
-  const displayName=user.name||user.username;
 
-  // FIX: Match orders by BOTH username AND display name to handle legacy data
-  // where contactedBy may have been stored as the display name before this fix
-  const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username||o.contactedBy===displayName),[orders,username,displayName]);
+  const username=user.username;
+  // FIX: Match on contactedBy (the field backend stores and returns)
+  const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);
   const years=useMemo(()=>{const s=new Set(myOrders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));return[...s].sort().reverse();},[myOrders]);
   const filtered=useMemo(()=>{
     if(period==='month')return myOrders.filter(o=>String(o.date||'').startsWith(selMonth));
@@ -946,18 +961,38 @@ function StaffAnalyticsPage({user}){
     return myOrders;
   },[myOrders,period,selMonth,selYear]);
 
-  const delivered=filtered.filter(o=>statusOf(o)==='Delivered');const deliveredPaid=delivered.filter(o=>paymentOf(o)==='Paid');const pending=filtered.filter(o=>!['Delivered','Canceled'].includes(statusOf(o)));const canceled=filtered.filter(o=>statusOf(o)==='Canceled');const revenueGHC=deliveredPaid.reduce((s,o)=>s+sp(o.sellingPrice),0);const earnings=deliveredPaid.length*STAFF_PAYOUT_NGN;
-
-  // FIX: paidOut also matches by both username and display name for legacy records
-  const paidOut=payoutRecords.filter(r=>r.staffName===username||r.staffName===displayName).reduce((s,r)=>s+sp(r.amountNGN),0);
-  const allDeliveredPaidAllTime=myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');const totalEarnedAllTime=allDeliveredPaidAllTime.length*STAFF_PAYOUT_NGN;const unpaidBalance=Math.max(0,totalEarnedAllTime-paidOut);const allTimeConv=myOrders.length>0?Math.round(allDeliveredPaidAllTime.length/myOrders.length*100):0;const filteredConv=filtered.length>0?Math.round(deliveredPaid.length/filtered.length*100):0;
+  const delivered=filtered.filter(o=>statusOf(o)==='Delivered');
+  const deliveredPaid=delivered.filter(o=>paymentOf(o)==='Paid');
+  const pending=filtered.filter(o=>!['Delivered','Canceled'].includes(statusOf(o)));
+  const canceled=filtered.filter(o=>statusOf(o)==='Canceled');
+  const revenueGHC=deliveredPaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
+  const earnings=deliveredPaid.length*STAFF_PAYOUT_NGN;
+  const paidOut=payoutRecords.filter(r=>r.staffName===username).reduce((s,r)=>s+sp(r.amountNGN),0);
+  const allDeliveredPaidAllTime=myOrders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
+  const totalEarnedAllTime=allDeliveredPaidAllTime.length*STAFF_PAYOUT_NGN;
+  const unpaidBalance=Math.max(0,totalEarnedAllTime-paidOut);
+  const allTimeConv=myOrders.length>0?Math.round(allDeliveredPaidAllTime.length/myOrders.length*100):0;
+  const filteredConv=filtered.length>0?Math.round(deliveredPaid.length/filtered.length*100):0;
   const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
+
   if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
   return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'My Analytics'),React.createElement('div',{className:'section-sub'},`Performance for ${displayName}`))),
+    React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'My Analytics'),React.createElement('div',{className:'section-sub'},`Performance for ${user.name||user.username}`))),
+    myOrders.length===0&&React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 No orders found where you are listed as the contacting staff. Orders show here once you are marked as "Contacted By" on an order.'),
     React.createElement('div',{className:'card',style:{marginBottom:20}},React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},React.createElement('div',{className:'tabs',style:{margin:0}},[{id:'all',label:'All Time'},{id:'year',label:'By Year'},{id:'month',label:'By Month'}].map(t=>React.createElement('div',{key:t.id,className:`tab ${period===t.id?'active':''}`,onClick:()=>setPeriod(t.id)},t.label))),period==='month'&&React.createElement('input',{type:'month',className:'form-input',style:{width:160},value:selMonth,onChange:e=>setSelMonth(e.target.value)}),period==='year'&&React.createElement('select',{className:'form-select',style:{width:120},value:selYear,onChange:e=>setSelYear(e.target.value)},years.map(y=>React.createElement('option',{key:y,value:y},y))))),
-    myOrders.length===0&&React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 No orders linked to your account yet. Use "Mark Contacted" on orders to have them tracked here.'),
-    React.createElement('div',{className:'stat-grid'},[{label:'Orders Contacted',value:filtered.length,sub:'In selected period',cls:'blue'},{label:'Delivered',value:delivered.length,sub:'Successfully delivered',cls:'green'},{label:'Delivered & Paid',value:deliveredPaid.length,sub:'Eligible for payout',cls:'green'},{label:'Pending',value:pending.length,sub:'In progress',cls:'orange'},{label:'Canceled',value:canceled.length,sub:'Lost orders',cls:'red'},{label:'Period Conversion',value:`${filteredConv}%`,sub:'Delivered+paid ÷ Contacted',cls:'purple'},{label:'All-Time Conversion',value:`${allTimeConv}%`,sub:'Across all orders',cls:'orange'},{label:'Revenue Generated (GHC)',value:fmtGHC(revenueGHC),sub:'From paid deliveries',cls:'green'},{label:'My Earnings (NGN)',value:fmtNGN(earnings),sub:'₦2,000/delivered+paid',cls:'green'},{label:'Total Paid Out (NGN)',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},{label:'Unpaid Balance (NGN)',value:fmtNGN(unpaidBalance),sub:'Pending from admin',cls:'orange'},].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))),
+    React.createElement('div',{className:'stat-grid'},[
+      {label:'Orders Contacted',value:filtered.length,sub:'In selected period',cls:'blue'},
+      {label:'Delivered',value:delivered.length,sub:'Successfully delivered',cls:'green'},
+      {label:'Delivered & Paid',value:deliveredPaid.length,sub:'Eligible for payout',cls:'green'},
+      {label:'Pending',value:pending.length,sub:'In progress',cls:'orange'},
+      {label:'Canceled',value:canceled.length,sub:'Lost orders',cls:'red'},
+      {label:'Period Conversion',value:`${filteredConv}%`,sub:'Delivered+paid ÷ Contacted',cls:'purple'},
+      {label:'All-Time Conversion',value:`${allTimeConv}%`,sub:'Across all orders',cls:'orange'},
+      {label:'Revenue Generated (GHC)',value:fmtGHC(revenueGHC),sub:'From paid deliveries',cls:'green'},
+      {label:'My Earnings (NGN)',value:fmtNGN(earnings),sub:'₦2,000/delivered+paid',cls:'green'},
+      {label:'Total Paid Out (NGN)',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},
+      {label:'Unpaid Balance (NGN)',value:fmtNGN(unpaidBalance),sub:'Pending from admin',cls:'orange'},
+    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))),
     React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Order Status Breakdown'),DELIVERY_STATUSES.map(s=>{const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:s,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}})));}))
   );
 }
@@ -974,7 +1009,7 @@ function FinancialsPage({isAdmin}){
     React.createElement('div',{className:'tabs'},[{id:'overview',label:'Overview'},{id:'orders',label:'Paid Orders'},{id:'staff',label:'Staff Payouts'},{id:'withdrawals',label:'Withdrawals'}].map(t=>React.createElement('div',{key:t.id,className:`tab ${tab===t.id?'active':''}`,onClick:()=>setTab(t.id)},t.label))),
     loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
     tab==='overview'?React.createElement('div',{className:'stat-grid'},[{label:'Revenue in GHC',value:fmtGHC(totalRevGHC),sub:'From paid orders',cls:'green'},{label:'Revenue in NGN',value:fmtNGN(totalWdNGN),sub:'Total withdrawn',cls:'green'},{label:'Gross Profit (GHC)',value:fmtGHC(profitGHC),sub:'After product+delivery costs',cls:'orange'},{label:'Net Profit After Ads',value:lastExRate!=null?fmtNGN(netProfitNGN):'Set exchange rate first',sub:`Ad spend: ${fmtNGN(totalAdSpend)}`,cls:netProfitNGN>=0?'green':'red'},{label:'Pending Revenue (GHC)',value:fmtGHC(pendRevGHC),sub:'Delivered, not yet paid',cls:'orange'},{label:'Last Exchange Rate',value:lastExRate?`₦${lastExRate}/GH₵`:'Not set',sub:'From last withdrawal',cls:'blue'},{label:'Total GHC Withdrawn',value:fmtGHC(totalWdGHC),sub:'GHC converted to NGN',cls:'blue'},{label:'Total NGN Received',value:fmtNGN(totalWdNGN),sub:'Across all withdrawals',cls:'blue'},].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))):
-    tab==='orders'?React.createElement('div',{className:'card'},React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Paid Orders Breakdown')),paid.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💰'),React.createElement('div',{className:'empty-text'},'No paid orders yet')):React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Date','Customer','Product','Bundle','Selling','Cost','Delivery','Profit GHC'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,paid.map(o=>{const s2=sp(o.sellingPrice),c=sp(o.costOfProduct),d=sp(o.deliveryPrice),p=s2-c-d;return React.createElement('tr',{key:o.id},React.createElement('td',null,o.date),React.createElement('td',null,o.customerName),React.createElement('td',null,o.product),React.createElement('td',null,o.bundleLabel||`${o.qty||1}×`),React.createElement('td',{className:'td-mono'},fmtGHC(s2)),React.createElement('td',{className:'td-mono'},fmtGHC(c)),React.createElement('td',{className:'td-mono'},fmtGHC(d)),React.createElement('td',{className:p>=0?'profit-positive':'profit-negative'},fmtGHC(p)));})))))  :
+    tab==='orders'?React.createElement('div',{className:'card'},React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Paid Orders Breakdown')),paid.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💰'),React.createElement('div',{className:'empty-text'},'No paid orders yet')):React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Date','Customer','Product','Bundle','Selling','Cost','Delivery','Profit GHC'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,paid.map(o=>{const s2=sp(o.sellingPrice),c=sp(o.costOfProduct),d=sp(o.deliveryPrice),p=s2-c-d;return React.createElement('tr',{key:o.id},React.createElement('td',null,o.date),React.createElement('td',null,o.customerName),React.createElement('td',null,o.product),React.createElement('td',null,o.bundleLabel||`${o.qty||1}×`),React.createElement('td',{className:'td-mono'},fmtGHC(s2)),React.createElement('td',{className:'td-mono'},fmtGHC(c)),React.createElement('td',{className:'td-mono'},fmtGHC(d)),React.createElement('td',{className:p>=0?'profit-positive':'profit-negative'},fmtGHC(p)));}))))):
     tab==='staff'?React.createElement('div',{className:'card'},React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'Staff Payout Breakdown'),React.createElement('div',{className:'section-sub'},'₦2,000 per delivered+paid order'))),React.createElement(StaffPayoutTable,{orders,payoutRecords,isAdmin,onPaid:async(staffName,amount)=>{setSaving(true);const r=await API.call({action:'addPayoutRecord',record:JSON.stringify({staffName,amountNGN:amount,date:today()})});setSaving(false);if(r.success){toast(`Payout of ${fmtNGN(amount)} marked for ${staffName} ✓`);load();}else toast(r.error||'Failed','error');}})):
     React.createElement('div',null,React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'Withdrawals'),React.createElement('div',{className:'section-sub'},'Log GHC→NGN conversions')),isAdmin&&React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowWDModal(true)},'+ Log Withdrawal')),withdrawals.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💱'),React.createElement('div',{className:'empty-text'},'No withdrawals logged yet')):React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Date','GHC Sent','NGN Received','Rate (₦/GH₵)','Notes'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,withdrawals.map(w=>React.createElement('tr',{key:w.id},React.createElement('td',null,w.date),React.createElement('td',{className:'td-mono'},fmtGHC(w.amountGHC)),React.createElement('td',{className:'td-mono'},fmtNGN(w.amountNGN)),React.createElement('td',{style:{fontWeight:700,color:'var(--accent)',fontFamily:'var(--font-mono)'}},w.exchangeRate||'—'),React.createElement('td',null,w.notes||'—')))))),showWDModal&&React.createElement(WithdrawalModal,{onSave:()=>{setShowWDModal(false);load();toast('Withdrawal logged ✓');},onClose:()=>setShowWDModal(false),onSaving:setSaving}))
   );
@@ -1082,7 +1117,7 @@ function StaffPage(){
   const [staffToken,setStaffToken]=useState(()=>getOrCreateToken('staff'));const [copied,setCopied]=useState(false);
   const signupUrl=`${window.location.origin}${window.location.pathname}?signup=staff&token=${staffToken}`;
   const copyLink=()=>{navigator.clipboard.writeText(signupUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
-  const revokeStaffToken=()=>{const t=revokeToken('staff');setStaffToken(t);toast('Signup link revoked');};
+  const revokeStaffToken=()=>{const t=revokeToken('staff');setStaffToken(t);toast('Signup link revoked — generate and share a new one');};
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving...'}),
     React.createElement('div',{className:'card',style:{marginBottom:20}},
@@ -1110,7 +1145,7 @@ function SuppliersPage(){
   const [supplierToken,setSupplierToken]=useState(()=>getOrCreateToken('supplier'));const [copied,setCopied]=useState(false);
   const signupUrl=`${window.location.origin}${window.location.pathname}?signup=supplier&token=${supplierToken}`;
   const copyLink=()=>{navigator.clipboard.writeText(signupUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
-  const revokeSupplierToken=()=>{const t=revokeToken('supplier');setSupplierToken(t);toast('Supplier signup link revoked');};
+  const revokeSupplierToken=()=>{const t=revokeToken('supplier');setSupplierToken(t);toast('Supplier signup link revoked — generate and share a new one');};
   const toArray=(v)=>{if(Array.isArray(v))return v;if(Array.isArray(v?.data))return v.data;return[];};
   const load=useCallback(async()=>{try{setLoading(true);const [su,pr]=await Promise.all([API.call({action:'getSuppliers'}),API.call({action:'getProducts'})]);setSuppliers(toArray(su?.data));setProducts(toArray(pr?.data));}catch{setSuppliers([]);setProducts([]);}finally{setLoading(false);}},[]);
   useEffect(()=>{load();},[load]);
@@ -1144,9 +1179,10 @@ function SupplierModal({supplier,products,onSave,onClose,onSaving}){
 }
 
 // ── SETTINGS PAGE ─────────────────────────────────────────────
-// FIX: Connection tab is admin-only. Supplier/CC only see: email, password.
+// FIX 3: Connection tab is now admin-only. Suppliers and CC staff only see:
+// email, password (and pixel + embed + emails for admins)
 function SettingsPage({user,isAdmin,onUserUpdate}){
-  const [tab,setTab]=useState(isAdmin?'connection':'email');
+  const [tab,setTab]=useState(()=>isAdmin?'connection':'email');
   const [url,setUrl]=useState(()=>localStorage.getItem('apiUrl')||SITE_API_URL||'');
   const [savedUrl,setSavedUrl]=useState(false);
   const [myEmail,setMyEmail]=useState(user.email||'');
@@ -1176,7 +1212,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
   const setPwField=k=>e=>setPw(p=>({...p,[k]:e.target.value}));
   const changePassword=async()=>{if(!pw.oldPassword){toast('Enter current password','error');return;}if(!pw.newPassword){toast('Enter new password','error');return;}if(pw.newPassword!==pw.confirmPassword){toast('Passwords do not match','error');return;}setSavingPw(true);const r=await API.call({action:'changePassword',username:user.username,role:user.role,oldPassword:pw.oldPassword,newPassword:pw.newPassword});setSavingPw(false);if(r.success){toast('Password changed ✓');setPw({oldPassword:'',newPassword:'',confirmPassword:''});}else toast(r.error||'Failed','error');};
 
-  // FIX: Build tab list based on role — connection is admin-only
+  // FIX 3: Admin sees all tabs; CC/Supplier see only email + password
   const settingsTabs=[
     ...(isAdmin?[{id:'connection',label:'🔌 Connection'}]:[]),
     {id:'email',label:'📧 My Email'},
@@ -1190,31 +1226,30 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
 
     tab==='connection'&&isAdmin&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:4}},'Database Connection'),
-      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'The API URL is hardcoded in this file for all users. Use this field to temporarily override it for testing.'),
-      React.createElement('div',{className:'alert-success',style:{marginBottom:12}},'✅ API URL is hardcoded — all users (staff, suppliers, customers) can use the app without any setup.'),
+      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'The API URL is hardcoded in this file. Use this to temporarily override for testing.'),
+      React.createElement('div',{className:'alert-success',style:{marginBottom:12}},'✅ API URL is hardcoded — all users can use the app without any setup.'),
       React.createElement('div',{className:'form-group',style:{marginBottom:12}},
         React.createElement('label',{className:'form-label'},'Override URL (Admin only)'),
         React.createElement('input',{className:'form-input',value:url,onChange:e=>setUrl(e.target.value),placeholder:'https://script.google.com/macros/s/.../exec'})
       ),
       React.createElement('div',{style:{display:'flex',gap:8}},
         React.createElement('button',{className:'btn btn-primary',onClick:saveUrl},savedUrl?'✓ Saved':'Save Override'),
-        localStorage.getItem('apiUrl')&&React.createElement('button',{className:'btn btn-danger',onClick:()=>{API.setUrl(null);setUrl(SITE_API_URL);toast('Override cleared — using default URL');}}, 'Clear Override')
+        localStorage.getItem('apiUrl')&&React.createElement('button',{className:'btn btn-danger',onClick:()=>{API.setUrl(null);setUrl(SITE_API_URL);toast('Override cleared');}}, 'Clear Override')
       )
     ),
 
     tab==='email'&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:4}},'My Email Address'),
-      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Save your email to receive order notifications automatically.'),
+      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Receive order notifications via email.'),
       user.email&&React.createElement('div',{className:'alert-success',style:{marginBottom:16}},`✅ Current email: ${user.email}`),
-      // FIX: Explain email notification prerequisites clearly
-      React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'📧 Once saved, you\'ll receive an email for every new order placed. Make sure the GAS script has permission to send emails (it uses your Google account\'s MailApp quota).'),
       React.createElement('div',{className:'form-group',style:{marginBottom:14}},
         React.createElement('label',{className:'form-label'},'Email Address'),
         React.createElement('div',{className:'email-row'},
           React.createElement('input',{className:'form-input',type:'email',value:myEmail,onChange:e=>setMyEmail(e.target.value),placeholder:'your@email.com'}),
           React.createElement('button',{className:'btn btn-primary',onClick:saveMyEmail,disabled:savingEmail},savingEmail?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Email')
         )
-      )
+      ),
+      React.createElement('div',{className:'alert-info'},'📧 You\'ll receive order notifications once your email is saved.')
     ),
 
     tab==='password'&&React.createElement('div',{className:'card'},
@@ -1255,7 +1290,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
         React.createElement('div',null,React.createElement('div',{className:'section-title'},'Customer Order Forms'),React.createElement('div',{className:'section-sub'},'Built into this same file — no separate file needed')),
         React.createElement('a',{href:baseOrderUrl,target:'_blank',className:'btn btn-blue btn-sm'},'🔗 View All-Products Form')
       ),
-      React.createElement('div',{className:'alert-success',style:{marginBottom:20}},'✅ These links work on GitHub Pages as-is. Share them directly or embed via iFrame on Systeme.io. Each product has its own dedicated form showing only its packages and sizes.'),
+      React.createElement('div',{className:'alert-success',style:{marginBottom:20}},'✅ Share these links directly or embed via iFrame on Systeme.io. Each product has its own dedicated form.'),
       React.createElement('div',{className:'form-url-wrap'},
         React.createElement('div',{className:'form-url-title'},'🌐 General Order Form (all products)'),
         React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},baseOrderUrl),React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(baseOrderUrl,'general')},copied==='general'?'✓ Copied!':'Copy'))

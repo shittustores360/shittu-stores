@@ -143,15 +143,12 @@ tr:hover td{background:var(--bg3)}
 .profit-negative{color:var(--red);font-family:var(--font-mono);font-size:12px}
 .divider{height:1px;background:var(--border);margin:16px 0}
 .text-muted{color:var(--text3);font-size:12px}
-.perm-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition)}
-.perm-chip.active{background:var(--accent-dim);border-color:rgba(245,166,35,0.3);color:var(--accent)}
 .tag{display:inline-flex;align-items:center;gap:4px;background:var(--accent-dim);border:1px solid rgba(245,166,35,0.25);color:var(--accent);border-radius:20px;padding:2px 8px;font-size:12px}
 .tag-remove{cursor:pointer;line-height:1;opacity:0.7}.tag-remove:hover{opacity:1}
 .section-divider{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .alert-info{background:var(--blue-dim);border:1px solid rgba(52,152,219,0.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--blue);margin-bottom:12px}
 .alert-warning{background:var(--accent-dim);border:1px solid rgba(245,166,35,0.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--accent);margin-bottom:12px}
 .alert-success{background:var(--green-dim);border:1px solid rgba(46,204,113,0.25);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--green);margin-bottom:12px}
-.price-history-item{background:var(--bg3);border-radius:8px;padding:8px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
 .product-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;color:var(--text2);transition:all var(--transition)}
 .product-chip.active{background:var(--blue-dim);border-color:rgba(52,152,219,0.3);color:var(--blue)}
 .theme-toggle{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:5px 10px;cursor:pointer;color:var(--text2);font-size:12px;display:flex;align-items:center;gap:5px;transition:all var(--transition)}
@@ -184,20 +181,17 @@ tr:hover td{background:var(--bg3)}
 .save-overlay-label{font-size:14px;color:var(--text2);font-weight:600}
 .email-row{display:flex;gap:8px;align-items:center}
 .email-row .form-input{flex:1}
-.email-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.email-status-dot.set{background:var(--green)}
-.email-status-dot.missing{background:var(--red)}
-.code-box{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;font-family:var(--font-mono);font-size:11px;color:var(--text2);word-break:break-all;white-space:pre-wrap;line-height:1.6;max-height:140px;overflow-y:auto}
 .pixel-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
 .pixel-indicator{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
 .pixel-on{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,113,0.2)}
 .pixel-off{background:var(--red-dim);color:var(--red);border:1px solid rgba(231,76,60,0.2)}
 .form-url-wrap{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px}
 .form-url-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.product-link-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
+.product-link-name{font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.product-link-meta{font-size:11px;color:var(--text3);margin-bottom:8px}
 
-/* ═══════════════════════════════════════
-   CUSTOMER ORDER FORM STYLES
-   ═══════════════════════════════════════ */
+/* ── CUSTOMER ORDER FORM ─────────────────────────── */
 .cof-root{min-height:100vh;background:linear-gradient(135deg,#0d0f14 0%,#111520 40%,#0a0c10 100%);font-family:'Outfit',sans-serif;color:#e8eaf0;position:relative;overflow-x:hidden}
 .cof-root::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(245,166,35,0.08) 0%,transparent 60%);pointer-events:none;z-index:0}
 .cof-root::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#f5a623,#e8912a,transparent);z-index:10}
@@ -226,14 +220,12 @@ tr:hover td{background:var(--bg3)}
 .cof-bundle-card.selected{border-color:#f5a623;background:rgba(245,166,35,0.08)}
 .cof-bundle-card.selected::before{content:'✓';position:absolute;top:12px;right:14px;width:22px;height:22px;background:#f5a623;color:#000;border-radius:50%;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
 .cof-bundle-name{font-size:15px;font-weight:700;color:#e8eaf0;margin-bottom:4px}
-.cof-bundle-price{font-size:22px;font-weight:700;color:#f5a623;font-family:'Outfit',sans-serif}
+.cof-bundle-price{font-size:22px;font-weight:700;color:#f5a623}
 .cof-bundle-qty{font-size:12px;color:#5a6070;margin-top:3px}
 .cof-bundle-gift{display:inline-flex;align-items:center;gap:5px;background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.2);color:#2ecc71;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;margin-top:8px}
 .cof-submit{width:100%;padding:18px;background:linear-gradient(135deg,#f5a623,#e8912a);border:none;border-radius:14px;color:#000;font-size:16px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;position:relative;overflow:hidden;margin-top:8px}
 .cof-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 32px rgba(245,166,35,0.35)}
-.cof-submit:active{transform:translateY(0)}
 .cof-submit:disabled{opacity:0.6;cursor:not-allowed;transform:none}
-.cof-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);pointer-events:none}
 .cof-success{text-align:center;padding:60px 20px}
 .cof-success-icon{font-size:72px;margin-bottom:20px;animation:successPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275)}
 @keyframes successPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -258,12 +250,6 @@ tr:hover td{background:var(--bg3)}
 .cof-size-btn{padding:10px 8px;background:rgba(26,30,40,0.9);border:2px solid rgba(56,67,90,0.6);border-radius:10px;color:#9aa0b4;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'Outfit',sans-serif}
 .cof-size-btn:hover{border-color:rgba(245,166,35,0.4)}
 .cof-size-btn.selected{border-color:#f5a623;color:#f5a623;background:rgba(245,166,35,0.08)}
-
-/* Per-product link table */
-.product-link-row{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px}
-.product-link-name{font-weight:700;font-size:13px;color:var(--text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.product-link-meta{font-size:11px;color:var(--text3);margin-bottom:8px}
-
 @media(max-width:768px){
   .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:100;transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -286,17 +272,19 @@ tr:hover td{background:var(--bg3)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
-const SITE_API_URL = 'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec'; // ← PASTE YOUR GOOGLE APPS SCRIPT URL HERE
+// ════════════════════════════════════════════════════════════════
+// CONFIGURATION — hardcoded so ALL users (staff, suppliers, customers)
+// can use the app without any setup step.
+// ════════════════════════════════════════════════════════════════
+const SITE_API_URL = 'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec';
 
 const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext} = React;
 
+// ── CACHE ─────────────────────────────────────────────────────
 const _cache={};const _inflight={};const CACHE_TTL=90000;
 function cacheGet(k){return _cache[k]||null;}
 function cacheSet(k,v){_cache[k]={v,ts:Date.now()};}
-function cacheBust(keys){
-  if(keys){keys.forEach(k=>{Object.keys(_cache).forEach(ck=>{if(ck.includes(k))delete _cache[ck];});});}
-  else{Object.keys(_cache).forEach(k=>delete _cache[k]);}
-}
+function cacheBust(keys){if(keys){keys.forEach(k=>{Object.keys(_cache).forEach(ck=>{if(ck.includes(k))delete _cache[ck];});});}else{Object.keys(_cache).forEach(k=>delete _cache[k]);}}
 const BUST_MAP={
   addOrder:['getOrders','getDashboard','getMyDashboard'],
   updateOrder:['getOrders','getDashboard','getMyDashboard'],
@@ -311,12 +299,18 @@ const BUST_MAP={
   saveEmail:['getStaff','getSuppliers','getEmailSettings'],
 };
 
+// ── API ───────────────────────────────────────────────────────
+// ALWAYS use SITE_API_URL. localStorage override is only for admin dev use.
 const API={
-  get url(){const override=localStorage.getItem('apiUrl');return override||SITE_API_URL||'';},
+  get url(){
+    // localStorage override only if explicitly set (admin only)
+    const override=localStorage.getItem('apiUrl');
+    return override||SITE_API_URL||'';
+  },
   setUrl(u){if(u){localStorage.setItem('apiUrl',u);}else{localStorage.removeItem('apiUrl');}},
   async call(params){
     const url=this.url;
-    if(!url)return{success:false,error:'API URL not configured.'};
+    if(!url)return{success:false,error:'API not configured.'};
     const key=JSON.stringify(params);const action=params.action||'';
     const isRead=action.startsWith('get')||action.startsWith('fetch');
     if(isRead){const c=cacheGet(key);if(c&&Date.now()-c.ts<CACHE_TTL)return{success:true,data:c.v,_cached:true};}
@@ -339,6 +333,7 @@ const API={
   prefetch(action){const url=this.url;if(!url)return;const params={action};const key=JSON.stringify(params);const c=cacheGet(key);if(c&&Date.now()-c.ts<CACHE_TTL)return;this.call(params);}
 };
 
+// ── THEME ─────────────────────────────────────────────────────
 const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
 function ThemeProvider({children}){
   const [theme,setTheme]=useState(()=>localStorage.getItem('ssTheme')||'dark');
@@ -347,18 +342,17 @@ function ThemeProvider({children}){
   return React.createElement(ThemeCtx.Provider,{value:{theme,toggleTheme}},children);
 }
 
+// ── TOAST ─────────────────────────────────────────────────────
 const _toastListeners=[];
 function toast(msg,type='success'){_toastListeners.forEach(fn=>fn(msg,type));}
 function ToastContainer(){
   const [toasts,setToasts]=useState([]);
-  useEffect(()=>{
-    const fn=(msg,type)=>{const id=Date.now()+Math.random();setToasts(t=>[...t,{id,msg,type}]);setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),3500);};
-    _toastListeners.push(fn);return()=>{const i=_toastListeners.indexOf(fn);if(i>-1)_toastListeners.splice(i,1);};
-  },[]);
+  useEffect(()=>{const fn=(msg,type)=>{const id=Date.now()+Math.random();setToasts(t=>[...t,{id,msg,type}]);setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),3500);};_toastListeners.push(fn);return()=>{const i=_toastListeners.indexOf(fn);if(i>-1)_toastListeners.splice(i,1);};},[]);
   return React.createElement('div',{className:'toast-wrap'},toasts.map(t=>React.createElement('div',{key:t.id,className:`toast ${t.type}`},t.msg)));
 }
 function SaveOverlay({label}){return React.createElement('div',{className:'save-overlay'},React.createElement('div',{className:'save-overlay-box'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'save-overlay-label'},label||'Saving…')));}
 
+// ── CONSTANTS ─────────────────────────────────────────────────
 const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
 const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
@@ -370,6 +364,7 @@ function genToken(){return Math.random().toString(36).slice(2,10)+Math.random().
 function getOrCreateToken(type){const tokens=getSignupTokens();if(!tokens[type]){tokens[type]=genToken();saveSignupTokens(tokens);}return tokens[type];}
 function revokeToken(type){const tokens=getSignupTokens();tokens[type]=genToken();saveSignupTokens(tokens);return tokens[type];}
 
+// ── UTILS ─────────────────────────────────────────────────────
 function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
 function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
 function fmtGHC(n){return `GH₵${fmt(n,2)}`;}
@@ -390,6 +385,7 @@ function supplierOwnsOrder(order,products,user){
   return order.supplierUsername===user.username||order.supplier===user.username||product?.supplierUsername===user.username||productSuppliers.includes(user.username)||assigned.includes(order.product);
 }
 
+// ── DATA HOOK ─────────────────────────────────────────────────
 function useData(action,enabled=true){
   const [data,setData]=useState(()=>{if(!enabled||!API.url)return null;const cached=cacheGet(JSON.stringify({action}));return cached?cached.v:null;});
   const [loading,setLoading]=useState(()=>{if(!enabled||!API.url)return false;const cached=cacheGet(JSON.stringify({action}));return!cached;});
@@ -405,6 +401,7 @@ function useData(action,enabled=true){
   return{data,loading,error,reload:()=>load(true),setData};
 }
 
+// ── CHARTS ────────────────────────────────────────────────────
 function BarChart({data,color='var(--accent)',height=80}){
   if(!data||data.length===0)return null;const max=Math.max(...data.map(d=>d.value),1);const w=100/data.length;
   return React.createElement('svg',{viewBox:`0 0 100 ${height}`,className:'chart-svg',style:{height}},data.map((d,i)=>{const bh=Math.max(2,(d.value/max)*(height-18));const x=i*w+w*0.1;const bw=w*0.8;const y=height-bh-12;return React.createElement('g',{key:i},React.createElement('rect',{x,y,width:bw,height:bh,fill:color,rx:2,opacity:0.85}),React.createElement('text',{x:x+bw/2,y:height-1,textAnchor:'middle',fontSize:5,fill:'var(--text3)'},d.label));}));
@@ -414,9 +411,10 @@ function LineChart({data,color='var(--accent)',height=80}){
   return React.createElement('svg',{viewBox:`0 0 100 ${height}`,className:'chart-svg',style:{height}},React.createElement('defs',null,React.createElement('linearGradient',{id:'lg',x1:'0',y1:'0',x2:'0',y2:'1'},React.createElement('stop',{offset:'0%',stopColor:color,stopOpacity:0.3}),React.createElement('stop',{offset:'100%',stopColor:color,stopOpacity:0.02}))),React.createElement('path',{d:areaPath,fill:'url(#lg)'}),React.createElement('path',{d:path,fill:'none',stroke:color,strokeWidth:1.5,strokeLinejoin:'round'}),pts.map((p,i)=>React.createElement('circle',{key:i,cx:p[0],cy:p[1],r:1.5,fill:color})),data.map((d,i)=>React.createElement('text',{key:i,x:pts[i][0],y:height-1,textAnchor:'middle',fontSize:5,fill:'var(--text3)'},d.label)));
 }
 
-// ═══════════════════════════════════════════════════════
-// CUSTOMER ORDER FORM — full-page, beautiful, per-product
-// ═══════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════
+// CUSTOMER ORDER FORM — beautiful per-product form
+// Accessed via ?view=order or ?view=order&product=ProductName
+// ════════════════════════════════════════════════════════════════
 function CustomerOrderForm({productName}){
   const [product,setProduct]=useState(null);
   const [allProducts,setAllProducts]=useState([]);
@@ -429,19 +427,17 @@ function CustomerOrderForm({productName}){
   const [submitting,setSubmitting]=useState(false);
   const [submitErr,setSubmitErr]=useState('');
   const [done,setDone]=useState(false);
-  const [orderId,setOrderId]=useState('');
 
-  // Load all active products from API
   useEffect(()=>{
-    if(!API.url){setLoadErr('Store is not yet configured.');setLoadingProducts(false);return;}
+    // API URL is hardcoded so this always works
     API.call({action:'getProducts'}).then(r=>{
       setLoadingProducts(false);
       if(r.success){
         const active=(r.data||[]).filter(p=>isActive(p.active));
         setAllProducts(active);
         if(productName){
-          // Find by name (URL-decoded, case-insensitive)
-          const found=active.find(p=>p.name.toLowerCase()===decodeURIComponent(productName).toLowerCase());
+          const decoded=decodeURIComponent(productName);
+          const found=active.find(p=>p.name.toLowerCase()===decoded.toLowerCase());
           setProduct(found||null);
         }
       }else{setLoadErr(r.error||'Could not load products.');}
@@ -450,7 +446,6 @@ function CustomerOrderForm({productName}){
 
   const bundles=useMemo(()=>{try{return JSON.parse(product?.bundles||'[]');}catch{return[];}},[product]);
   const sizes=useMemo(()=>{if(!product||(product.hasSizes!==true&&product.hasSizes!=='true'))return[];try{return JSON.parse(product?.sizes||'[]');}catch{return[];}},[product]);
-
   const setField=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
 
   const validate=()=>{
@@ -463,9 +458,7 @@ function CustomerOrderForm({productName}){
   };
 
   const submit=async()=>{
-    setSubmitErr('');
-    if(!validate())return;
-    setSubmitting(true);
+    setSubmitErr('');if(!validate())return;setSubmitting(true);
     const su=readList(product?.supplierUsernames||product?.supplierUsername);
     const orderData={
       date:today(),customerName:form.customerName.trim(),contact:form.contact.trim(),
@@ -479,151 +472,133 @@ function CustomerOrderForm({productName}){
     };
     const r=await API.call({action:'addOrder',order:JSON.stringify(orderData)});
     setSubmitting(false);
-    if(r.success){setOrderId(r.data?.id||('ORD-'+Date.now().toString(36).toUpperCase()));setDone(true);}
+    if(r.success)setDone(true);
     else setSubmitErr(r.error||'Something went wrong. Please try again.');
   };
 
   // Facebook Pixel
   useEffect(()=>{
-    const pid=localStorage.getItem('ssPixelId');
-    if(!pid)return;
-    if(!window.fbq){
-      (function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-      window.fbq('init',pid);window.fbq('track','PageView');
-    }
-    if(product){window.fbq('track','ViewContent',{content_name:product.name,content_category:'Product'});}
+    const pid=localStorage.getItem('ssPixelId');if(!pid)return;
+    if(!window.fbq){(function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');window.fbq('init',pid);window.fbq('track','PageView');}
+    if(product)window.fbq('track','ViewContent',{content_name:product.name});
   },[product]);
+  useEffect(()=>{if(selectedBundle&&window.fbq)window.fbq('track','AddToCart',{content_name:product?.name,value:sp(selectedBundle.sellingPrice||selectedBundle.price),currency:'GHS'});},[selectedBundle]);
 
-  useEffect(()=>{
-    if(selectedBundle&&window.fbq){window.fbq('track','AddToCart',{content_name:product?.name,value:sp(selectedBundle.sellingPrice||selectedBundle.price),currency:'GHS'});}
-  },[selectedBundle]);
+  const brandHeader=React.createElement('div',{className:'cof-brand'},React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores'),React.createElement('div',{className:'cof-brand-tagline'},'Fast & Reliable Delivery'));
 
-  if(loadingProducts)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},React.createElement('div',{className:'cof-brand'},React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores')),React.createElement('div',{className:'cof-loading'},React.createElement('div',{className:'cof-spinner'}),React.createElement('div',{style:{color:'#5a6070',fontSize:14}},'Loading store…'))));
+  if(loadingProducts)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},brandHeader,React.createElement('div',{className:'cof-loading'},React.createElement('div',{className:'cof-spinner'}),React.createElement('div',{style:{color:'#5a6070',fontSize:14}},'Loading store…'))));
+  if(loadErr)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},brandHeader,React.createElement('div',{className:'cof-no-product'},React.createElement('div',{className:'cof-no-product-icon'},'⚠️'),React.createElement('div',{className:'cof-no-product-title'},'Store Unavailable'),React.createElement('div',{className:'cof-no-product-sub'},loadErr))));
+  if(productName&&!product)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},brandHeader,React.createElement('div',{className:'cof-no-product'},React.createElement('div',{className:'cof-no-product-icon'},'🔍'),React.createElement('div',{className:'cof-no-product-title'},'Product Not Found'),React.createElement('div',{className:'cof-no-product-sub'},'This product link may be invalid or the product has been removed.'))));
 
-  if(loadErr)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},React.createElement('div',{className:'cof-brand'},React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores')),React.createElement('div',{className:'cof-no-product'},React.createElement('div',{className:'cof-no-product-icon'},'⚠️'),React.createElement('div',{className:'cof-no-product-title'},'Store Unavailable'),React.createElement('div',{className:'cof-no-product-sub'},loadErr))));
-
-  if(productName&&!product)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},React.createElement('div',{className:'cof-brand'},React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores'),React.createElement('div',{className:'cof-brand-tagline'},'Premium Delivery')),React.createElement('div',{className:'cof-no-product'},React.createElement('div',{className:'cof-no-product-icon'},'🔍'),React.createElement('div',{className:'cof-no-product-title'},'Product Not Found'),React.createElement('div',{className:'cof-no-product-sub'},'This product link may be invalid or the product has been removed.'))));
-
-  // If no product specified — show all-products picker
+  // All-products picker (no specific product in URL)
   if(!productName&&!product){
-    return React.createElement('div',{className:'cof-root'},
-      React.createElement('div',{className:'cof-wrap'},
-        React.createElement('div',{className:'cof-brand'},React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores'),React.createElement('div',{className:'cof-brand-tagline'},'Order Now')),
-        React.createElement('div',{className:'cof-section'},
-          React.createElement('div',{className:'cof-section-title'},'Choose a Product'),
-          allProducts.length===0?React.createElement('div',{style:{color:'#5a6070',fontSize:14,textAlign:'center',padding:'20px 0'}},'No products available yet.'):
-          React.createElement('div',{className:'cof-bundle-grid'},
-            allProducts.map(p=>{
-              let bArr=[];try{bArr=JSON.parse(p.bundles||'[]');}catch{}
-              const minPrice=bArr.length>0?Math.min(...bArr.map(b=>sp(b.sellingPrice||b.price||0))):0;
-              return React.createElement('div',{key:p.id,className:'cof-bundle-card',onClick:()=>setProduct(p)},
-                React.createElement('div',{className:'cof-bundle-name'},p.name),
-                p.description&&React.createElement('div',{style:{fontSize:12,color:'#5a6070',marginBottom:8}},p.description),
-                bArr.length>0&&React.createElement('div',{className:'cof-bundle-price'},'from '+fmtGHC(minPrice))
-              );
-            })
-          )
-        )
+    return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},
+      brandHeader,
+      React.createElement('div',{className:'cof-section'},
+        React.createElement('div',{className:'cof-section-title'},'Choose a Product'),
+        allProducts.length===0
+          ?React.createElement('div',{style:{color:'#5a6070',fontSize:14,textAlign:'center',padding:'20px 0'}},'No products available yet.')
+          :React.createElement('div',{className:'cof-bundle-grid'},allProducts.map(p=>{
+            let bArr=[];try{bArr=JSON.parse(p.bundles||'[]');}catch{}
+            const minPrice=bArr.length>0?Math.min(...bArr.map(b=>sp(b.sellingPrice||b.price||0))):0;
+            return React.createElement('div',{key:p.id,className:'cof-bundle-card',onClick:()=>setProduct(p)},
+              React.createElement('div',{className:'cof-bundle-name'},p.name),
+              p.description&&React.createElement('div',{style:{fontSize:12,color:'#5a6070',marginBottom:8}},p.description),
+              bArr.length>0&&React.createElement('div',{className:'cof-bundle-price'},'from '+fmtGHC(minPrice))
+            );
+          }))
       )
-    );
+    ));
   }
 
-  if(done)return React.createElement('div',{className:'cof-root'},
-    React.createElement('div',{className:'cof-wrap'},
-      React.createElement('div',{className:'cof-brand'},React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores')),
-      React.createElement('div',{className:'cof-success'},
-        React.createElement('div',{className:'cof-success-icon'},'🎉'),
-        React.createElement('div',{className:'cof-success-title'},'Order Placed!'),
-        React.createElement('div',{className:'cof-success-sub'},'Thank you, '+form.customerName+'! Your order has been received and our team will contact you shortly to confirm delivery.'),
-        React.createElement('div',{className:'cof-success-detail'},
-          React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Product'),React.createElement('span',{className:'cof-success-val'},product.name)),
-          React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Package'),React.createElement('span',{className:'cof-success-val'},selectedBundle.label)),
-          selectedSize&&React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Size'),React.createElement('span',{className:'cof-success-val'},selectedSize)),
-          React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Amount'),React.createElement('span',{className:'cof-success-val',style:{color:'#f5a623'}},fmtGHC(selectedBundle.sellingPrice||selectedBundle.price||0))),
-          React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Phone'),React.createElement('span',{className:'cof-success-val'},form.contact))
-        )
+  if(done)return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},
+    brandHeader,
+    React.createElement('div',{className:'cof-success'},
+      React.createElement('div',{className:'cof-success-icon'},'🎉'),
+      React.createElement('div',{className:'cof-success-title'},'Order Placed!'),
+      React.createElement('div',{className:'cof-success-sub'},`Thank you, ${form.customerName}! Your order has been received and our team will contact you shortly to confirm delivery.`),
+      React.createElement('div',{className:'cof-success-detail'},
+        React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Product'),React.createElement('span',{className:'cof-success-val'},product.name)),
+        React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Package'),React.createElement('span',{className:'cof-success-val'},selectedBundle.label)),
+        selectedSize&&React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Size'),React.createElement('span',{className:'cof-success-val'},selectedSize)),
+        React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Amount'),React.createElement('span',{className:'cof-success-val',style:{color:'#f5a623'}},fmtGHC(selectedBundle.sellingPrice||selectedBundle.price||0))),
+        React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Phone'),React.createElement('span',{className:'cof-success-val'},form.contact))
       )
     )
-  );
+  ));
 
-  return React.createElement('div',{className:'cof-root'},
-    React.createElement('div',{className:'cof-wrap'},
-      React.createElement('div',{className:'cof-brand'},
-        React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores'),
-        React.createElement('div',{className:'cof-brand-tagline'},'Fast & Reliable Delivery')
-      ),
-      React.createElement('div',{className:'cof-product-hero'},
-        React.createElement('div',{className:'cof-product-name'},product.name),
-        product.description&&React.createElement('div',{className:'cof-product-desc'},product.description)
-      ),
-
-      // PACKAGES
-      React.createElement('div',{className:'cof-section'},
-        React.createElement('div',{className:'cof-section-title'},'📦 Choose Your Package'),
-        bundles.length===0?React.createElement('div',{style:{color:'#5a6070',fontSize:13}},'No packages configured for this product.'):
-        React.createElement('div',{className:'cof-bundle-grid'},
-          bundles.map((b,i)=>React.createElement('div',{key:i,className:`cof-bundle-card ${selectedBundle?.label===b.label?'selected':''}`,onClick:()=>setSelectedBundle(b)},
+  return React.createElement('div',{className:'cof-root'},React.createElement('div',{className:'cof-wrap'},
+    brandHeader,
+    React.createElement('div',{className:'cof-product-hero'},
+      React.createElement('div',{className:'cof-product-name'},product.name),
+      product.description&&React.createElement('div',{className:'cof-product-desc'},product.description)
+    ),
+    // Packages
+    React.createElement('div',{className:'cof-section'},
+      React.createElement('div',{className:'cof-section-title'},'📦 Choose Your Package'),
+      bundles.length===0
+        ?React.createElement('div',{style:{color:'#5a6070',fontSize:13}},'No packages configured for this product.')
+        :React.createElement('div',{className:'cof-bundle-grid'},bundles.map((b,i)=>
+          React.createElement('div',{key:i,className:`cof-bundle-card ${selectedBundle?.label===b.label?'selected':''}`,onClick:()=>setSelectedBundle(b)},
             React.createElement('div',{className:'cof-bundle-name'},b.label),
             React.createElement('div',{className:'cof-bundle-price'},fmtGHC(b.sellingPrice||b.price||0)),
             React.createElement('div',{className:'cof-bundle-qty'},`Qty: ${b.qty||1}`),
             b.hasFreeGift&&React.createElement('div',{className:'cof-bundle-gift'},'🎁 Free Gift Included',b.freeGiftName?` — ${b.freeGiftName}`:'')
-          ))
-        )
+          )
+        ))
+    ),
+    // Sizes
+    sizes.length>0&&React.createElement('div',{className:'cof-section'},
+      React.createElement('div',{className:'cof-section-title'},'📐 Choose Your Size'),
+      React.createElement('div',{className:'cof-size-grid'},sizes.map(s=>
+        React.createElement('button',{key:s,type:'button',className:`cof-size-btn ${selectedSize===s?'selected':''}`,onClick:()=>setSelectedSize(s)},s)
+      ))
+    ),
+    // Customer details
+    React.createElement('div',{className:'cof-section'},
+      React.createElement('div',{className:'cof-section-title'},'👤 Your Details'),
+      submitErr&&React.createElement('div',{className:'cof-error-banner'},submitErr),
+      React.createElement('div',{className:'cof-field'},
+        React.createElement('label',{className:'cof-label'},'Full Name *'),
+        React.createElement('input',{className:'cof-input',type:'text',placeholder:'Enter your full name',value:form.customerName,onChange:setField('customerName')})
       ),
-
-      // SIZES
-      sizes.length>0&&React.createElement('div',{className:'cof-section'},
-        React.createElement('div',{className:'cof-section-title'},'📐 Choose Your Size'),
-        React.createElement('div',{className:'cof-size-grid'},
-          sizes.map(s=>React.createElement('button',{key:s,type:'button',className:`cof-size-btn ${selectedSize===s?'selected':''}`,onClick:()=>setSelectedSize(s)},s))
-        )
+      React.createElement('div',{className:'cof-field'},
+        React.createElement('label',{className:'cof-label'},'Phone Number *'),
+        React.createElement('input',{className:'cof-input',type:'tel',placeholder:'Your WhatsApp / phone number',value:form.contact,onChange:setField('contact')}),
+        !showContact2&&React.createElement('button',{type:'button',className:'cof-phone2-btn',onClick:()=>setShowContact2(true)},'+ Add a second phone number'),
+        showContact2&&React.createElement('input',{className:'cof-input',type:'tel',placeholder:'Second phone (optional)',value:form.contact2,onChange:setField('contact2'),style:{marginTop:10}})
       ),
-
-      // CUSTOMER DETAILS
-      React.createElement('div',{className:'cof-section'},
-        React.createElement('div',{className:'cof-section-title'},'👤 Your Details'),
-        submitErr&&React.createElement('div',{className:'cof-error-banner'},submitErr),
-        React.createElement('div',{className:'cof-field'},
-          React.createElement('label',{className:'cof-label'},'Full Name *'),
-          React.createElement('input',{className:'cof-input',type:'text',placeholder:'Enter your full name',value:form.customerName,onChange:setField('customerName')})
-        ),
-        React.createElement('div',{className:'cof-field'},
-          React.createElement('label',{className:'cof-label'},'Phone Number *'),
-          React.createElement('input',{className:'cof-input',type:'tel',placeholder:'Your WhatsApp / phone number',value:form.contact,onChange:setField('contact')}),
-          !showContact2&&React.createElement('button',{type:'button',className:'cof-phone2-btn',onClick:()=>setShowContact2(true)},'+ Add a second phone number'),
-          showContact2&&React.createElement('input',{className:'cof-input',type:'tel',placeholder:'Second phone (optional)',value:form.contact2,onChange:setField('contact2'),style:{marginTop:10}})
-        ),
-        React.createElement('div',{className:'cof-field'},
-          React.createElement('label',{className:'cof-label'},'Delivery Address *'),
-          React.createElement('textarea',{className:'cof-textarea',placeholder:'Full address including area, landmark, city…',value:form.address,onChange:setField('address')})
-        ),
-        React.createElement('div',{className:'cof-field',style:{marginBottom:0}},
-          React.createElement('label',{className:'cof-label'},'Additional Notes (optional)'),
-          React.createElement('textarea',{className:'cof-textarea',rows:3,placeholder:'Any special instructions for your order…',value:form.notes,onChange:setField('notes')})
-        )
+      React.createElement('div',{className:'cof-field'},
+        React.createElement('label',{className:'cof-label'},'Delivery Address *'),
+        React.createElement('textarea',{className:'cof-textarea',placeholder:'Full address including area, landmark, city…',value:form.address,onChange:setField('address')})
       ),
-
-      // ORDER SUMMARY
-      selectedBundle&&React.createElement('div',{className:'cof-section'},
-        React.createElement('div',{className:'cof-section-title'},'🧾 Order Summary'),
-        React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:14}},React.createElement('span',{style:{color:'#9aa0b4'}},'Product'),React.createElement('span',{style:{fontWeight:600}},product.name)),
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:14}},React.createElement('span',{style:{color:'#9aa0b4'}},'Package'),React.createElement('span',{style:{fontWeight:600}},selectedBundle.label)),
-          selectedSize&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:14}},React.createElement('span',{style:{color:'#9aa0b4'}},'Size'),React.createElement('span',{style:{fontWeight:600}},selectedSize)),
-          selectedBundle.hasFreeGift&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:13,color:'#2ecc71'}},React.createElement('span',null,'🎁 Free Gift'),React.createElement('span',null,selectedBundle.freeGiftName||'Included')),
-          React.createElement('div',{style:{height:1,background:'rgba(56,67,90,0.5)',margin:'4px 0'}}),
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:18,fontWeight:700}},React.createElement('span',{style:{color:'#9aa0b4'}},'Total'),React.createElement('span',{style:{color:'#f5a623'}},fmtGHC(selectedBundle.sellingPrice||selectedBundle.price||0)))
-        )
-      ),
-
-      React.createElement('button',{className:'cof-submit',onClick:submit,disabled:submitting||!selectedBundle},
-        submitting?React.createElement('span',null,React.createElement('span',{className:'spinner',style:{borderTopColor:'#000'}},' '),'Placing Order…'):'🛒 Place Order Now'
-      ),
-      React.createElement('div',{className:'cof-secure-note'},'🔒','Your information is secure and will only be used to process your order.')
-    )
-  );
+      React.createElement('div',{className:'cof-field',style:{marginBottom:0}},
+        React.createElement('label',{className:'cof-label'},'Additional Notes (optional)'),
+        React.createElement('textarea',{className:'cof-textarea',rows:3,placeholder:'Any special instructions…',value:form.notes,onChange:setField('notes')})
+      )
+    ),
+    // Summary
+    selectedBundle&&React.createElement('div',{className:'cof-section'},
+      React.createElement('div',{className:'cof-section-title'},'🧾 Order Summary'),
+      React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:14}},React.createElement('span',{style:{color:'#9aa0b4'}},'Product'),React.createElement('span',{style:{fontWeight:600}},product.name)),
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:14}},React.createElement('span',{style:{color:'#9aa0b4'}},'Package'),React.createElement('span',{style:{fontWeight:600}},selectedBundle.label)),
+        selectedSize&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:14}},React.createElement('span',{style:{color:'#9aa0b4'}},'Size'),React.createElement('span',{style:{fontWeight:600}},selectedSize)),
+        selectedBundle.hasFreeGift&&React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:13,color:'#2ecc71'}},React.createElement('span',null,'🎁 Free Gift'),React.createElement('span',null,selectedBundle.freeGiftName||'Included')),
+        React.createElement('div',{style:{height:1,background:'rgba(56,67,90,0.5)',margin:'4px 0'}}),
+        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:18,fontWeight:700}},React.createElement('span',{style:{color:'#9aa0b4'}},'Total'),React.createElement('span',{style:{color:'#f5a623'}},fmtGHC(selectedBundle.sellingPrice||selectedBundle.price||0)))
+      )
+    ),
+    React.createElement('button',{className:'cof-submit',onClick:submit,disabled:submitting||!selectedBundle},
+      submitting?React.createElement('span',null,React.createElement('span',{className:'spinner',style:{borderTopColor:'#000'}}),' Placing Order…'):'🛒 Place Order Now'
+    ),
+    React.createElement('div',{className:'cof-secure-note'},'🔒','Your information is secure and will only be used to process your order.')
+  ));
 }
 
+// ════════════════════════════════════════════════════════════════
+// SIGNUP PAGE — works because SITE_API_URL is hardcoded
+// ════════════════════════════════════════════════════════════════
 function SignupPage({type,token}){
   const storedToken=getOrCreateToken(type);
   const [valid,setValid]=useState(false);
@@ -637,15 +612,14 @@ function SignupPage({type,token}){
   const submit=async e=>{
     e.preventDefault();setErr('');
     if(!f.name||!f.username||!f.password||!f.phone){setErr('All required fields must be filled.');return;}
-    if(!API.url){setErr('System not configured. Please contact the administrator.');return;}
     setSaving(true);
     const action=type==='supplier'?'signupSupplier':'signupStaff';
     const r=await API.call({action,data:JSON.stringify(f)});
     setSaving(false);if(r.success)setDone(true);else setErr(r.error||'Signup failed.');
   };
-  if(!API.url)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'alert-warning'},'⚠️ System not configured.')));
+  // Always show form — SITE_API_URL is hardcoded so no "not configured" state
   if(!valid)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'login-error'},'❌ Invalid or expired signup link.')));
-  if(done)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'signup-success'},React.createElement('div',{style:{fontSize:24,marginBottom:8}},'🎉'),React.createElement('div',{style:{fontWeight:700,marginBottom:4}},'Account Created!'),type==='supplier'?'Your supplier account is ready.':'Your account is ready. Contact admin to confirm.',React.createElement('div',{style:{marginTop:12,fontSize:12,color:'var(--text3)'}},`Username: ${f.username}`))));
+  if(done)return React.createElement('div',{className:'signup-wrap'},React.createElement('div',{className:'signup-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'signup-success'},React.createElement('div',{style:{fontSize:24,marginBottom:8}},'🎉'),React.createElement('div',{style:{fontWeight:700,marginBottom:4}},'Account Created!'),type==='supplier'?'Your supplier account is ready.':'Your account is ready.',React.createElement('div',{style:{marginTop:12,fontSize:12,color:'var(--text3)'}},`Username: ${f.username}`))));
   return React.createElement('div',{className:'signup-wrap'},
     saving&&React.createElement(SaveOverlay,{label:'Creating account…'}),
     React.createElement('div',{className:'signup-card'},
@@ -653,7 +627,9 @@ function SignupPage({type,token}){
       React.createElement('div',{className:'login-sub'},type==='supplier'?'Supplier Registration':'Staff Registration'),
       err&&React.createElement('div',{className:'login-error'},err),
       React.createElement('form',{onSubmit:submit},
-        [['name','Full Name *','text'],['username','Username *','text'],['password','Password *','password'],['email','Email Address (recommended)','email'],['phone','Phone Number *','tel']].map(([k,lbl,t])=>React.createElement('div',{key:k,className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},lbl),React.createElement('input',{className:'form-input',type:t,value:f[k],onChange:set(k),required:['name','username','password','phone'].includes(k)}))),
+        [['name','Full Name *','text'],['username','Username *','text'],['password','Password *','password'],['email','Email Address','email'],['phone','Phone Number *','tel']].map(([k,lbl,t])=>
+          React.createElement('div',{key:k,className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},lbl),React.createElement('input',{className:'form-input',type:t,value:f[k],onChange:set(k),required:['name','username','password','phone'].includes(k)}))
+        ),
         !showPhone2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginBottom:14},onClick:()=>setShowPhone2(true)},'+ Add 2nd Phone'),
         showPhone2&&React.createElement('div',{className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},'2nd Phone'),React.createElement('input',{className:'form-input',value:f.phone2,onChange:set('phone2')})),
         React.createElement('button',{className:'btn btn-primary',type:'submit',style:{width:'100%',marginTop:8},disabled:saving},'Create Account')
@@ -662,7 +638,7 @@ function SignupPage({type,token}){
   );
 }
 
-// ─── APP ROOT ──────────────────────────────────────────────────
+// ── APP ROOT ──────────────────────────────────────────────────
 function App(){
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [page,setPage]=useState('dashboard');
@@ -670,7 +646,6 @@ function App(){
   const urlParams=useMemo(()=>new URLSearchParams(window.location.search),[]);
   const signupType=urlParams.get('signup');
   const signupToken=urlParams.get('token');
-  // NEW: customer order form detection
   const viewMode=urlParams.get('view');
   const productParam=urlParams.get('product');
 
@@ -678,12 +653,25 @@ function App(){
   const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
   const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
 
-  // Customer order form — no auth needed
+  // Customer order form — no auth needed, works for customers
   if(viewMode==='order'){
-    return React.createElement(ThemeProvider,null,React.createElement(CustomerOrderForm,{productName:productParam||''}),React.createElement(ToastContainer));
+    return React.createElement(ThemeProvider,null,
+      React.createElement(CustomerOrderForm,{productName:productParam||''}),
+      React.createElement(ToastContainer)
+    );
   }
-  if(signupType&&signupToken){return React.createElement(ThemeProvider,null,React.createElement(SignupPage,{type:signupType,token:signupToken}),React.createElement(ToastContainer));}
-  if(!user){return React.createElement(ThemeProvider,null,React.createElement(LoginPage,{onLogin:login}),React.createElement(ToastContainer));}
+  if(signupType&&signupToken){
+    return React.createElement(ThemeProvider,null,
+      React.createElement(SignupPage,{type:signupType,token:signupToken}),
+      React.createElement(ToastContainer)
+    );
+  }
+  if(!user){
+    return React.createElement(ThemeProvider,null,
+      React.createElement(LoginPage,{onLogin:login}),
+      React.createElement(ToastContainer)
+    );
+  }
 
   const isAdmin=user.role==='admin';const isSupplier=user.role==='supplier';
   const isCC=user.role==='customer_care'||user.role==='staff'||user.role==='manager'||user.role==='cc';
@@ -719,7 +707,10 @@ function App(){
       default:             return React.createElement(DashboardPage,ctx);
     }
   }
-  return React.createElement(ThemeProvider,null,React.createElement(AppShell,{user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout},renderPage()),React.createElement(ToastContainer));
+  return React.createElement(ThemeProvider,null,
+    React.createElement(AppShell,{user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout},renderPage()),
+    React.createElement(ToastContainer)
+  );
 }
 
 function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,children}){
@@ -730,10 +721,19 @@ function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,chil
     React.createElement('aside',{className:`sidebar ${sidebarOpen?'open':''}`},
       React.createElement('div',{className:'sidebar-logo'},React.createElement('div',{className:'logo-text'},'Shittu Stores'),React.createElement('div',{className:'logo-sub'},'Business Manager')),
       React.createElement('div',{className:'nav-section'},React.createElement('div',{className:'nav-section-label'},'Menu'),navItems.map(n=>React.createElement('div',{key:n.id,className:`nav-item ${page===n.id?'active':''}`,onClick:()=>nav(n.id),onMouseEnter:()=>prefetchOnHover(n.id)},React.createElement('span',{className:'nav-icon'},n.icon),n.label))),
-      React.createElement('div',{className:'sidebar-footer'},React.createElement('div',{className:'user-pill'},React.createElement('div',{className:'user-avatar'},(user.name||user.username||'?')[0].toUpperCase()),React.createElement('div',null,React.createElement('div',{className:'user-name'},user.name||user.username),React.createElement('div',{className:'user-role'},user.role))),React.createElement('button',{className:'btn btn-secondary btn-sm',style:{width:'100%',marginTop:8},onClick:logout},'Sign Out'))
+      React.createElement('div',{className:'sidebar-footer'},
+        React.createElement('div',{className:'user-pill'},React.createElement('div',{className:'user-avatar'},(user.name||user.username||'?')[0].toUpperCase()),React.createElement('div',null,React.createElement('div',{className:'user-name'},user.name||user.username),React.createElement('div',{className:'user-role'},user.role))),
+        React.createElement('button',{className:'btn btn-secondary btn-sm',style:{width:'100%',marginTop:8},onClick:logout},'Sign Out')
+      )
     ),
     React.createElement('div',{className:'main'},
-      React.createElement('div',{className:'topbar'},React.createElement('button',{className:'hamburger',onClick:()=>setSidebarOpen(o=>!o)},'☰'),React.createElement('div',{className:'topbar-title'},navItems.find(n=>n.id===page)?.label||''),React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},React.createElement('button',{className:'theme-toggle',onClick:toggleTheme},theme==='dark'?'☀️ Light':'🌙 Dark'),!API.url&&React.createElement('span',{style:{fontSize:11,color:'var(--accent)',background:'var(--accent-dim)',padding:'3px 8px',borderRadius:20}},'⚠ Setup Required'))),
+      React.createElement('div',{className:'topbar'},
+        React.createElement('button',{className:'hamburger',onClick:()=>setSidebarOpen(o=>!o)},'☰'),
+        React.createElement('div',{className:'topbar-title'},navItems.find(n=>n.id===page)?.label||''),
+        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
+          React.createElement('button',{className:'theme-toggle',onClick:toggleTheme},theme==='dark'?'☀️ Light':'🌙 Dark')
+        )
+      ),
       React.createElement('div',{className:'content'},children)
     )
   );
@@ -742,29 +742,38 @@ function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,chil
 function LoginPage({onLogin}){
   const [u,setU]=useState('');const [p,setP]=useState('');const [err,setErr]=useState('');const [loading,setLoading]=useState(false);const [showPw,setShowPw]=useState(false);
   const submit=async e=>{
-    e.preventDefault();setErr('');
-    if(!API.url){setErr('System is being set up. Please contact the administrator.');return;}
-    setLoading(true);const r=await API.call({action:'login',username:u,password:p});setLoading(false);
-    if(r.success&&r.data&&!r.data.error)onLogin(r.data);else setErr(r.data?.error||r.error||'Invalid username or password.');
+    e.preventDefault();setErr('');setLoading(true);
+    const r=await API.call({action:'login',username:u,password:p});setLoading(false);
+    if(r.success&&r.data&&!r.data.error)onLogin(r.data);
+    else setErr(r.data?.error||r.error||'Invalid username or password.');
   };
-  return React.createElement('div',{className:'login-wrap'},loading&&React.createElement(SaveOverlay,{label:'Signing in…'}),
-    React.createElement('div',{className:'login-card'},React.createElement('div',{className:'login-logo'},'Shittu Stores'),React.createElement('div',{className:'login-sub'},'E-Commerce Business Manager'),err&&React.createElement('div',{className:'login-error'},err),
+  return React.createElement('div',{className:'login-wrap'},
+    loading&&React.createElement(SaveOverlay,{label:'Signing in…'}),
+    React.createElement('div',{className:'login-card'},
+      React.createElement('div',{className:'login-logo'},'Shittu Stores'),
+      React.createElement('div',{className:'login-sub'},'E-Commerce Business Manager'),
+      err&&React.createElement('div',{className:'login-error'},err),
       React.createElement('form',{onSubmit:submit},
         React.createElement('div',{className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},'Username'),React.createElement('input',{className:'form-input',value:u,onChange:e=>setU(e.target.value),required:true,autoFocus:true,autoComplete:'username'})),
-        React.createElement('div',{className:'form-group',style:{marginBottom:20}},React.createElement('label',{className:'form-label'},'Password'),React.createElement('div',{style:{position:'relative'}},React.createElement('input',{className:'form-input',type:showPw?'text':'password',value:p,onChange:e=>setP(e.target.value),required:true,style:{paddingRight:40},autoComplete:'current-password'}),React.createElement('button',{type:'button',onClick:()=>setShowPw(v=>!v),style:{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--text3)',fontSize:14}},showPw?'🙈':'👁'))),
+        React.createElement('div',{className:'form-group',style:{marginBottom:20}},
+          React.createElement('label',{className:'form-label'},'Password'),
+          React.createElement('div',{style:{position:'relative'}},
+            React.createElement('input',{className:'form-input',type:showPw?'text':'password',value:p,onChange:e=>setP(e.target.value),required:true,style:{paddingRight:40},autoComplete:'current-password'}),
+            React.createElement('button',{type:'button',onClick:()=>setShowPw(v=>!v),style:{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--text3)',fontSize:14}},showPw?'🙈':'👁')
+          )
+        ),
         React.createElement('button',{className:'btn btn-primary',type:'submit',style:{width:'100%'},disabled:loading},'Sign In')
       )
     )
   );
 }
 
-// ─── DASHBOARD ────────────────────────────────────────────────
+// ── DASHBOARD ─────────────────────────────────────────────────
 function DashboardPage({user,isAdmin,isSupplier,isCC}){
   const [adminData,setAdminData]=useState(null);const [adminLoading,setAdminLoading]=useState(false);const [adminError,setAdminError]=useState('');
   const [myData,setMyData]=useState(null);const [myLoading,setMyLoading]=useState(false);const [myError,setMyError]=useState('');
-  useEffect(()=>{if(!isAdmin||!API.url)return;setAdminLoading(true);setAdminError('');API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed');});},[isAdmin]);
-  useEffect(()=>{if(!API.url)return;if(isCC||isSupplier){setMyLoading(true);setMyError('');API.call({action:'getMyDashboard',username:user.username,role:user.role}).then(r=>{setMyLoading(false);if(r.success)setMyData(r.data||{});else setMyError(r.error||'Failed');});}},[user.username,user.role,isCC,isSupplier]);
-  if(!API.url)return React.createElement('div',{className:'setup-banner'},React.createElement('div',null,'⚙️'),React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,color:'var(--accent)',marginBottom:4}},'Setup Required'),React.createElement('div',{style:{color:'var(--text2)',fontSize:13}},'Go to ⚙ Settings → Connection and enter your Google Apps Script URL.')));
+  useEffect(()=>{if(!isAdmin)return;setAdminLoading(true);setAdminError('');API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed');});},[isAdmin]);
+  useEffect(()=>{if(isCC||isSupplier){setMyLoading(true);setMyError('');API.call({action:'getMyDashboard',username:user.username,role:user.role}).then(r=>{setMyLoading(false);if(r.success)setMyData(r.data||{});else setMyError(r.error||'Failed');});}},[user.username,user.role,isCC,isSupplier]);
   if(isAdmin){if(adminLoading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading dashboard…'));if(adminError)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)'}},'❌ '+adminError));return React.createElement(AdminDashboard,{data:adminData||{},reload:()=>{setAdminLoading(true);API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed');});}});}
   if(isSupplier)return React.createElement(SupplierDashboard,{data:myData,loading:myLoading,error:myError,user});
   return React.createElement(StaffDashboard,{data:myData,loading:myLoading,error:myError,user});
@@ -778,7 +787,10 @@ function AdminDashboard({data,reload}){
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Admin Overview'),React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
     React.createElement('div',{className:'stat-grid'},stats.map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))),
-    React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:24}},React.createElement('div',{className:'card'},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},React.createElement('div',{className:'section-title',style:{fontSize:14}},'Orders Per Month'),React.createElement('div',{className:'text-muted'},'Last 6 months')),React.createElement(BarChart,{data:monthlyData.map(m=>({label:m.label,value:m.value})),color:'var(--accent)',height:90})),React.createElement('div',{className:'card'},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},React.createElement('div',{className:'section-title',style:{fontSize:14}},'Deliveries Per Month'),React.createElement('div',{className:'text-muted'},'Last 6 months')),React.createElement(LineChart,{data:monthlyData.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:90}))),
+    React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:24}},
+      React.createElement('div',{className:'card'},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},React.createElement('div',{className:'section-title',style:{fontSize:14}},'Orders Per Month'),React.createElement('div',{className:'text-muted'},'Last 6 months')),React.createElement(BarChart,{data:monthlyData.map(m=>({label:m.label,value:m.value})),color:'var(--accent)',height:90})),
+      React.createElement('div',{className:'card'},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},React.createElement('div',{className:'section-title',style:{fontSize:14}},'Deliveries Per Month'),React.createElement('div',{className:'text-muted'},'Last 6 months')),React.createElement(LineChart,{data:monthlyData.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:90}))
+    ),
     d.staffPayouts&&d.staffPayouts.length>0&&React.createElement('div',{className:'card',style:{marginBottom:20}},React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Staff Payout Summary'),React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Staff','Deliveries','Earned (NGN)','Pending (NGN)','Paid (NGN)'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,d.staffPayouts.map(s=>React.createElement('tr',{key:s.name},React.createElement('td',null,s.name),React.createElement('td',null,s.count||0),React.createElement('td',{className:'profit-positive'},fmtNGN(s.earned)),React.createElement('td',{className:sp(s.pending)>0?'profit-negative':'td-mono'},fmtNGN(s.pending)),React.createElement('td',{className:'td-mono',style:{color:'var(--green)'}},fmtNGN(s.paid||0)))))))),
     d.supplierSummary&&d.supplierSummary.length>0&&React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Supplier Summary'),React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Supplier','Orders','Delivered','Pending','Revenue (GHC)'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,d.supplierSummary.map(s=>React.createElement('tr',{key:s.name},React.createElement('td',null,s.name),React.createElement('td',null,s.orders),React.createElement('td',null,s.delivered),React.createElement('td',null,s.pending),React.createElement('td',{className:'profit-positive'},fmtGHC(s.revenueGHC))))))))
   );
@@ -789,7 +801,11 @@ function StaffDashboard({data,loading,error,user}){
   if(error)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)',marginBottom:8}},'❌ '+error));
   const d=data||{};const totalEarned=sp(d.earnedNGN)||0;const paidOut=sp(d.paidOutNGN)||0;const unpaidBalance=Math.max(0,totalEarned-paidOut);
   const stats=[{label:'Orders I Processed',value:d.ordersContacted||0,sub:'Orders I contacted',cls:'blue'},{label:'Delivered',value:d.delivered||0,sub:'Confirmed deliveries',cls:'green'},{label:'Pending',value:d.pending||0,sub:'In progress',cls:'orange'},{label:'Canceled',value:d.canceled||0,sub:'Lost orders',cls:'red'},{label:'My Earnings (NGN)',value:fmtNGN(d.earnedNGN),sub:'₦2,000 per delivered+paid order',cls:'green'},{label:'Pending Payout',value:fmtNGN(d.pendingPayoutNGN),sub:'Delivered but not yet paid',cls:'orange'},{label:'Total Paid Out',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},{label:'Unpaid Balance',value:fmtNGN(unpaidBalance),sub:'Owed to you',cls:'purple'},];
-  return React.createElement('div',null,React.createElement('div',{className:'section-title',style:{marginBottom:16}},`Welcome back, ${user.name||user.username} 👋`),!d.ordersContacted&&React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 Your stats appear here once you start marking orders as Contacted.'),React.createElement('div',{className:'stat-grid'},stats.map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))));
+  return React.createElement('div',null,
+    React.createElement('div',{className:'section-title',style:{marginBottom:16}},`Welcome back, ${user.name||user.username} 👋`),
+    !d.ordersContacted&&React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 Your stats appear here once you start marking orders as Contacted.'),
+    React.createElement('div',{className:'stat-grid'},stats.map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub))))
+  );
 }
 function SupplierDashboard({data,loading,error,user}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
@@ -799,7 +815,7 @@ function SupplierDashboard({data,loading,error,user}){
   return React.createElement('div',null,React.createElement('div',{className:'section-title',style:{marginBottom:16}},`Welcome, ${user.name||user.username} 👋`),React.createElement('div',{className:'stat-grid'},stats.map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))));
 }
 
-// ─── ORDERS PAGE ──────────────────────────────────────────────
+// ── ORDERS PAGE ───────────────────────────────────────────────
 function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const [orders,setOrders]=useState([]);const [loading,setLoading]=useState(true);const [products,setProducts]=useState([]);const [staffList,setStaffList]=useState([]);const [showModal,setShowModal]=useState(false);const [editing,setEditing]=useState(null);const [search,setSearch]=useState('');const [statusFilter,setStatusFilter]=useState('');const [contactFilter,setContactFilter]=useState('');const [payFilter,setPayFilter]=useState('');const [contactingOrder,setContactingOrder]=useState(null);const [saving,setSaving]=useState(false);
   const load=useCallback(async()=>{setLoading(true);const params={action:'getOrders'};if(isSupplier)params.supplierUsername=user.username;const [or,pr,sf]=await Promise.all([API.call(params),API.call({action:'getProducts'}),API.call({action:'getStaff'})]);if(or.success)setOrders(or.data||[]);if(pr.success)setProducts(pr.data||[]);if(sf.success)setStaffList(sf.data||[]);setLoading(false);},[isSupplier,user.username]);
@@ -856,7 +872,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
   const isCustom=f.bundleLabel==='__custom__'||f.isCustom;
   const selectedBundle=useMemo(()=>{if(isCustom||!f.bundleLabel)return null;return bundles.find(b=>b.label===f.bundleLabel)||null;},[bundles,f.bundleLabel,isCustom]);
   const pickBundle=sel=>{if(sel==='__custom__'){setF(p=>({...p,bundleLabel:'__custom__',isCustom:true,qty:'',sellingPrice:'',costOfProduct:'',deliveryPrice:'',paymentStatus:'Unpaid'}));return;}const b=bundles.find(x=>x.label===sel);if(!b)return;const su=readList(prod?.supplierUsernames||prod?.supplierUsername);setF(p=>({...p,bundleLabel:b.label,qty:b.qty,sellingPrice:b.sellingPrice||b.price||'',costOfProduct:b.costPrice||b.cost||'',isCustom:false,supplierUsername:su[0]||p.supplierUsername||''}));};
-  const validate=()=>{if(!f.customerName){toast('Customer name required','error');return false;}if(!f.contact){toast('Contact phone required','error');return false;}if(!f.address){toast('Delivery address required','error');return false;}if(!f.product){toast('Please select a product','error');return false;}if(bundles.length>0&&!f.bundleLabel){toast('Please select a bundle/package','error');return false;}if(sizes.length>0&&!f.size){toast('Please select a size','error');return false;}if(isCustom&&(!f.qty||!f.notes)){toast('Qty and notes are required for custom orders','error');return false;}return true;};
+  const validate=()=>{if(!f.customerName){toast('Customer name required','error');return false;}if(!f.contact){toast('Contact phone required','error');return false;}if(!f.address){toast('Delivery address required','error');return false;}if(!f.product){toast('Please select a product','error');return false;}if(bundles.length>0&&!f.bundleLabel){toast('Please select a bundle/package','error');return false;}if(sizes.length>0&&!f.size){toast('Please select a size','error');return false;}if(isCustom&&(!f.qty||!f.notes)){toast('Qty and notes required for custom orders','error');return false;}return true;};
   const save=async()=>{if(!validate())return;setSaving(true);if(onSaving)onSaving(true);const payload={...f,bundleLabel:isCustom?`Custom x${f.qty}`:f.bundleLabel};const r=isEdit?await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(payload)}):await API.call({action:'addOrder',order:JSON.stringify(payload)});setSaving(false);if(onSaving)onSaving(false);if(r.success){const saved=isEdit?payload:{...payload,id:r.data?.id||('tmp_'+Date.now())};onSave(saved);}else toast(r.error||'Save failed','error');};
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal modal-lg'},
@@ -880,7 +896,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
   );
 }
 
-// ─── STAFF ANALYTICS ──────────────────────────────────────────
+// ── STAFF ANALYTICS ───────────────────────────────────────────
 function StaffAnalyticsPage({user}){
   const [orders,setOrders]=useState([]);const [payoutRecords,setPayoutRecords]=useState([]);const [loading,setLoading]=useState(true);const [period,setPeriod]=useState('all');const [selMonth,setSelMonth]=useState(()=>today().slice(0,7));const [selYear,setSelYear]=useState(()=>today().slice(0,4));
   useEffect(()=>{setLoading(true);Promise.all([API.call({action:'getOrders'}),API.call({action:'getPayoutRecords'})]).then(([or,pr])=>{if(or.success)setOrders(or.data||[]);if(pr.success)setPayoutRecords(pr.data||[]);setLoading(false);});},[]);
@@ -893,11 +909,11 @@ function StaffAnalyticsPage({user}){
     React.createElement('div',{className:'card',style:{marginBottom:20}},React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},React.createElement('div',{className:'tabs',style:{margin:0}},[{id:'all',label:'All Time'},{id:'year',label:'By Year'},{id:'month',label:'By Month'}].map(t=>React.createElement('div',{key:t.id,className:`tab ${period===t.id?'active':''}`,onClick:()=>setPeriod(t.id)},t.label))),period==='month'&&React.createElement('input',{type:'month',className:'form-input',style:{width:160},value:selMonth,onChange:e=>setSelMonth(e.target.value)}),period==='year'&&React.createElement('select',{className:'form-select',style:{width:120},value:selYear,onChange:e=>setSelYear(e.target.value)},years.map(y=>React.createElement('option',{key:y,value:y},y))))),
     myOrders.length===0&&React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 No orders found with your username as the contacting staff.'),
     React.createElement('div',{className:'stat-grid'},[{label:'Orders Contacted',value:filtered.length,sub:'In selected period',cls:'blue'},{label:'Delivered',value:delivered.length,sub:'Successfully delivered',cls:'green'},{label:'Delivered & Paid',value:deliveredPaid.length,sub:'Eligible for payout',cls:'green'},{label:'Pending',value:pending.length,sub:'In progress',cls:'orange'},{label:'Canceled',value:canceled.length,sub:'Lost orders',cls:'red'},{label:'Period Conversion',value:`${filteredConv}%`,sub:'Delivered+paid ÷ Contacted',cls:'purple'},{label:'All-Time Conversion',value:`${allTimeConv}%`,sub:'Across all orders',cls:'orange'},{label:'Revenue Generated (GHC)',value:fmtGHC(revenueGHC),sub:'From paid deliveries',cls:'green'},{label:'My Earnings (NGN)',value:fmtNGN(earnings),sub:'₦2,000/delivered+paid',cls:'green'},{label:'Total Paid Out (NGN)',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},{label:'Unpaid Balance (NGN)',value:fmtNGN(unpaidBalance),sub:'Pending from admin',cls:'orange'},].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))),
-    React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Order Status Breakdown'),DELIVERY_STATUSES.map(s=>{const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:s,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}})));})
-  ));
+    React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Order Status Breakdown'),DELIVERY_STATUSES.map(s=>{const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:s,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}})));}))
+  );
 }
 
-// ─── FINANCIALS ────────────────────────────────────────────────
+// ── FINANCIALS ────────────────────────────────────────────────
 function FinancialsPage({isAdmin}){
   const [tab,setTab]=useState('overview');const [orders,setOrders]=useState([]);const [expenses,setExpenses]=useState([]);const [withdrawals,setWithdrawals]=useState([]);const [payoutRecords,setPayoutRecords]=useState([]);const [loading,setLoading]=useState(true);const [showWDModal,setShowWDModal]=useState(false);const [saving,setSaving]=useState(false);
   const load=useCallback(async()=>{setLoading(true);const [or,ex,wd,pr]=await Promise.all([API.call({action:'getOrders'}),API.call({action:'getExpenses'}),API.call({action:'getWithdrawals'}),API.call({action:'getPayoutRecords'})]);if(or.success)setOrders(or.data||[]);if(ex.success)setExpenses(ex.data||[]);if(wd.success)setWithdrawals(wd.data||[]);if(pr.success)setPayoutRecords(pr.data||[]);setLoading(false);},[]);
@@ -928,7 +944,7 @@ function WithdrawalModal({onSave,onClose,onSaving}){
   return React.createElement('div',{className:'modal-overlay'},React.createElement('div',{className:'modal',style:{maxWidth:480}},React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Log Withdrawal'),React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),React.createElement('div',{className:'modal-body'},React.createElement('div',{className:'alert-info'},'Enter GHC sent and NGN received — rate is calculated automatically.'),React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Date'),React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'GHC Sent'),React.createElement('input',{className:'form-input',type:'number',value:f.amountGHC,onChange:set('amountGHC')}))),React.createElement('div',{className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},'NGN Received'),React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')})),rate&&React.createElement('div',{className:'alert-info',style:{marginBottom:14}},`📊 Exchange Rate: ₦${rate} per GH₵1`),React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Notes'),React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes')}))),React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving||!f.amountGHC||!f.amountNGN},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving…'):'Log Withdrawal'))));
 }
 
-// ─── ANALYTICS ─────────────────────────────────────────────────
+// ── ANALYTICS ─────────────────────────────────────────────────
 function AnalyticsPage({user,isAdmin,isSupplier}){
   const [orders,setOrders]=useState([]);const [loading,setLoading]=useState(true);const [period,setPeriod]=useState('month');const [selMonth,setSelMonth]=useState(()=>today().slice(0,7));const [selYear,setSelYear]=useState(()=>today().slice(0,4));
   useEffect(()=>{const params={action:'getOrders'};if(isSupplier)params.supplierUsername=user.username;API.call(params).then(r=>{if(r.success)setOrders(r.data||[]);setLoading(false);});},[isSupplier,user.username]);
@@ -942,10 +958,14 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
     React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Analytics')),
     React.createElement('div',{className:'card',style:{marginBottom:20}},React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},React.createElement('div',{className:'tabs',style:{margin:0}},[{id:'all',label:'All Time'},{id:'year',label:'By Year'},{id:'month',label:'By Month'}].map(t=>React.createElement('div',{key:t.id,className:`tab ${period===t.id?'active':''}`,onClick:()=>setPeriod(t.id)},t.label))),period==='month'&&React.createElement('input',{type:'month',className:'form-input',style:{width:160},value:selMonth,onChange:e=>setSelMonth(e.target.value)}),period==='year'&&React.createElement('select',{className:'form-select',style:{width:120},value:selYear,onChange:e=>setSelYear(e.target.value)},years.map(y=>React.createElement('option',{key:y,value:y},y))))),
     React.createElement('div',{className:'stat-grid'},[{label:'Total Orders',value:filtered.length,cls:'blue'},{label:'Delivered',value:byStatus['Delivered']||0,cls:'green'},{label:'Canceled',value:byStatus['Canceled']||0,cls:'red'},{label:'Conversion Rate',value:`${convRate}%`,cls:'orange'},{label:'Revenue (GHC)',value:fmtGHC(rev),cls:'green'},{label:'Gross Profit (GHC)',value:fmtGHC(rev-cost),cls:'orange'},].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value)))),
-    React.createElement('div',{className:'form-grid form-grid-2'},React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Orders by Status'),DELIVERY_STATUSES.map(s=>{const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:s,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}})));})),React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Top Products'),byProduct.length===0?React.createElement('div',{className:'text-muted'},'No data for selected period'):byProduct.map(([name,c])=>{const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:name,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',{style:{maxWidth:'65%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},name),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--blue)'}})));}))));
+    React.createElement('div',{className:'form-grid form-grid-2'},
+      React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Orders by Status'),DELIVERY_STATUSES.map(s=>{const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:s,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}})));})),
+      React.createElement('div',{className:'card'},React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Top Products'),byProduct.length===0?React.createElement('div',{className:'text-muted'},'No data for selected period'):byProduct.map(([name,c])=>{const pct=filtered.length>0?Math.round(c/filtered.length*100):0;return React.createElement('div',{key:name,style:{marginBottom:10}},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',{style:{maxWidth:'65%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},name),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--blue)'}})));}))
+    )
+  );
 }
 
-// ─── EXPENSES ──────────────────────────────────────────────────
+// ── EXPENSES ──────────────────────────────────────────────────
 function ExpensesPage({isAdmin}){
   const {data,loading,reload}=useData('getExpenses');const [showAdd,setShowAdd]=useState(false);const [f,setF]=useState({date:today(),category:'Ad Cost',amountNGN:'',notes:''});const [saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const add=async()=>{setSaving(true);const r=await API.call({action:'addExpense',expense:JSON.stringify(f)});setSaving(false);if(r.success){toast('Expense added ✓');setShowAdd(false);setF({date:today(),category:'Ad Cost',amountNGN:'',notes:''});reload();}else toast(r.error,'error');};
@@ -961,7 +981,7 @@ function ExpensesPage({isAdmin}){
   );
 }
 
-// ─── PRODUCTS ──────────────────────────────────────────────────
+// ── PRODUCTS ──────────────────────────────────────────────────
 function ProductsPage(){
   const {data,loading,reload}=useData('getProducts');const [showModal,setShowModal]=useState(false);const [editing,setEditing]=useState(null);const list=data||[];
   const del=async p=>{if(!confirm(`Delete ${p.name}?`))return;await API.call({action:'deleteProduct',id:p.id});toast('Deleted');reload();};
@@ -1006,7 +1026,7 @@ function ProductModal({product,onSave,onClose}){
   );
 }
 
-// ─── STAFF PAGE ────────────────────────────────────────────────
+// ── STAFF PAGE ────────────────────────────────────────────────
 function StaffPage(){
   const {data,loading,reload}=useData('getStaff');const [showModal,setShowModal]=useState(false);const [editing,setEditing]=useState(null);const staff=data||[];const [saving,setSaving]=useState(false);
   const del=async s=>{if(s.role==='admin'){toast('Cannot delete admin account','error');return;}if(!confirm(`Remove ${s.name||s.username}?`))return;const r=await API.call({action:'deleteStaff',id:s.id});if(r.success){toast('Staff removed');reload();}else toast(r.error||'Failed','error');};
@@ -1016,7 +1036,10 @@ function StaffPage(){
   const revokeStaffToken=()=>{const t=revokeToken('staff');setStaffToken(t);toast('Signup link revoked');};
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving…'}),
-    React.createElement('div',{className:'card',style:{marginBottom:20}},React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Staff Self-Registration Link'),React.createElement('div',{className:'text-muted'},'Share this link so staff can create their own accounts.')),React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeStaffToken},'↺ Revoke Link')),React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},signupUrl),React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy'))),
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Staff Self-Registration Link'),React.createElement('div',{className:'text-muted'},'Share this link so staff can create their own accounts.')),React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeStaffToken},'↺ Revoke Link')),
+      React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},signupUrl),React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy'))
+    ),
     React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'Staff Access')),React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Staff')),
     loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):staff.filter(s=>s.role!=='admin').length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No staff added yet')):
     React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Phone','Email','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,staff.filter(s=>s.role!=='admin').map(s=>React.createElement('tr',{key:s.id||s.username},React.createElement('td',null,s.name||'-'),React.createElement('td',{className:'td-mono'},s.username),React.createElement('td',null,React.createElement('div',null,s.phone||'—'),s.phone2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},s.phone2)),React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},'✉ '+s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'Edit'),React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')))))))),
@@ -1032,7 +1055,7 @@ function StaffModal({staff,onSave,onClose,onSaving}){
   );
 }
 
-// ─── SUPPLIERS PAGE ────────────────────────────────────────────
+// ── SUPPLIERS PAGE ────────────────────────────────────────────
 function SuppliersPage(){
   const [suppliers,setSuppliers]=useState([]);const [products,setProducts]=useState([]);const [loading,setLoading]=useState(true);const [showModal,setShowModal]=useState(false);const [editing,setEditing]=useState(null);const [saving,setSaving]=useState(false);
   const [supplierToken,setSupplierToken]=useState(()=>getOrCreateToken('supplier'));const [copied,setCopied]=useState(false);
@@ -1046,7 +1069,10 @@ function SuppliersPage(){
   const safeSuppliers=Array.isArray(suppliers)?suppliers:[];const safeProducts=Array.isArray(products)?products:[];
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving supplier…'}),
-    React.createElement('div',{className:'card',style:{marginBottom:20}},React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Supplier Self-Registration Link'),React.createElement('div',{className:'text-muted'},'Share this link so suppliers can register themselves.')),React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeSupplierToken},'↺ Revoke Link')),React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},signupUrl),React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy'))),
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Supplier Self-Registration Link'),React.createElement('div',{className:'text-muted'},'Share this link so suppliers can register themselves.')),React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeSupplierToken},'↺ Revoke Link')),
+      React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},signupUrl),React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy'))
+    ),
     React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Suppliers'),React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Supplier')),
     loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):safeSuppliers.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No suppliers yet')):
     React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Phone','Email','Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,safeSuppliers.map(s=>{const assigned=readList(s?.assignedProducts||s?.products||[]);const hasNoProducts=assigned.length===0||assigned.every(x=>!x);return React.createElement('tr',{key:s?.id||s?.username},React.createElement('td',null,s?.name||'-'),React.createElement('td',{className:'td-mono'},s?.username||'-'),React.createElement('td',null,React.createElement('div',null,s?.phone||'—'),s?.phone2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},s.phone2)),React.createElement('td',null,s?.email?React.createElement('span',{className:'badge badge-email-set'},'✉ '+s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),React.createElement('td',null,hasNoProducts?React.createElement('span',{className:'badge badge-unassigned'},'⚠ None assigned'):React.createElement('span',null,assigned.join(', '))),React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s?.active)?'badge-delivered':'badge-canceled'}`},isActive(s?.active)?'Active':'Inactive')),React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},hasNoProducts?'✏ Assign Products':'✏ Edit'),React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete'))));})))),
@@ -1068,7 +1094,7 @@ function SupplierModal({supplier,products,onSave,onClose,onSaving}){
   );
 }
 
-// ─── SETTINGS PAGE ─────────────────────────────────────────────
+// ── SETTINGS PAGE ─────────────────────────────────────────────
 function SettingsPage({user,isAdmin,onUserUpdate}){
   const [tab,setTab]=useState('connection');
   const [url,setUrl]=useState(()=>localStorage.getItem('apiUrl')||SITE_API_URL||'');
@@ -1082,17 +1108,16 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
   const [emailSettings,setEmailSettings]=useState(null);
   const [loadingEmails,setLoadingEmails]=useState(false);
   const [copied,setCopied]=useState('');
-  // NEW: per-product links
   const [products,setProducts]=useState([]);
   const [loadingProducts,setLoadingProducts]=useState(false);
 
-  // base URL for order form — same file, just ?view=order
+  // Base order form URL — same single file, uses ?view=order
   const baseOrderUrl=`${window.location.origin}${window.location.pathname}?view=order`;
-  const getProductUrl=(productName)=>`${baseOrderUrl}&product=${encodeURIComponent(productName)}`;
-  const iframeCode=(productName)=>{const u=getProductUrl(productName);return `<iframe src="${u}" width="100%" height="720" frameborder="0" style="border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.1);" allow="clipboard-write"></iframe>`;};
-  const scriptCode=(productName)=>{const u=getProductUrl(productName);return `<script>\n  (function(){\n    var f=document.createElement('iframe');\n    f.src='${u.replace(/'/g,"\\'")}';f.width='100%';f.height='720';\n    f.frameBorder='0';f.style.cssText='border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.15);';\n    document.currentScript.parentNode.replaceChild(f,document.currentScript);\n  })();\n<\/script>`;};
-
+  const getProductUrl=(pName)=>`${baseOrderUrl}&product=${encodeURIComponent(pName)}`;
+  const iframeCode=(pName)=>{const u=getProductUrl(pName);return `<iframe src="${u}" width="100%" height="720" frameborder="0" style="border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);" allow="clipboard-write"></iframe>`;};
+  const scriptCode=(pName)=>{const u=getProductUrl(pName);return `<script>\n(function(){\n  var f=document.createElement('iframe');\n  f.src='${u.replace(/'/g,"\\'")}';f.width='100%';f.height='720';\n  f.frameBorder='0';f.style.cssText='border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.15);';\n  document.currentScript.parentNode.replaceChild(f,document.currentScript);\n})();\n<\/script>`;};
   const copyText=(text,key)=>{navigator.clipboard.writeText(text).then(()=>{setCopied(key);setTimeout(()=>setCopied(''),2500);});};
+
   const saveUrl=()=>{API.setUrl(url.trim());setSavedUrl(true);toast('API URL saved');setTimeout(()=>setSavedUrl(false),1800);};
   const savePixel=()=>{localStorage.setItem('ssPixelId',pixelId.trim());setSavedPixel(true);toast('Pixel ID saved');setTimeout(()=>setSavedPixel(false),1800);};
   const saveMyEmail=async()=>{if(!myEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(myEmail)){toast('Enter a valid email address','error');return;}setSavingEmail(true);const r=await API.call({action:'saveEmail',username:user.username,role:user.role,email:myEmail});setSavingEmail(false);if(r.success){toast('Email saved ✓');if(onUserUpdate)onUserUpdate({...user,email:myEmail});}else toast(r.error||'Failed','error');};
@@ -1100,7 +1125,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
   useEffect(()=>{if(isAdmin&&tab==='emails')loadEmailSettings();},[tab,isAdmin]);
   useEffect(()=>{if(isAdmin&&tab==='embed'&&products.length===0){setLoadingProducts(true);API.call({action:'getProducts'}).then(r=>{setLoadingProducts(false);if(r.success)setProducts((r.data||[]).filter(p=>isActive(p.active)));});}},[tab,isAdmin,products.length]);
   const setPwField=k=>e=>setPw(p=>({...p,[k]:e.target.value}));
-  const changePassword=async()=>{if(!pw.oldPassword){toast('Enter your current password','error');return;}if(!pw.newPassword){toast('Enter a new password','error');return;}if(pw.newPassword!==pw.confirmPassword){toast('New passwords do not match','error');return;}setSavingPw(true);const r=await API.call({action:'changePassword',username:user.username,role:user.role,oldPassword:pw.oldPassword,newPassword:pw.newPassword});setSavingPw(false);if(r.success){toast('Password changed ✓');setPw({oldPassword:'',newPassword:'',confirmPassword:''});}else toast(r.error||'Failed','error');};
+  const changePassword=async()=>{if(!pw.oldPassword){toast('Enter current password','error');return;}if(!pw.newPassword){toast('Enter new password','error');return;}if(pw.newPassword!==pw.confirmPassword){toast('Passwords do not match','error');return;}setSavingPw(true);const r=await API.call({action:'changePassword',username:user.username,role:user.role,oldPassword:pw.oldPassword,newPassword:pw.newPassword});setSavingPw(false);if(r.success){toast('Password changed ✓');setPw({oldPassword:'',newPassword:'',confirmPassword:''});}else toast(r.error||'Failed','error');};
 
   const settingsTabs=[
     {id:'connection',label:'🔌 Connection'},{id:'email',label:'📧 My Email'},{id:'password',label:'🔑 Password'},
@@ -1113,30 +1138,45 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
 
     tab==='connection'&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:4}},'Database Connection'),
-      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Paste your Google Apps Script deployment URL.'),
-      !SITE_API_URL&&React.createElement('div',{className:'alert-warning',style:{marginBottom:12}},'⚠️ No default URL embedded. Edit SITE_API_URL at the top of index.html.'),
-      SITE_API_URL&&React.createElement('div',{className:'alert-success',style:{marginBottom:12}},'✅ Default URL is configured — all users can log in without setup.'),
-      React.createElement('div',{className:'form-group',style:{marginBottom:12}},React.createElement('label',{className:'form-label'},'Apps Script URL'),React.createElement('input',{className:'form-input',value:url,onChange:e=>setUrl(e.target.value),placeholder:'https://script.google.com/macros/s/…/exec'})),
-      React.createElement('button',{className:'btn btn-primary',onClick:saveUrl},savedUrl?'✓ Saved':'Save URL')
+      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'The API URL is hardcoded in this file for all users. Use this field to temporarily override it for testing.'),
+      React.createElement('div',{className:'alert-success',style:{marginBottom:12}},'✅ API URL is hardcoded — all users (staff, suppliers, customers) can use the app without any setup.'),
+      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+        React.createElement('label',{className:'form-label'},'Override URL (Admin only)'),
+        React.createElement('input',{className:'form-input',value:url,onChange:e=>setUrl(e.target.value),placeholder:'https://script.google.com/macros/s/…/exec'})
+      ),
+      React.createElement('div',{style:{display:'flex',gap:8}},
+        React.createElement('button',{className:'btn btn-primary',onClick:saveUrl},savedUrl?'✓ Saved':'Save Override'),
+        localStorage.getItem('apiUrl')&&React.createElement('button',{className:'btn btn-danger',onClick:()=>{API.setUrl(null);setUrl(SITE_API_URL);toast('Override cleared — using default URL');}}, 'Clear Override')
+      )
     ),
 
     tab==='email'&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:4}},'My Email Address'),
       React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Receive order notifications via email.'),
       user.email&&React.createElement('div',{className:'alert-success',style:{marginBottom:16}},`✅ Current email: ${user.email}`),
-      React.createElement('div',{className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},'Email Address'),React.createElement('div',{className:'email-row'},React.createElement('input',{className:'form-input',type:'email',value:myEmail,onChange:e=>setMyEmail(e.target.value),placeholder:'your@email.com'}),React.createElement('button',{className:'btn btn-primary',onClick:saveMyEmail,disabled:savingEmail},savingEmail?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving…'):'Save Email'))),
-      React.createElement('div',{className:'alert-info'},'📧 You\'ll receive a confirmation email and order notifications once saved.')
+      React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+        React.createElement('label',{className:'form-label'},'Email Address'),
+        React.createElement('div',{className:'email-row'},
+          React.createElement('input',{className:'form-input',type:'email',value:myEmail,onChange:e=>setMyEmail(e.target.value),placeholder:'your@email.com'}),
+          React.createElement('button',{className:'btn btn-primary',onClick:saveMyEmail,disabled:savingEmail},savingEmail?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving…'):'Save Email')
+        )
+      ),
+      React.createElement('div',{className:'alert-info'},'📧 You\'ll receive order notifications once saved.')
     ),
 
     tab==='password'&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:16}},'Change Password'),
-      React.createElement('div',{className:'form-grid form-grid-3'},React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Current Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.oldPassword,onChange:setPwField('oldPassword')})),React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'New Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.newPassword,onChange:setPwField('newPassword')})),React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Confirm New'),React.createElement('input',{className:'form-input',type:'password',value:pw.confirmPassword,onChange:setPwField('confirmPassword')}))),
+      React.createElement('div',{className:'form-grid form-grid-3'},
+        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Current Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.oldPassword,onChange:setPwField('oldPassword')})),
+        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'New Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.newPassword,onChange:setPwField('newPassword')})),
+        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Confirm New'),React.createElement('input',{className:'form-input',type:'password',value:pw.confirmPassword,onChange:setPwField('confirmPassword')}))
+      ),
       React.createElement('div',{style:{display:'flex',justifyContent:'flex-end',marginTop:14}},React.createElement('button',{className:'btn btn-primary',onClick:changePassword,disabled:savingPw},'Change Password'))
     ),
 
     tab==='emails'&&isAdmin&&React.createElement('div',null,
       React.createElement('div',{className:'section-header'},React.createElement('div',null,React.createElement('div',{className:'section-title'},'Email Notification Status')),React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:loadEmailSettings},'↻ Refresh')),
-      React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'ℹ️ Everyone with an email set receives order notifications automatically.'),
+      React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'Everyone with an email set receives order notifications automatically.'),
       loadingEmails?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
       emailSettings?React.createElement('div',null,
         React.createElement('div',{className:'card',style:{marginBottom:16}},React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'Staff Emails'),emailSettings.staff&&emailSettings.staff.length>0?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,React.createElement('thead',null,React.createElement('tr',null,['Name','Role','Email','Status'].map(h=>React.createElement('th',{key:h},h)))),React.createElement('tbody',null,emailSettings.staff.map(s=>React.createElement('tr',{key:s.username},React.createElement('td',null,s.name||s.username),React.createElement('td',null,React.createElement('span',{className:'badge badge-processing'},s.role)),React.createElement('td',{className:'td-mono',style:{fontSize:12}},s.email||'—'),React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},'✅ Set'):React.createElement('span',{className:'badge badge-email-missing'},'❌ Missing'))))))):React.createElement('div',{className:'text-muted'},'No staff yet.')),
@@ -1145,51 +1185,46 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
     ),
 
     tab==='pixel'&&isAdmin&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:4}},'Facebook Pixel Configuration'),
-      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Your Pixel ID is injected into the customer order form to track conversions.'),
-      React.createElement('div',{className:'form-group',style:{marginBottom:12}},React.createElement('label',{className:'form-label'},'Facebook Pixel ID'),React.createElement('div',{className:'pixel-row'},React.createElement('input',{className:'form-input',value:pixelId,onChange:e=>setPixelId(e.target.value),placeholder:'e.g. 1234567890123456',style:{flex:1}}),React.createElement('span',{className:`pixel-indicator ${pixelId?'pixel-on':'pixel-off'}`},pixelId?'🟢 Active':'🔴 Not set')),React.createElement('button',{className:'btn btn-primary',onClick:savePixel},savedPixel?'✓ Saved':'Save Pixel ID')),
-      React.createElement('div',{className:'divider'}),
-      React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:10}},'Events Tracked Automatically'),
-      ['PageView — when customer opens the form','ViewContent — when customer views a product','AddToCart — when customer selects a bundle','InitiateCheckout — when customer clicks Place Order','Purchase — when order is submitted successfully'].map(ev=>React.createElement('div',{key:ev,style:{display:'flex',gap:8,alignItems:'center',fontSize:13,marginBottom:8,color:'var(--text2)'}},React.createElement('span',{style:{color:'var(--green)'}},'✓'),ev))
+      React.createElement('div',{className:'section-title',style:{marginBottom:4}},'Facebook Pixel'),
+      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Injected into the order form to track conversions.'),
+      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+        React.createElement('label',{className:'form-label'},'Facebook Pixel ID'),
+        React.createElement('div',{className:'pixel-row'},
+          React.createElement('input',{className:'form-input',value:pixelId,onChange:e=>setPixelId(e.target.value),placeholder:'e.g. 1234567890123456',style:{flex:1}}),
+          React.createElement('span',{className:`pixel-indicator ${pixelId?'pixel-on':'pixel-off'}`},pixelId?'🟢 Active':'🔴 Not set')
+        ),
+        React.createElement('button',{className:'btn btn-primary',onClick:savePixel},savedPixel?'✓ Saved':'Save Pixel ID')
+      )
     ),
 
     tab==='embed'&&isAdmin&&React.createElement('div',null,
       React.createElement('div',{className:'section-header'},
-        React.createElement('div',null,
-          React.createElement('div',{className:'section-title'},'Customer Order Forms'),
-          React.createElement('div',{className:'section-sub'},'Each product has its own dedicated order form URL')
-        ),
+        React.createElement('div',null,React.createElement('div',{className:'section-title'},'Customer Order Forms'),React.createElement('div',{className:'section-sub'},'Built into this same file — no separate file needed')),
         React.createElement('a',{href:baseOrderUrl,target:'_blank',className:'btn btn-blue btn-sm'},'🔗 View All-Products Form')
       ),
-      React.createElement('div',{className:'alert-info',style:{marginBottom:20}},'✅ These order forms are built into this same file — no separate file needed. They work on GitHub Pages as-is. Each link opens a beautiful customer-facing form showing only that product\'s packages and sizes.'),
+      React.createElement('div',{className:'alert-success',style:{marginBottom:20}},'✅ These links work on GitHub Pages as-is. Share them directly or embed via iFrame on Systeme.io. Each product has its own dedicated form showing only its packages and sizes.'),
 
-      // General / all-products form
+      // General form
       React.createElement('div',{className:'form-url-wrap'},
         React.createElement('div',{className:'form-url-title'},'🌐 General Order Form (all products)'),
-        React.createElement('div',{className:'text-muted',style:{marginBottom:8,fontSize:12}},'Shows a product picker — customer selects their product first.'),
         React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},baseOrderUrl),React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(baseOrderUrl,'general')},copied==='general'?'✓ Copied!':'Copy'))
       ),
 
-      // Per-product forms
       React.createElement('div',{className:'section-divider'},'Per-Product Order Forms'),
       loadingProducts?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-      products.length===0?React.createElement('div',{className:'alert-warning'},'No active products found. Add products first via the Products page.'):
+      products.length===0?React.createElement('div',{className:'alert-warning'},'No active products yet. Add products first.'):
       products.map(p=>{
         let bundles=[];try{bundles=JSON.parse(p.bundles||'[]');}catch{}
-        const pUrl=getProductUrl(p.name);
-        const pKey=encodeURIComponent(p.name);
+        const pUrl=getProductUrl(p.name);const pKey=encodeURIComponent(p.name);
         return React.createElement('div',{key:p.id,className:'product-link-row'},
           React.createElement('div',{className:'product-link-name'},
-            React.createElement('span',{style:{fontSize:16}},p.name),
+            React.createElement('span',null,p.name),
             bundles.length>0&&React.createElement('span',{className:'badge badge-processing'},`${bundles.length} packages`),
             (p.hasSizes===true||p.hasSizes==='true')&&React.createElement('span',{className:'badge badge-confirmed'},'Sizes'),
             React.createElement('a',{href:pUrl,target:'_blank',className:'btn btn-blue btn-sm',style:{marginLeft:'auto'}},'Preview ↗')
           ),
           p.description&&React.createElement('div',{className:'product-link-meta'},p.description),
-          React.createElement('div',{className:'copy-link-box'},
-            React.createElement('span',{style:{flex:1,fontSize:10}},pUrl),
-            React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(pUrl,`link-${pKey}`)},copied===`link-${pKey}`?'✓ Copied!':'Copy Link')
-          ),
+          React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1,fontSize:10}},pUrl),React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(pUrl,`link-${pKey}`)},copied===`link-${pKey}`?'✓ Copied!':'Copy Link')),
           React.createElement('div',{style:{display:'flex',gap:8,marginTop:8,flexWrap:'wrap'}},
             React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>copyText(iframeCode(p.name),`iframe-${pKey}`)},copied===`iframe-${pKey}`?'✓ Copied!':'📋 Copy iFrame'),
             React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>copyText(scriptCode(p.name),`script-${pKey}`)},copied===`script-${pKey}`?'✓ Copied!':'⚡ Copy Script')
@@ -1199,13 +1234,18 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
 
       React.createElement('div',{className:'card',style:{marginTop:20}},
         React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'How to embed on Systeme.io'),
-        ['Go to your Systeme.io funnel page editor.','Add a new section → insert an "HTML" or "Custom code" block.','Click "Copy iFrame" next to the product you want to embed.','Paste the code into the HTML block and publish.','Orders appear in your Orders page tagged as "🌐 Form".'].map((step,i)=>React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10,alignItems:'flex-start'}},React.createElement('div',{style:{width:22,height:22,borderRadius:'50%',background:'var(--accent)',color:'#000',fontWeight:700,fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},i+1),React.createElement('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.6}},step)))
+        ['Go to your Systeme.io funnel page editor.','Add a new section → insert an "HTML" or "Custom code" block.','Click "Copy iFrame" next to the product you want to embed.','Paste the code into the HTML block and publish.','Orders appear in your Orders page tagged as "🌐 Form".'].map((step,i)=>
+          React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10,alignItems:'flex-start'}},
+            React.createElement('div',{style:{width:22,height:22,borderRadius:'50%',background:'var(--accent)',color:'#000',fontWeight:700,fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},i+1),
+            React.createElement('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.6}},step)
+          )
+        )
       )
     )
   );
 }
 
-// ─── ERROR BOUNDARY & BOOT ─────────────────────────────────────
+// ── ERROR BOUNDARY & BOOT ─────────────────────────────────────
 class ErrorBoundary extends React.Component{
   constructor(props){super(props);this.state={error:null};}
   static getDerivedStateFromError(error){return{error};}

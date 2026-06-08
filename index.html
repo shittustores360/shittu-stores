@@ -285,9 +285,9 @@ tr:hover td{background:var(--bg3)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
 const SITE_API_URL = 'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec';
-
+ 
 const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext} = React;
-
+ 
 // ─── CACHE ────────────────────────────────────────────────────
 const _cache={};const _inflight={};const CACHE_TTL=90000;
 function cacheGet(k){const c=_cache[k];return(c&&Date.now()-c.ts<CACHE_TTL)?c:null;}
@@ -309,7 +309,7 @@ const BUST_MAP={
   signupSupplier:['getSuppliers'],signupStaff:['getStaff'],
   saveEmail:['getStaff','getSuppliers','getEmailSettings'],
 };
-
+ 
 const API={
   get url(){return localStorage.getItem('apiUrl')||SITE_API_URL||'';}
   ,setUrl(u){if(u){localStorage.setItem('apiUrl',u);}else{localStorage.removeItem('apiUrl');}}
@@ -335,7 +335,7 @@ const API={
   }
   ,prefetch(action){const url=this.url;if(!url)return;const params={action};const key=JSON.stringify(params);const c=cacheGet(key);if(c)return;this.call(params);}
 };
-
+ 
 // ─── THANK-YOU URL STORE ─────────────────────────────────────
 // FIX: Consistent naming — getTyUrl / setTyUrl are the global helpers
 function getTyUrl(productName){return localStorage.getItem('ssTyUrl_'+productName)||'';}
@@ -343,7 +343,7 @@ function setTyUrl(productName,url){
   if(url&&url.trim()){localStorage.setItem('ssTyUrl_'+productName,url.trim());}
   else{localStorage.removeItem('ssTyUrl_'+productName);}
 }
-
+ 
 // ─── THEME ────────────────────────────────────────────────────
 const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
 function ThemeProvider({children}){
@@ -356,7 +356,7 @@ function ThemeProvider({children}){
   const toggleTheme=useCallback(()=>setTheme(t=>t==='dark'?'light':'dark'),[]);
   return React.createElement(ThemeCtx.Provider,{value:{theme,toggleTheme}},children);
 }
-
+ 
 // ─── TOAST ────────────────────────────────────────────────────
 const _toastListeners=[];
 function toast(msg,type='success'){_toastListeners.forEach(fn=>fn(msg,type));}
@@ -377,20 +377,20 @@ function SaveOverlay({label}){
     )
   );
 }
-
+ 
 // ─── CONSTANTS ────────────────────────────────────────────────
 const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
 const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
 const STAFF_PAYOUT_NGN=2000;
-
+ 
 // ─── SIGNUP TOKENS ────────────────────────────────────────────
 function getSignupTokens(){try{return JSON.parse(localStorage.getItem('ssSignupTokens')||'{}');}catch{return{};}}
 function saveSignupTokens(t){localStorage.setItem('ssSignupTokens',JSON.stringify(t));}
 function genToken(){return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);}
 function getOrCreateToken(type){const t=getSignupTokens();if(!t[type]){t[type]=genToken();saveSignupTokens(t);}return t[type];}
 function revokeToken(type){const t=getSignupTokens();t[type]=genToken();saveSignupTokens(t);return t[type];}
-
+ 
 // ─── UTILS ────────────────────────────────────────────────────
 function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
 function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
@@ -408,7 +408,7 @@ function supplierOwnsOrder(order,products,user){
   const productSuppliers=readList(product?.supplierUsernames||product?.suppliers);
   return order.supplierUsername===user.username||order.supplier===user.username||product?.supplierUsername===user.username||productSuppliers.includes(user.username)||assigned.includes(order.product);
 }
-
+ 
 // ─── COPY CUSTOMER DETAILS ────────────────────────────────────
 function formatCustomerDetails(order){
   const lines=[
@@ -430,7 +430,7 @@ function formatCustomerDetails(order){
   ].filter(Boolean);
   return lines.join('\n');
 }
-
+ 
 function CopyDetailsBtn({order}){
   const[copied,setCopied]=useState(false);
   const copy=()=>{
@@ -455,14 +455,14 @@ function CopyDetailsBtn({order}){
     title:'Copy customer details'
   },copied?'✓ Copied':'📋 Copy');
 }
-
+ 
 function statusBadge(s){
   const m={'Delivered':'badge-delivered','Canceled':'badge-canceled','Rescheduled':'badge-rescheduled','Not Confirmed':'badge-notconfirmed','No Response':'badge-noresponse','Processing':'badge-processing','Confirmed':'badge-confirmed'};
   return React.createElement('span',{className:`badge ${m[s]||'badge-noresponse'}`},s||'—');
 }
 function contactBadge(s){return React.createElement('span',{className:`badge ${s==='Contacted'?'badge-contacted':'badge-uncontacted'}`},s||'Uncontacted');}
 function payBadge(s){return React.createElement('span',{className:`badge ${s==='Paid'?'badge-paid':'badge-unpaid'}`},s||'Unpaid');}
-
+ 
 // ─── DATA HOOK ────────────────────────────────────────────────
 function useData(action,enabled=true){
   const[data,setData]=useState(()=>{if(!enabled||!API.url)return null;const c=cacheGet(JSON.stringify({action}));return c?c.v:null;});
@@ -477,7 +477,7 @@ function useData(action,enabled=true){
   useEffect(()=>{load();},[load]);
   return{data,loading,error,reload:()=>load(true),setData};
 }
-
+ 
 // ─── CHARTS ───────────────────────────────────────────────────
 function BarChart({data,color='var(--accent)',height=80}){
   if(!data||data.length===0)return null;
@@ -508,7 +508,7 @@ function LineChart({data,color='var(--accent)',height=80}){
     data.map((d,i)=>React.createElement('text',{key:i,x:pts[i][0],y:height-1,textAnchor:'middle',fontSize:5,fill:'var(--text3)'},d.label))
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // CUSTOMER ORDER FORM — thank-you page redirect after order
 // ═══════════════════════════════════════════════════════════════
@@ -525,7 +525,7 @@ function CustomerOrderForm({productName}){
   const[submitErr,setSubmitErr]=useState('');
   const[done,setDone]=useState(false);
   const[redirecting,setRedirecting]=useState(false);
-
+ 
   useEffect(()=>{
     API.call({action:'getProducts'}).then(r=>{
       setLoadingProducts(false);
@@ -540,14 +540,14 @@ function CustomerOrderForm({productName}){
       }else{setLoadErr(r.error||'Could not load products.');}
     });
   },[productName]);
-
+ 
   const bundles=useMemo(()=>{try{return JSON.parse(product?.bundles||'[]');}catch{return[];}},[product]);
   const sizes=useMemo(()=>{
     if(!product||(product.hasSizes!==true&&product.hasSizes!=='true'))return[];
     try{return JSON.parse(product?.sizes||'[]');}catch{return[];}
   },[product]);
   const setField=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
-
+ 
   const validate=()=>{
     if(!form.customerName.trim()){setSubmitErr('Please enter your full name.');return false;}
     if(!form.contact.trim()){setSubmitErr('Please enter your phone number.');return false;}
@@ -556,7 +556,7 @@ function CustomerOrderForm({productName}){
     if(sizes.length>0&&!selectedSize){setSubmitErr('Please select a size.');return false;}
     return true;
   };
-
+ 
   const submit=async()=>{
     setSubmitErr('');if(!validate())return;setSubmitting(true);
     const su=readList(product?.supplierUsernames||product?.supplierUsername);
@@ -583,32 +583,32 @@ function CustomerOrderForm({productName}){
       }
     }else{setSubmitErr(r.error||'Something went wrong. Please try again.');}
   };
-
+ 
   const brandHeader=React.createElement('div',{className:'cof-brand'},
     React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores'),
     React.createElement('div',{className:'cof-brand-tagline'},'Fast & Reliable Delivery')
   );
-
+ 
   if(loadingProducts)return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},brandHeader,
       React.createElement('div',{className:'cof-loading'},
         React.createElement('div',{className:'cof-spinner'}),
         React.createElement('div',{style:{color:'#5a6070',fontSize:14}},'Loading store...'))));
-
+ 
   if(loadErr)return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},brandHeader,
       React.createElement('div',{className:'cof-no-product'},
         React.createElement('div',{className:'cof-no-product-icon'},'⚠️'),
         React.createElement('div',{className:'cof-no-product-title'},'Store Unavailable'),
         React.createElement('div',{className:'cof-no-product-sub'},loadErr))));
-
+ 
   if(productName&&!product)return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},brandHeader,
       React.createElement('div',{className:'cof-no-product'},
         React.createElement('div',{className:'cof-no-product-icon'},'🔍'),
         React.createElement('div',{className:'cof-no-product-title'},'Product Not Found'),
         React.createElement('div',{className:'cof-no-product-sub'},'This product link may be invalid or the product has been removed.'))));
-
+ 
   // No specific product — show product picker
   if(!productName&&!product){
     return React.createElement('div',{className:'cof-root'},
@@ -629,7 +629,7 @@ function CustomerOrderForm({productName}){
       )
     );
   }
-
+ 
   // Success / done screen
   if(done){
     const tyUrl=product&&getTyUrl(product.name);
@@ -654,7 +654,7 @@ function CustomerOrderForm({productName}){
       )
     );
   }
-
+ 
   // Main order form
   return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},
@@ -728,7 +728,7 @@ function CustomerOrderForm({productName}){
     )
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // SIGNUP PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -786,7 +786,7 @@ function SignupPage({type,token}){
     )
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // GMAIL EMAIL SENDER — uses Anthropic API + Gmail MCP
 // No API key needed — handled by the proxy
@@ -818,7 +818,7 @@ async function sendEmailViaGmail(to,subject,body){
     return{success:sent,message:(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(' ')};
   }catch(e){return{success:false,error:e.message};}
 }
-
+ 
 // ─── MAIN APP ──────────────────────────────────────────────────
 function App(){
   const[sidebarOpen,setSidebarOpen]=useState(false);
@@ -832,7 +832,7 @@ function App(){
   const login=useCallback(u=>{setUser(u);localStorage.setItem('ssUser',JSON.stringify(u));},[]);
   const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
   const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
-
+ 
   // Customer-facing order form
   if(viewMode==='order'){
     return React.createElement(ThemeProvider,null,
@@ -851,13 +851,13 @@ function App(){
       React.createElement(LoginPage,{onLogin:login}),
       React.createElement(ToastContainer));
   }
-
+ 
   const isAdmin=user.role==='admin';
   const isSupplier=user.role==='supplier';
   const isCC=!isAdmin&&!isSupplier;
   const perms=user.permissions==='all'?['all']:(user.permissions||'').split(',').map(s=>s.trim()).filter(Boolean);
   const can=p=>isAdmin||perms.includes('all')||perms.includes(p);
-
+ 
   const navItems=[
     {id:'dashboard',icon:'📊',label:'Dashboard',show:true},
     {id:'orders',icon:'📦',label:'Orders',show:isAdmin||isSupplier||can('view_orders')},
@@ -870,9 +870,9 @@ function App(){
     {id:'suppliers',icon:'🚚',label:'Suppliers',show:isAdmin},
     {id:'settings',icon:'⚙️',label:'Settings',show:true},
   ].filter(x=>x.show);
-
+ 
   const ctx={user,isAdmin,isSupplier,isCC,can};
-
+ 
   function renderPage(){
     switch(page){
       case 'dashboard':   return React.createElement(DashboardPage,ctx);
@@ -888,13 +888,13 @@ function App(){
       default:            return React.createElement(DashboardPage,ctx);
     }
   }
-
+ 
   return React.createElement(ThemeProvider,null,
     React.createElement(AppShell,{user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout},renderPage()),
     React.createElement(ToastContainer)
   );
 }
-
+ 
 function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,children}){
   const{theme,toggleTheme}=useContext(ThemeCtx);
   const prefetchOnHover=(id)=>{
@@ -929,7 +929,7 @@ function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,chil
     )
   );
 }
-
+ 
 function LoginPage({onLogin}){
   const[u,setU]=useState('');const[p,setP]=useState('');const[err,setErr]=useState('');const[loading,setLoading]=useState(false);const[showPw,setShowPw]=useState(false);
   const submit=async e=>{
@@ -959,7 +959,7 @@ function LoginPage({onLogin}){
     )
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -984,7 +984,7 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
   if(isSupplier)return React.createElement(SupplierDashboard,{data:myData,loading:myLoading,error:myError,user,reload:reloadMy});
   return React.createElement(StaffDashboard,{data:myData,loading:myLoading,error:myError,user,reload:reloadMy});
 }
-
+ 
 function AdminDashboard({data,reload}){
   const d=data||{};
   const monthlyData=useMemo(()=>{
@@ -1060,7 +1060,7 @@ function AdminDashboard({data,reload}){
     )
   );
 }
-
+ 
 function StaffDashboard({data,loading,error,user,reload}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading your dashboard...'));
   if(error)return React.createElement('div',null,
@@ -1091,7 +1091,7 @@ function StaffDashboard({data,loading,error,user,reload}){
       React.createElement('div',{className:'stat-sub'},s.sub))))
   );
 }
-
+ 
 function SupplierDashboard({data,loading,error,user,reload}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
   if(error)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)'}},'❌ '+error),React.createElement('button',{className:'btn btn-secondary',style:{marginTop:8},onClick:reload},'Retry'));
@@ -1115,7 +1115,7 @@ function SupplierDashboard({data,loading,error,user,reload}){
         React.createElement('div',{className:'stat-sub'},s.sub))))
   );
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // ORDERS PAGE — with Copy Details button per row
 // ═══════════════════════════════════════════════════════════════
@@ -1132,7 +1132,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const[payFilter,setPayFilter]=useState('');
   const[contactingOrder,setContactingOrder]=useState(null);
   const[saving,setSaving]=useState(false);
-
+ 
   const load=useCallback(async()=>{
     setLoading(true);
     const params={action:'getOrders'};
@@ -1143,9 +1143,9 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     if(sf.success)setStaffList(sf.data||[]);
     setLoading(false);
   },[isSupplier,user.username]);
-
+ 
   useEffect(()=>{load();},[load]);
-
+ 
   const filtered=useMemo(()=>{
     let r=orders.filter(o=>supplierOwnsOrder(o,products,user));
     if(statusFilter)r=r.filter(o=>statusOf(o)===statusFilter);
@@ -1154,33 +1154,33 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     if(search){const s=search.toLowerCase();r=r.filter(o=>(o.customerName||'').toLowerCase().includes(s)||(o.contact||'').includes(s)||(o.contact2||'').includes(s)||(o.product||'').toLowerCase().includes(s));}
     return r;
   },[orders,statusFilter,contactFilter,payFilter,search,products,user]);
-
+ 
   const updateField=useCallback(async(order,updates)=>{
     const updated={...order,...updates};
     setOrders(prev=>prev.map(o=>o.id===order.id?updated:o));
     const r=await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(updated)});
     if(!r.success){setOrders(prev=>prev.map(o=>o.id===order.id?order:o));toast(r.error||'Update failed','error');}
   },[]);
-
+ 
   const del=async o=>{
     if(!confirm(`Delete order for ${o.customerName}?`))return;
     setOrders(prev=>prev.filter(x=>x.id!==o.id));
     const r=await API.call({action:'deleteOrder',id:o.id});
     if(r.success)toast('Order deleted');else{setOrders(prev=>[...prev,o]);toast(r.error||'Delete failed','error');}
   };
-
+ 
   const markContacted=useCallback(async(order,byUsername)=>{
     await updateField(order,{contactStatus:'Contacted',contactedBy:byUsername});
     toast('Marked as contacted ✓');
   },[updateField]);
-
+ 
   const canCreate=!isSupplier&&(isAdmin||can('add_orders'));
   const canEdit=isAdmin||can('edit_orders');
   const canDelete=isAdmin||can('delete_orders');
   const canContact=(isAdmin||isCC)&&!isSupplier;
   const canChangeDelivery=isAdmin||isSupplier;
   const canChangePay=isAdmin||isSupplier;
-
+ 
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving order...'}),
     React.createElement('div',{className:'section-header'},
@@ -1287,7 +1287,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     })
   );
 }
-
+ 
 function DeliveryPriceInput({order,onUpdate}){
   const[val,setVal]=useState(order.deliveryPrice||'');
   useEffect(()=>setVal(order.deliveryPrice||''),[order.deliveryPrice]);
@@ -1298,7 +1298,7 @@ function DeliveryPriceInput({order,onUpdate}){
     onBlur:e=>{const v=e.target.value;if(v!==String(order.deliveryPrice||''))onUpdate(order,{deliveryPrice:v});}
   });
 }
-
+ 
 function ContactedByModal({staffList,onConfirm,onClose}){
   const[sel,setSel]=useState('');
   const activeStaff=staffList.filter(s=>isActive(s.active)&&s.role!=='supplier'&&s.role!=='admin');
@@ -1323,7 +1323,7 @@ function ContactedByModal({staffList,onConfirm,onClose}){
     )
   );
 }
-
+ 
 function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
   const isEdit=!!order;
   const[f,setF]=useState(()=>order?{...order}:{
@@ -1348,20 +1348,20 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
       setF(p=>({...p,bundleLabel:'',qty:'',sellingPrice:'',costOfProduct:'',isCustom:false,supplierUsername:su[0]||prod.supplierUsername||''}));
     }
   },[f.product,prod,isEdit]);
-
+ 
   const isCustom=f.bundleLabel==='__custom__'||f.isCustom;
   const selectedBundle=useMemo(()=>{
     if(isCustom||!f.bundleLabel)return null;
     return bundles.find(b=>b.label===f.bundleLabel)||null;
   },[bundles,f.bundleLabel,isCustom]);
-
+ 
   const pickBundle=sel=>{
     if(sel==='__custom__'){setF(p=>({...p,bundleLabel:'__custom__',isCustom:true,qty:'',sellingPrice:'',costOfProduct:'',deliveryPrice:'',paymentStatus:'Unpaid'}));return;}
     const b=bundles.find(x=>x.label===sel);if(!b)return;
     const su=readList(prod?.supplierUsernames||prod?.supplierUsername);
     setF(p=>({...p,bundleLabel:b.label,qty:b.qty,sellingPrice:b.sellingPrice||b.price||'',costOfProduct:b.costPrice||b.cost||'',isCustom:false,supplierUsername:su[0]||p.supplierUsername||''}));
   };
-
+ 
   const validate=()=>{
     if(!f.customerName){toast('Customer name required','error');return false;}
     if(!f.contact){toast('Contact phone required','error');return false;}
@@ -1372,7 +1372,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
     if(isCustom&&!f.qty){toast('Qty required for custom orders','error');return false;}
     return true;
   };
-
+ 
   const save=async()=>{
     if(!validate())return;setSaving(true);if(onSaving)onSaving(true);
     const payload={...f,bundleLabel:isCustom?`Custom x${f.qty}`:f.bundleLabel,source:f.source||'manager'};
@@ -1383,7 +1383,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
     if(r.success){const saved=isEdit?payload:{...payload,id:r.data?.id||('tmp_'+Date.now())};onSave(saved);}
     else toast(r.error||'Save failed','error');
   };
-
+ 
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal modal-lg'},
       React.createElement('div',{className:'modal-header'},
@@ -1449,7 +1449,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
     )
   );
 }
-
+ 
 // ─── STAFF ANALYTICS ──────────────────────────────────────────
 function StaffAnalyticsPage({user}){
   const[orders,setOrders]=useState([]);
@@ -1458,7 +1458,7 @@ function StaffAnalyticsPage({user}){
   const[period,setPeriod]=useState('all');
   const[selMonth,setSelMonth]=useState(()=>today().slice(0,7));
   const[selYear,setSelYear]=useState(()=>today().slice(0,4));
-
+ 
   useEffect(()=>{
     setLoading(true);
     Promise.all([API.call({action:'getOrders'}),API.call({action:'getPayoutRecords'})]).then(([or,pr])=>{
@@ -1467,20 +1467,20 @@ function StaffAnalyticsPage({user}){
       setLoading(false);
     });
   },[]);
-
+ 
   const username=user.username;
   const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);
   const years=useMemo(()=>{
     const s=new Set(myOrders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));
     return[...s].sort().reverse();
   },[myOrders]);
-
+ 
   const filtered=useMemo(()=>{
     if(period==='month')return myOrders.filter(o=>String(o.date||'').startsWith(selMonth));
     if(period==='year')return myOrders.filter(o=>String(o.date||'').startsWith(selYear));
     return myOrders;
   },[myOrders,period,selMonth,selYear]);
-
+ 
   const delivered=filtered.filter(o=>statusOf(o)==='Delivered');
   const deliveredPaid=delivered.filter(o=>paymentOf(o)==='Paid');
   const pending=filtered.filter(o=>!['Delivered','Canceled'].includes(statusOf(o)));
@@ -1494,9 +1494,9 @@ function StaffAnalyticsPage({user}){
   const allTimeConv=myOrders.length>0?Math.round(allDeliveredPaidAllTime.length/myOrders.length*100):0;
   const filteredConv=filtered.length>0?Math.round(deliveredPaid.length/filtered.length*100):0;
   const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
-
+ 
   if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading analytics...'));
-
+ 
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},
       React.createElement('div',null,
@@ -1542,14 +1542,14 @@ function StaffAnalyticsPage({user}){
       }))
   );
 }
-
+ 
 // ─── FINANCIALS PAGE ───────────────────────────────────────────
 function FinancialsPage({isAdmin}){
   const[tab,setTab]=useState('overview');
   const[orders,setOrders]=useState([]);const[expenses,setExpenses]=useState([]);
   const[withdrawals,setWithdrawals]=useState([]);const[payoutRecords,setPayoutRecords]=useState([]);
   const[loading,setLoading]=useState(true);const[showWDModal,setShowWDModal]=useState(false);const[saving,setSaving]=useState(false);
-
+ 
   const load=useCallback(async()=>{
     setLoading(true);
     const[or,ex,wd,pr]=await Promise.all([API.call({action:'getOrders'}),API.call({action:'getExpenses'}),API.call({action:'getWithdrawals'}),API.call({action:'getPayoutRecords'})]);
@@ -1558,7 +1558,7 @@ function FinancialsPage({isAdmin}){
     setLoading(false);
   },[]);
   useEffect(()=>{load();},[load]);
-
+ 
   const lastExRate=useMemo(()=>{const s=[...withdrawals].sort((a,b)=>new Date(b.date)-new Date(a.date));return s[0]?.exchangeRate?s[0].exchangeRate:null;},[withdrawals]);
   const paid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
   const delivUnpaid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)!=='Paid');
@@ -1570,7 +1570,7 @@ function FinancialsPage({isAdmin}){
   const totalWdGHC=withdrawals.reduce((s,w)=>s+sp(w.amountGHC),0);
   const netProfitNGN=lastExRate!=null?(profitGHC*sp(lastExRate)-totalAdSpend):0;
   const pendRevGHC=delivUnpaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
-
+ 
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Processing...'}),
     React.createElement('div',{className:'tabs'},
@@ -1625,7 +1625,7 @@ function FinancialsPage({isAdmin}){
     )
   );
 }
-
+ 
 function StaffPayoutTable({orders,payoutRecords,isAdmin,onPaid}){
   const byStaff={};
   orders.forEach(o=>{
@@ -1655,7 +1655,7 @@ function StaffPayoutTable({orders,payoutRecords,isAdmin,onPaid}){
     }))
   ));
 }
-
+ 
 function WithdrawalModal({onSave,onClose,onSaving}){
   const[f,setF]=useState({date:today(),amountGHC:'',amountNGN:'',notes:''});const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const rate=f.amountGHC&&f.amountNGN?(sp(f.amountNGN)/sp(f.amountGHC)).toFixed(2):null;
@@ -1681,41 +1681,41 @@ function WithdrawalModal({onSave,onClose,onSaving}){
         React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving||!f.amountGHC||!f.amountNGN},
           saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Log Withdrawal'))));
 }
-
+ 
 // ─── ANALYTICS PAGE ───────────────────────────────────────────
 function AnalyticsPage({user,isAdmin,isSupplier}){
   const[orders,setOrders]=useState([]);const[loading,setLoading]=useState(true);
   const[period,setPeriod]=useState('month');
   const[selMonth,setSelMonth]=useState(()=>today().slice(0,7));
   const[selYear,setSelYear]=useState(()=>today().slice(0,4));
-
+ 
   useEffect(()=>{
     const params={action:'getOrders'};
     if(isSupplier)params.supplierUsername=user.username;
     API.call(params).then(r=>{if(r.success)setOrders(r.data||[]);setLoading(false);});
   },[isSupplier,user.username]);
-
+ 
   const years=useMemo(()=>{
     const s=new Set(orders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));
     return[...s].sort().reverse();
   },[orders]);
-
+ 
   const filtered=useMemo(()=>orders.filter(o=>{
     if(!o.date)return false;
     if(period==='month')return String(o.date||'').startsWith(selMonth);
     if(period==='year')return String(o.date||'').startsWith(selYear);
     return true;
   }),[orders,period,selMonth,selYear]);
-
+ 
   const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
   const byProduct=useMemo(()=>{const m={};filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);},[filtered]);
   const paidD=filtered.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
   const rev=paidD.reduce((s,o)=>s+sp(o.sellingPrice),0);
   const cost=paidD.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);
   const convRate=filtered.length>0?Math.round((byStatus['Delivered']||0)/filtered.length*100):0;
-
+ 
   if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading analytics...'));
-
+ 
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Analytics')),
     React.createElement('div',{className:'card',style:{marginBottom:20}},
@@ -1756,7 +1756,7 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
         })))
   );
 }
-
+ 
 // ─── EXPENSES PAGE ────────────────────────────────────────────
 function ExpensesPage({isAdmin}){
   const{data,loading,reload}=useData('getExpenses');
@@ -1807,7 +1807,7 @@ function ExpensesPage({isAdmin}){
           React.createElement('td',null,isAdmin&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(e)},'🗑')))))))
   );
 }
-
+ 
 // ─── PRODUCTS PAGE ────────────────────────────────────────────
 function ProductsPage(){
   const{data,loading,reload}=useData('getProducts');const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const list=data||[];
@@ -1838,7 +1838,7 @@ function ProductsPage(){
     showModal&&React.createElement(ProductModal,{product:editing,onSave:()=>{setShowModal(false);reload();toast('Saved ✓');},onClose:()=>setShowModal(false)})
   );
 }
-
+ 
 function ProductModal({product,onSave,onClose}){
   const isEdit=!!product;
   const[f,setF]=useState(product?{...product}:{name:'',description:'',active:true,hasSizes:false});
@@ -1858,7 +1858,7 @@ function ProductModal({product,onSave,onClose}){
   const updBundle=(i,k,v)=>setBundles(b=>b.map((x,j)=>j===i?{...x,[k]:v}:x));
   const rmBundle=i=>setBundles(b=>b.filter((_,j)=>j!==i));
   const hasSizes=f.hasSizes===true||f.hasSizes==='true';
-
+ 
   const save=async()=>{
     if(!f.name){toast('Product name required','error');return;}
     if(bundles.some(b=>!b.label)){toast('All bundles need a label','error');return;}
@@ -1868,7 +1868,7 @@ function ProductModal({product,onSave,onClose}){
     const r=isEdit?await API.call({action:'updateProduct',id:product.id,product:JSON.stringify(data)}):await API.call({action:'addProduct',product:JSON.stringify(data)});
     setSaving(false);if(r.success)onSave();else toast(r.error||'Failed','error');
   };
-
+ 
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     saving&&React.createElement(SaveOverlay,{label:'Saving product...'}),
     React.createElement('div',{className:'modal modal-lg'},
@@ -1917,7 +1917,7 @@ function ProductModal({product,onSave,onClose}){
     )
   );
 }
-
+ 
 // ─── STAFF PAGE ────────────────────────────────────────────────
 function StaffPage(){
   const{data,loading,reload}=useData('getStaff');const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const staff=data||[];const[saving,setSaving]=useState(false);
@@ -1952,7 +1952,7 @@ function StaffPage(){
     showModal&&React.createElement(StaffModal,{staff:editing,onSave:()=>{setShowModal(false);reload();toast('Saved');},onClose:()=>setShowModal(false),onSaving:setSaving})
   );
 }
-
+ 
 function StaffModal({staff,onSave,onClose,onSaving}){
   const isEdit=!!staff;const[f,setF]=useState(staff?{...staff}:{name:'',username:'',password:'',phone:'',phone2:'',email:'',role:'customer_care',active:true});const[showPhone2,setShowPhone2]=useState(!!(staff&&staff.phone2));const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const save=async()=>{
@@ -1979,7 +1979,7 @@ function StaffModal({staff,onSave,onClose,onSaving}){
             showPhone2&&React.createElement('input',{className:'form-input',style:{marginTop:6},value:f.phone2||'',onChange:set('phone2')})))),
       React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save'))));
 }
-
+ 
 // ─── SUPPLIERS PAGE ────────────────────────────────────────────
 function SuppliersPage(){
   const[suppliers,setSuppliers]=useState([]);const[products,setProducts]=useState([]);const[loading,setLoading]=useState(true);const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const[saving,setSaving]=useState(false);
@@ -2025,7 +2025,7 @@ function SuppliersPage(){
     showModal&&React.createElement(SupplierModal,{supplier:editing,products:safeProducts,onSave:()=>{setShowModal(false);load();toast('Saved');},onClose:()=>setShowModal(false),onSaving:setSaving})
   );
 }
-
+ 
 function SupplierModal({supplier,products,onSave,onClose,onSaving}){
   const isEdit=!!supplier;const[f,setF]=useState(supplier?{...supplier}:{name:'',username:'',password:'',phone:'',phone2:'',email:'',active:true});const[showPhone2,setShowPhone2]=useState(!!(supplier&&supplier.phone2));const[selected,setSelected]=useState(()=>readList(supplier?.assignedProducts||supplier?.products));const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));const toggleProduct=name=>setSelected(prev=>prev.includes(name)?prev.filter(x=>x!==name):[...prev,name]);
   const save=async()=>{
@@ -2068,7 +2068,7 @@ function SupplierModal({supplier,products,onSave,onClose,onSaving}){
             (products||[]).map(p=>React.createElement('div',{key:p.name,className:`product-chip ${selected.includes(p.name)?'active':''}`,onClick:()=>toggleProduct(p.name)},p.name))))),
       React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save'))));
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS PAGE
 // Tabs: Connection (admin) | My Email | Password | All Emails (admin) | Gmail Send (admin) | Order Forms (admin)
@@ -2090,7 +2090,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
   const[gmailTest,setGmailTest]=useState({to:'',subject:'Test from Shittu Stores',body:'This is a test email from your Shittu Stores business manager.',sending:false,result:''});
   // Thank-you URLs keyed by product name (loaded from localStorage)
   const[tyUrls,setTyUrls]=useState({});
-
+ 
   const baseOrderUrl=`${window.location.origin}${window.location.pathname}?view=order`;
   const getProductUrl=(pName)=>`${baseOrderUrl}&product=${encodeURIComponent(pName)}`;
   const iframeCode=(pName)=>{const u=getProductUrl(pName);return`<iframe src="${u}" width="100%" height="720" frameborder="0" style="border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);" allow="clipboard-write"></iframe>`;};
@@ -2101,9 +2101,9 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
       const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');setCopied(key);setTimeout(()=>setCopied(''),2500);}catch{}document.body.removeChild(ta);
     }
   };
-
+ 
   const saveUrl=()=>{API.setUrl(url.trim());setSavedUrl(true);toast('API URL saved');setTimeout(()=>setSavedUrl(false),1800);};
-
+ 
   const saveMyEmail=async()=>{
     if(!myEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(myEmail)){toast('Enter a valid email address','error');return;}
     setSavingEmail(true);
@@ -2112,10 +2112,10 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
     if(r.success){toast('Email saved ✓');if(onUserUpdate)onUserUpdate({...user,email:myEmail});}
     else toast(r.error||'Failed','error');
   };
-
+ 
   const loadEmailSettings=async()=>{setLoadingEmails(true);const r=await API.call({action:'getEmailSettings'});setLoadingEmails(false);if(r.success)setEmailSettings(r.data);};
   useEffect(()=>{if(isAdmin&&tab==='emails')loadEmailSettings();},[tab,isAdmin]);
-
+ 
   // Load products for embed tab
   useEffect(()=>{
     if(isAdmin&&tab==='embed'&&products.length===0){
@@ -2132,7 +2132,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
       });
     }
   },[tab,isAdmin,products.length]);
-
+ 
   const setPwField=k=>e=>setPw(p=>({...p,[k]:e.target.value}));
   const changePassword=async()=>{
     if(!pw.oldPassword){toast('Enter current password','error');return;}
@@ -2144,21 +2144,21 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
     if(r.success){toast('Password changed ✓');setPw({oldPassword:'',newPassword:'',confirmPassword:''});}
     else toast(r.error||'Failed','error');
   };
-
+ 
   const sendGmailTest=async()=>{
     if(!gmailTest.to){toast('Enter a recipient email','error');return;}
     setGmailTest(s=>({...s,sending:true,result:''}));
     const res=await sendEmailViaGmail(gmailTest.to,gmailTest.subject,gmailTest.body);
     setGmailTest(s=>({...s,sending:false,result:res.success?'✅ Email sent successfully via Gmail!':'❌ '+(res.error||res.message||'Failed to send. Check your Gmail connection.')}));
   };
-
+ 
   // Save thank-you URL for a product to localStorage
   const saveTyUrlForProduct=(productName,url)=>{
     setTyUrl(productName,url);  // global localStorage helper
     setTyUrls(prev=>({...prev,[productName]:url}));
     toast('Thank-you URL saved ✓');
   };
-
+ 
   const settingsTabs=[
     ...(isAdmin?[{id:'connection',label:'🔌 Connection'}]:[]),
     {id:'email',label:'📧 My Email'},
@@ -2169,12 +2169,12 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
       {id:'embed',label:'🔗 Order Forms'},
     ]:[]),
   ];
-
+ 
   return React.createElement('div',null,
     savingPw&&React.createElement(SaveOverlay,{label:'Changing password...'}),
     React.createElement('div',{className:'tabs'},settingsTabs.map(t=>
       React.createElement('div',{key:t.id,className:`tab ${tab===t.id?'active':''}`,onClick:()=>setTab(t.id)},t.label))),
-
+ 
     // ── CONNECTION TAB ───────────────────────────────────────
     tab==='connection'&&isAdmin&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:4}},'Database Connection'),
@@ -2186,7 +2186,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
       React.createElement('div',{style:{display:'flex',gap:8}},
         React.createElement('button',{className:'btn btn-primary',onClick:saveUrl},savedUrl?'✓ Saved':'Save Override'),
         localStorage.getItem('apiUrl')&&React.createElement('button',{className:'btn btn-danger',onClick:()=>{API.setUrl(null);setUrl(SITE_API_URL);toast('Override cleared');}},'Clear Override'))),
-
+ 
     // ── MY EMAIL TAB ─────────────────────────────────────────
     tab==='email'&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:4}},'My Email Address'),
@@ -2198,7 +2198,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
           React.createElement('input',{className:'form-input',type:'email',value:myEmail,onChange:e=>setMyEmail(e.target.value),placeholder:'your@email.com'}),
           React.createElement('button',{className:'btn btn-primary',onClick:saveMyEmail,disabled:savingEmail},savingEmail?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Email'))),
       React.createElement('div',{className:'alert-info'},'📧 You\'ll receive order notifications once your email is saved.')),
-
+ 
     // ── PASSWORD TAB ─────────────────────────────────────────
     tab==='password'&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:16}},'Change Password'),
@@ -2208,7 +2208,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
         React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Confirm New'),React.createElement('input',{className:'form-input',type:'password',value:pw.confirmPassword,onChange:setPwField('confirmPassword')}))),
       React.createElement('div',{style:{display:'flex',justifyContent:'flex-end',marginTop:14}},
         React.createElement('button',{className:'btn btn-primary',onClick:changePassword,disabled:savingPw},'Change Password'))),
-
+ 
     // ── ALL EMAILS TAB ────────────────────────────────────────
     tab==='emails'&&isAdmin&&React.createElement('div',null,
       React.createElement('div',{className:'section-header'},
@@ -2241,7 +2241,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
                   React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},'✅ Set'):React.createElement('span',{className:'badge badge-email-missing'},'❌ Missing')))))))
             :React.createElement('div',{className:'text-muted'},'No suppliers yet.'))
       ):React.createElement('div',{className:'card'},React.createElement('div',{className:'text-muted'},'Click Refresh to load.'))),
-
+ 
     // ── GMAIL SEND TAB ────────────────────────────────────────
     tab==='gmail'&&isAdmin&&React.createElement('div',null,
       React.createElement('div',{className:'gmail-connect-card'},
@@ -2265,7 +2265,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
         React.createElement('button',{className:'btn btn-primary',onClick:sendGmailTest,disabled:gmailTest.sending||!gmailTest.to},
           gmailTest.sending?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Sending...'):'✉️ Send via Gmail')
       )),
-
+ 
     // ── ORDER FORMS (EMBED) TAB ──────────────────────────────
     tab==='embed'&&isAdmin&&React.createElement('div',null,
       React.createElement('div',{className:'section-header'},
@@ -2321,7 +2321,7 @@ function SettingsPage({user,isAdmin,onUserUpdate}){
     )
   );
 }
-
+ 
 // ── THANK-YOU URL INPUT COMPONENT ─────────────────────────────
 // Controlled input that saves to localStorage via the parent callback
 function TyUrlInput({productName,initialValue,onSave}){
@@ -2347,7 +2347,7 @@ function TyUrlInput({productName,initialValue,onSave}){
     val&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:clear,title:'Clear URL'},'✕')
   );
 }
-
+ 
 // ─── ERROR BOUNDARY ───────────────────────────────────────────
 class ErrorBoundary extends React.Component{
   constructor(props){super(props);this.state={error:null};}
@@ -2362,7 +2362,7 @@ class ErrorBoundary extends React.Component{
     return this.props.children;
   }
 }
-
+ 
 // ─── BOOTSTRAP ────────────────────────────────────────────────
 try{
   const root=ReactDOM.createRoot(document.getElementById('root'));

@@ -1948,7 +1948,7 @@ function StaffPage(){
           React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),
           React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
             React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'Edit'),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete'))))))),
+            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')))))))),
     showModal&&React.createElement(StaffModal,{staff:editing,onSave:()=>{setShowModal(false);reload();toast('Saved');},onClose:()=>setShowModal(false),onSaving:setSaving})
   );
 }

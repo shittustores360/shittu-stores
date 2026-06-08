@@ -884,9 +884,9 @@ function AdminDashboard({data,reload}){
     d.supplierSummary&&d.supplierSummary.length>0&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Supplier Summary'),
       React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Supplier','Orders','Delivered','Pending','Revenue (GHC)'].map(h=>React.createElement('th',{key:h},h)))),
+        React.createElement('thead',null,React.createElement('tr',null,['Supplier','Orders','Delivered','Pending','Cost (GHC)'].map(h=>React.createElement('th',{key:h},h)))),
         React.createElement('tbody',null,d.supplierSummary.map(s=>React.createElement('tr',{key:s.name},
-          React.createElement('td',null,s.name),React.createElement('td',null,s.orders),React.createElement('td',null,s.delivered),React.createElement('td',null,s.pending),React.createElement('td',{className:'profit-positive'},fmtGHC(s.revenueGHC))
+          React.createElement('td',null,s.name),React.createElement('td',null,s.orders),React.createElement('td',null,s.delivered),React.createElement('td',null,s.pending),React.createElement('td',{className:'profit-positive'},fmtGHC(s.costGHC))
         )))
       ))
     )
@@ -940,7 +940,7 @@ function SupplierDashboard({data,loading,error,user,reload}){
     {label:'Delivered',value:d.delivered||0,sub:'Successfully delivered',cls:'green'},
     {label:'Pending',value:d.pending||0,sub:'In progress',cls:'orange'},
     {label:'Canceled',value:d.canceled||0,sub:'Lost',cls:'red'},
-    {label:'Revenue Generated (GHC)',value:fmtGHC(d.revenueGHC),sub:'Product cost × delivered',cls:'green'},
+    {label:'Cost of Goods Supplied (GHC)',value:fmtGHC(d.costGHC),sub:'Your product cost (incl. free gifts) per delivered+paid order',cls:'green'},
     {label:'This Month Conv.',value:d.monthlyConv!=null?`${d.monthlyConv}%`:'—',sub:'Delivered ÷ Orders this month',cls:'orange'},
   ];
   return React.createElement('div',null,

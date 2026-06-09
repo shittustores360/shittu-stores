@@ -579,7 +579,10 @@ function CustomerOrderForm({productName}){
       const tyUrl=getTyUrl(product.name);
       if(tyUrl){
         setRedirecting(true);
-        setTimeout(()=>{window.location.href=tyUrl;},2200);
+        setTimeout(()=>{
+          try{window.top.location.href=tyUrl;}
+          catch(e){window.location.href=tyUrl;}
+        },2200);
       }
     }else{setSubmitErr(r.error||'Something went wrong. Please try again.');}
   };

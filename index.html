@@ -95,6 +95,8 @@ tr:hover td{background:var(--bg3)}
 .badge-unassigned{background:rgba(245,166,35,0.15);color:var(--accent)}
 .badge-email-set{background:var(--green-dim);color:var(--green)}
 .badge-email-missing{background:var(--red-dim);color:var(--red)}
+.badge-ready{background:var(--green-dim);color:var(--green)}
+.badge-notready{background:rgba(245,166,35,0.15);color:var(--accent)}
 .form-grid{display:grid;gap:14px}
 .form-grid-2{grid-template-columns:1fr 1fr}.form-grid-3{grid-template-columns:1fr 1fr 1fr}
 .form-group{display:flex;flex-direction:column;gap:5px}
@@ -134,7 +136,6 @@ tr:hover td{background:var(--bg3)}
 @keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:translateX(0);opacity:1}}
 .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:currentColor;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* FIX: Added missing loading-label class */
 .loading-full{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--text3)}
 .loading-full .spinner{width:28px;height:28px;border-width:3px;border-color:var(--border2);border-top-color:var(--accent)}
 .loading-label{font-size:13px;color:var(--text3);margin-top:4px}
@@ -189,21 +190,23 @@ tr:hover td{background:var(--bg3)}
 .cc-info-box{background:linear-gradient(135deg,rgba(52,152,219,0.08),rgba(52,152,219,0.03));border:1px solid rgba(52,152,219,0.2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:20px}
 .cc-info-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .cc-info-text{font-size:12px;color:var(--text2);line-height:1.6}
-/* ── COPY DETAILS BUTTON ── */
 .copy-btn-row{display:flex;gap:3px;margin-top:4px}
 .copy-detail-btn{background:none;border:1px solid var(--border2);border-radius:5px;color:var(--text3);font-size:10px;padding:2px 6px;cursor:pointer;transition:all var(--transition);white-space:nowrap}
 .copy-detail-btn:hover{background:var(--accent-dim);color:var(--accent);border-color:rgba(245,166,35,0.3)}
 .copy-detail-btn.copied{background:var(--green-dim);color:var(--green);border-color:rgba(46,204,113,0.3)}
-/* ── GMAIL CONNECT ── */
-.gmail-connect-card{background:linear-gradient(135deg,rgba(234,67,53,0.06),rgba(234,67,53,0.02));border:1px solid rgba(234,67,53,0.2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px}
-.gmail-connect-title{font-size:13px;font-weight:700;color:#ea4335;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.gmail-connect-card{background:linear-gradient(135deg,rgba(46,204,113,0.06),rgba(46,204,113,0.02));border:1px solid rgba(46,204,113,0.2);border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:16px}
+.gmail-connect-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .gmail-status-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
 .gmail-status-on{background:var(--green-dim);color:var(--green);border:1px solid rgba(46,204,113,0.25)}
 .gmail-status-off{background:var(--red-dim);color:var(--red);border:1px solid rgba(231,76,60,0.25)}
-/* ── THANK-YOU URL ── */
 .ty-url-row{display:flex;gap:8px;align-items:flex-end;margin-top:8px}
 .ty-url-row .form-input{flex:1;font-size:12px}
-/* ── CUSTOMER ORDER FORM ── */
+.reschedule-card{background:linear-gradient(135deg,rgba(52,152,219,0.08),rgba(52,152,219,0.02));border:1px solid rgba(52,152,219,0.2);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:16px}
+.reschedule-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.reschedule-grid{display:flex;flex-wrap:wrap;gap:8px}
+.reschedule-pill{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:7px 12px;font-size:12px;display:flex;flex-direction:column;gap:2px;min-width:96px}
+.reschedule-pill .rp-date{font-weight:700;color:var(--text);font-family:var(--font-mono);font-size:12px}
+.reschedule-pill .rp-count{font-size:11px;color:var(--blue);font-weight:600}
 .cof-root{min-height:100vh;background:linear-gradient(135deg,#0d0f14 0%,#111520 40%,#0a0c10 100%);font-family:'Outfit',sans-serif;color:#e8eaf0;position:relative;overflow-x:hidden}
 .cof-root::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(245,166,35,0.08) 0%,transparent 60%);pointer-events:none;z-index:0}
 .cof-root::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#f5a623,#e8912a,transparent);z-index:10}
@@ -285,9 +288,9 @@ tr:hover td{background:var(--bg3)}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script>
 const SITE_API_URL = 'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec';
- 
+
 const {useState,useEffect,useCallback,useRef,useMemo,createContext,useContext} = React;
- 
+
 // ─── CACHE ────────────────────────────────────────────────────
 const _cache={};const _inflight={};const CACHE_TTL=90000;
 function cacheGet(k){const c=_cache[k];return(c&&Date.now()-c.ts<CACHE_TTL)?c:null;}
@@ -301,6 +304,7 @@ const BUST_MAP={
   updateOrder:['getOrders','getDashboard','getMyDashboard'],
   deleteOrder:['getOrders','getDashboard','getMyDashboard'],
   addProduct:['getProducts'],updateProduct:['getProducts'],deleteProduct:['getProducts'],
+  saveThankYouUrl:['getProducts'],
   addStaff:['getStaff'],updateStaff:['getStaff'],deleteStaff:['getStaff'],
   addSupplier:['getSuppliers'],updateSupplier:['getSuppliers'],deleteSupplier:['getSuppliers'],
   addExpense:['getExpenses'],deleteExpense:['getExpenses'],
@@ -308,8 +312,9 @@ const BUST_MAP={
   addPayoutRecord:['getPayoutRecords','getDashboard','getMyDashboard'],
   signupSupplier:['getSuppliers'],signupStaff:['getStaff'],
   saveEmail:['getStaff','getSuppliers','getEmailSettings'],
+  sendManualEmail:[],
 };
- 
+
 const API={
   get url(){return localStorage.getItem('apiUrl')||SITE_API_URL||'';}
   ,setUrl(u){if(u){localStorage.setItem('apiUrl',u);}else{localStorage.removeItem('apiUrl');}}
@@ -335,15 +340,12 @@ const API={
   }
   ,prefetch(action){const url=this.url;if(!url)return;const params={action};const key=JSON.stringify(params);const c=cacheGet(key);if(c)return;this.call(params);}
 };
- 
-// ─── THANK-YOU URL STORE ─────────────────────────────────────
-// FIX: Consistent naming — getTyUrl / setTyUrl are the global helpers
-function getTyUrl(productName){return localStorage.getItem('ssTyUrl_'+productName)||'';}
-function setTyUrl(productName,url){
-  if(url&&url.trim()){localStorage.setItem('ssTyUrl_'+productName,url.trim());}
-  else{localStorage.removeItem('ssTyUrl_'+productName);}
-}
- 
+
+// ─── THANK-YOU URL ───────────────────────────────────────────
+// Stored on the backend per-product (product.thankYouUrl) so the
+// redirect works inside the embedded iframe on ANY visitor's browser.
+function getTyUrl(product){return (product&&product.thankYouUrl)?String(product.thankYouUrl).trim():'';}
+
 // ─── THEME ────────────────────────────────────────────────────
 const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
 function ThemeProvider({children}){
@@ -356,7 +358,7 @@ function ThemeProvider({children}){
   const toggleTheme=useCallback(()=>setTheme(t=>t==='dark'?'light':'dark'),[]);
   return React.createElement(ThemeCtx.Provider,{value:{theme,toggleTheme}},children);
 }
- 
+
 // ─── TOAST ────────────────────────────────────────────────────
 const _toastListeners=[];
 function toast(msg,type='success'){_toastListeners.forEach(fn=>fn(msg,type));}
@@ -377,20 +379,21 @@ function SaveOverlay({label}){
     )
   );
 }
- 
+
 // ─── CONSTANTS ────────────────────────────────────────────────
 const DELIVERY_STATUSES=['Not Confirmed','Processing','Rescheduled','Confirmed','Delivered','Canceled','No Response'];
 const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
+const READINESS_STATUSES=['Ready for Delivery','Not Ready for Delivery','Cancelled','Rescheduled'];
 const STAFF_PAYOUT_NGN=2000;
- 
+
 // ─── SIGNUP TOKENS ────────────────────────────────────────────
 function getSignupTokens(){try{return JSON.parse(localStorage.getItem('ssSignupTokens')||'{}');}catch{return{};}}
 function saveSignupTokens(t){localStorage.setItem('ssSignupTokens',JSON.stringify(t));}
 function genToken(){return Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10);}
 function getOrCreateToken(type){const t=getSignupTokens();if(!t[type]){t[type]=genToken();saveSignupTokens(t);}return t[type];}
 function revokeToken(type){const t=getSignupTokens();t[type]=genToken();saveSignupTokens(t);return t[type];}
- 
+
 // ─── UTILS ────────────────────────────────────────────────────
 function sp(v){const n=parseFloat(v);return isNaN(n)?0:n;}
 function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
@@ -400,6 +403,7 @@ function today(){return new Date().toISOString().split('T')[0];}
 function isActive(x){return x===true||x==='TRUE'||x==='true';}
 function statusOf(o){return o?.deliveryStatus||o?.status||'Not Confirmed';}
 function paymentOf(o){return o?.paymentStatus||'Unpaid';}
+function readinessOf(o){return o?.readinessStatus||'';}
 function readList(v){if(Array.isArray(v))return v;if(!v)return[];try{const p=JSON.parse(v);return Array.isArray(p)?p:[];}catch{}return String(v).split(',').map(x=>x.trim()).filter(Boolean);}
 function supplierOwnsOrder(order,products,user){
   if(!user||user.role!=='supplier')return true;
@@ -408,7 +412,7 @@ function supplierOwnsOrder(order,products,user){
   const productSuppliers=readList(product?.supplierUsernames||product?.suppliers);
   return order.supplierUsername===user.username||order.supplier===user.username||product?.supplierUsername===user.username||productSuppliers.includes(user.username)||assigned.includes(order.product);
 }
- 
+
 // ─── COPY CUSTOMER DETAILS ────────────────────────────────────
 function formatCustomerDetails(order){
   const lines=[
@@ -425,22 +429,16 @@ function formatCustomerDetails(order){
     `💰 Price:    ${order.sellingPrice?fmtGHC(order.sellingPrice):'—'}`,
     `💳 Payment:  ${paymentOf(order)}`,
     `🚚 Status:   ${statusOf(order)}`,
+    order.readinessStatus?`📦 Readiness: ${order.readinessStatus}`:'',
+    order.rescheduledTo?`📅 Resched.:  ${order.rescheduledTo}`:'',
     `📅 Date:     ${order.date||'—'}`,
     order.notes?`📝 Notes:    ${order.notes}`:'',
   ].filter(Boolean);
   return lines.join('\n');
 }
- 
+
 function CopyDetailsBtn({order}){
   const[copied,setCopied]=useState(false);
-  const copy=()=>{
-    const text=formatCustomerDetails(order);
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text)
-        .then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');})
-        .catch(()=>fallbackCopy(text));
-    }else{fallbackCopy(text);}
-  };
   const fallbackCopy=(text)=>{
     const ta=document.createElement('textarea');
     ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
@@ -449,20 +447,33 @@ function CopyDetailsBtn({order}){
     catch{}
     document.body.removeChild(ta);
   };
+  const copy=()=>{
+    const text=formatCustomerDetails(order);
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text)
+        .then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');})
+        .catch(()=>fallbackCopy(text));
+    }else{fallbackCopy(text);}
+  };
   return React.createElement('button',{
     className:`copy-detail-btn ${copied?'copied':''}`,
     onClick:copy,
     title:'Copy customer details'
   },copied?'✓ Copied':'📋 Copy');
 }
- 
+
 function statusBadge(s){
   const m={'Delivered':'badge-delivered','Canceled':'badge-canceled','Rescheduled':'badge-rescheduled','Not Confirmed':'badge-notconfirmed','No Response':'badge-noresponse','Processing':'badge-processing','Confirmed':'badge-confirmed'};
   return React.createElement('span',{className:`badge ${m[s]||'badge-noresponse'}`},s||'—');
 }
 function contactBadge(s){return React.createElement('span',{className:`badge ${s==='Contacted'?'badge-contacted':'badge-uncontacted'}`},s||'Uncontacted');}
 function payBadge(s){return React.createElement('span',{className:`badge ${s==='Paid'?'badge-paid':'badge-unpaid'}`},s||'Unpaid');}
- 
+function readinessBadge(s){
+  if(!s)return null;
+  const m={'Ready for Delivery':'badge-ready','Not Ready for Delivery':'badge-notready','Cancelled':'badge-canceled','Rescheduled':'badge-rescheduled'};
+  return React.createElement('span',{className:`badge ${m[s]||'badge-noresponse'}`},s);
+}
+
 // ─── DATA HOOK ────────────────────────────────────────────────
 function useData(action,enabled=true){
   const[data,setData]=useState(()=>{if(!enabled||!API.url)return null;const c=cacheGet(JSON.stringify({action}));return c?c.v:null;});
@@ -477,7 +488,7 @@ function useData(action,enabled=true){
   useEffect(()=>{load();},[load]);
   return{data,loading,error,reload:()=>load(true),setData};
 }
- 
+
 // ─── CHARTS ───────────────────────────────────────────────────
 function BarChart({data,color='var(--accent)',height=80}){
   if(!data||data.length===0)return null;
@@ -508,9 +519,9 @@ function LineChart({data,color='var(--accent)',height=80}){
     data.map((d,i)=>React.createElement('text',{key:i,x:pts[i][0],y:height-1,textAnchor:'middle',fontSize:5,fill:'var(--text3)'},d.label))
   );
 }
- 
+
 // ═══════════════════════════════════════════════════════════════
-// CUSTOMER ORDER FORM — thank-you page redirect after order
+// CUSTOMER ORDER FORM — thank-you page redirect (from backend) after order
 // ═══════════════════════════════════════════════════════════════
 function CustomerOrderForm({productName}){
   const[product,setProduct]=useState(null);
@@ -525,7 +536,7 @@ function CustomerOrderForm({productName}){
   const[submitErr,setSubmitErr]=useState('');
   const[done,setDone]=useState(false);
   const[redirecting,setRedirecting]=useState(false);
- 
+
   useEffect(()=>{
     API.call({action:'getProducts'}).then(r=>{
       setLoadingProducts(false);
@@ -540,14 +551,14 @@ function CustomerOrderForm({productName}){
       }else{setLoadErr(r.error||'Could not load products.');}
     });
   },[productName]);
- 
+
   const bundles=useMemo(()=>{try{return JSON.parse(product?.bundles||'[]');}catch{return[];}},[product]);
   const sizes=useMemo(()=>{
     if(!product||(product.hasSizes!==true&&product.hasSizes!=='true'))return[];
     try{return JSON.parse(product?.sizes||'[]');}catch{return[];}
   },[product]);
   const setField=k=>e=>setForm(p=>({...p,[k]:e.target.value}));
- 
+
   const validate=()=>{
     if(!form.customerName.trim()){setSubmitErr('Please enter your full name.');return false;}
     if(!form.contact.trim()){setSubmitErr('Please enter your phone number.');return false;}
@@ -556,7 +567,7 @@ function CustomerOrderForm({productName}){
     if(sizes.length>0&&!selectedSize){setSubmitErr('Please select a size.');return false;}
     return true;
   };
- 
+
   const submit=async()=>{
     setSubmitErr('');if(!validate())return;setSubmitting(true);
     const su=readList(product?.supplierUsernames||product?.supplierUsername);
@@ -567,7 +578,7 @@ function CustomerOrderForm({productName}){
       qty:selectedBundle.qty||1,sellingPrice:selectedBundle.sellingPrice||selectedBundle.price||'',
       costOfProduct:selectedBundle.costPrice||selectedBundle.cost||'',
       size:selectedSize,paymentStatus:'Unpaid',deliveryStatus:'Not Confirmed',
-      contactStatus:'Uncontacted',contactedBy:'',
+      contactStatus:'Uncontacted',contactedBy:'',readinessStatus:'',rescheduledTo:'',
       source:'order_form',createdBy:'order_form',
       supplierUsername:su[0]||product.supplierUsername||''
     };
@@ -575,44 +586,43 @@ function CustomerOrderForm({productName}){
     setSubmitting(false);
     if(r.success){
       setDone(true);
-      // Check for a thank-you redirect URL stored for this product
-      const tyUrl=getTyUrl(product.name);
+      // Redirect to the thank-you page stored on this product (backend), if any.
+      const tyUrl=getTyUrl(product);
       if(tyUrl){
         setRedirecting(true);
         setTimeout(()=>{
           try{window.top.location.href=tyUrl;}
           catch(e){window.location.href=tyUrl;}
-        },2200);
+        },2000);
       }
     }else{setSubmitErr(r.error||'Something went wrong. Please try again.');}
   };
- 
+
   const brandHeader=React.createElement('div',{className:'cof-brand'},
     React.createElement('div',{className:'cof-brand-logo'},'Shittu Stores'),
     React.createElement('div',{className:'cof-brand-tagline'},'Fast & Reliable Delivery')
   );
- 
+
   if(loadingProducts)return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},brandHeader,
       React.createElement('div',{className:'cof-loading'},
         React.createElement('div',{className:'cof-spinner'}),
         React.createElement('div',{style:{color:'#5a6070',fontSize:14}},'Loading store...'))));
- 
+
   if(loadErr)return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},brandHeader,
       React.createElement('div',{className:'cof-no-product'},
         React.createElement('div',{className:'cof-no-product-icon'},'⚠️'),
         React.createElement('div',{className:'cof-no-product-title'},'Store Unavailable'),
         React.createElement('div',{className:'cof-no-product-sub'},loadErr))));
- 
+
   if(productName&&!product)return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},brandHeader,
       React.createElement('div',{className:'cof-no-product'},
         React.createElement('div',{className:'cof-no-product-icon'},'🔍'),
         React.createElement('div',{className:'cof-no-product-title'},'Product Not Found'),
         React.createElement('div',{className:'cof-no-product-sub'},'This product link may be invalid or the product has been removed.'))));
- 
-  // No specific product — show product picker
+
   if(!productName&&!product){
     return React.createElement('div',{className:'cof-root'},
       React.createElement('div',{className:'cof-wrap'},brandHeader,
@@ -632,10 +642,9 @@ function CustomerOrderForm({productName}){
       )
     );
   }
- 
-  // Success / done screen
+
   if(done){
-    const tyUrl=product&&getTyUrl(product.name);
+    const tyUrl=getTyUrl(product);
     return React.createElement('div',{className:'cof-root'},
       React.createElement('div',{className:'cof-wrap'},brandHeader,
         React.createElement('div',{className:'cof-success'},
@@ -657,8 +666,7 @@ function CustomerOrderForm({productName}){
       )
     );
   }
- 
-  // Main order form
+
   return React.createElement('div',{className:'cof-root'},
     React.createElement('div',{className:'cof-wrap'},
       brandHeader,
@@ -666,7 +674,6 @@ function CustomerOrderForm({productName}){
         React.createElement('div',{className:'cof-product-name'},product.name),
         product.description&&React.createElement('div',{className:'cof-product-desc'},product.description)
       ),
-      // Bundle picker
       React.createElement('div',{className:'cof-section'},
         React.createElement('div',{className:'cof-section-title'},'📦 Choose Your Package'),
         bundles.length===0
@@ -679,14 +686,12 @@ function CustomerOrderForm({productName}){
               b.hasFreeGift&&React.createElement('div',{className:'cof-bundle-gift'},'🎁 Free Gift Included',b.freeGiftName?` — ${b.freeGiftName}`:''))
           ))
       ),
-      // Size picker
       sizes.length>0&&React.createElement('div',{className:'cof-section'},
         React.createElement('div',{className:'cof-section-title'},'📐 Choose Your Size'),
         React.createElement('div',{className:'cof-size-grid'},sizes.map(s=>
           React.createElement('button',{key:s,type:'button',className:`cof-size-btn ${selectedSize===s?'selected':''}`,onClick:()=>setSelectedSize(s)},s)
         ))
       ),
-      // Customer details
       React.createElement('div',{className:'cof-section'},
         React.createElement('div',{className:'cof-section-title'},'👤 Your Details'),
         submitErr&&React.createElement('div',{className:'cof-error-banner'},submitErr),
@@ -709,7 +714,6 @@ function CustomerOrderForm({productName}){
           React.createElement('textarea',{className:'cof-textarea',rows:3,placeholder:'Any special instructions...',value:form.notes,onChange:setField('notes')})
         )
       ),
-      // Order summary
       selectedBundle&&React.createElement('div',{className:'cof-section'},
         React.createElement('div',{className:'cof-section-title'},'🧾 Order Summary'),
         React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:10}},
@@ -731,7 +735,7 @@ function CustomerOrderForm({productName}){
     )
   );
 }
- 
+
 // ═══════════════════════════════════════════════════════════════
 // SIGNUP PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -789,39 +793,7 @@ function SignupPage({type,token}){
     )
   );
 }
- 
-// ═══════════════════════════════════════════════════════════════
-// GMAIL EMAIL SENDER — uses Anthropic API + Gmail MCP
-// No API key needed — handled by the proxy
-// ═══════════════════════════════════════════════════════════════
-async function sendEmailViaGmail(to,subject,body){
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system:'You are an email assistant. When asked to send an email, use the Gmail tool to send it immediately without asking questions or adding commentary. Just send it.',
-        messages:[{role:'user',content:`Please send an email to: ${to}\nSubject: ${subject}\nBody:\n${body}`}],
-        mcp_servers:[{type:'url',url:'https://gmailmcp.googleapis.com/mcp/v1',name:'gmail-mcp'}]
-      })
-    });
-    if(!resp.ok)return{success:false,error:`HTTP ${resp.status}`};
-    const data=await resp.json();
-    if(data.error)return{success:false,error:data.error.message||'API error'};
-    // Check response content for confirmation
-    const allText=(data.content||[])
-      .filter(b=>b.type==='text')
-      .map(b=>b.text||'')
-      .join(' ')
-      .toLowerCase();
-    const hasTool=(data.content||[]).some(b=>b.type==='mcp_tool_use'||b.type==='tool_use');
-    const sent=hasTool||allText.includes('sent')||allText.includes('success')||allText.includes('email');
-    return{success:sent,message:(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join(' ')};
-  }catch(e){return{success:false,error:e.message};}
-}
- 
+
 // ─── MAIN APP ──────────────────────────────────────────────────
 function App(){
   const[sidebarOpen,setSidebarOpen]=useState(false);
@@ -835,32 +807,29 @@ function App(){
   const login=useCallback(u=>{setUser(u);localStorage.setItem('ssUser',JSON.stringify(u));},[]);
   const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
   const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
- 
-  // Customer-facing order form
+
   if(viewMode==='order'){
     return React.createElement(ThemeProvider,null,
       React.createElement(CustomerOrderForm,{productName:productParam||''}),
       React.createElement(ToastContainer));
   }
-  // Signup pages
   if(signupType&&signupToken){
     return React.createElement(ThemeProvider,null,
       React.createElement(SignupPage,{type:signupType,token:signupToken}),
       React.createElement(ToastContainer));
   }
-  // Login
   if(!user){
     return React.createElement(ThemeProvider,null,
       React.createElement(LoginPage,{onLogin:login}),
       React.createElement(ToastContainer));
   }
- 
+
   const isAdmin=user.role==='admin';
   const isSupplier=user.role==='supplier';
   const isCC=!isAdmin&&!isSupplier;
   const perms=user.permissions==='all'?['all']:(user.permissions||'').split(',').map(s=>s.trim()).filter(Boolean);
   const can=p=>isAdmin||perms.includes('all')||perms.includes(p);
- 
+
   const navItems=[
     {id:'dashboard',icon:'📊',label:'Dashboard',show:true},
     {id:'orders',icon:'📦',label:'Orders',show:isAdmin||isSupplier||can('view_orders')},
@@ -873,9 +842,9 @@ function App(){
     {id:'suppliers',icon:'🚚',label:'Suppliers',show:isAdmin},
     {id:'settings',icon:'⚙️',label:'Settings',show:true},
   ].filter(x=>x.show);
- 
+
   const ctx={user,isAdmin,isSupplier,isCC,can};
- 
+
   function renderPage(){
     switch(page){
       case 'dashboard':   return React.createElement(DashboardPage,ctx);
@@ -891,13 +860,13 @@ function App(){
       default:            return React.createElement(DashboardPage,ctx);
     }
   }
- 
+
   return React.createElement(ThemeProvider,null,
     React.createElement(AppShell,{user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout},renderPage()),
     React.createElement(ToastContainer)
   );
 }
- 
+
 function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,children}){
   const{theme,toggleTheme}=useContext(ThemeCtx);
   const prefetchOnHover=(id)=>{
@@ -932,7 +901,7 @@ function AppShell({user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout,chil
     )
   );
 }
- 
+
 function LoginPage({onLogin}){
   const[u,setU]=useState('');const[p,setP]=useState('');const[err,setErr]=useState('');const[loading,setLoading]=useState(false);const[showPw,setShowPw]=useState(false);
   const submit=async e=>{
@@ -962,7 +931,7 @@ function LoginPage({onLogin}){
     )
   );
 }
- 
+
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -987,7 +956,7 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
   if(isSupplier)return React.createElement(SupplierDashboard,{data:myData,loading:myLoading,error:myError,user,reload:reloadMy});
   return React.createElement(StaffDashboard,{data:myData,loading:myLoading,error:myError,user,reload:reloadMy});
 }
- 
+
 function AdminDashboard({data,reload}){
   const d=data||{};
   const monthlyData=useMemo(()=>{
@@ -1063,7 +1032,7 @@ function AdminDashboard({data,reload}){
     )
   );
 }
- 
+
 function StaffDashboard({data,loading,error,user,reload}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading your dashboard...'));
   if(error)return React.createElement('div',null,
@@ -1094,7 +1063,7 @@ function StaffDashboard({data,loading,error,user,reload}){
       React.createElement('div',{className:'stat-sub'},s.sub))))
   );
 }
- 
+
 function SupplierDashboard({data,loading,error,user,reload}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
   if(error)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)'}},'❌ '+error),React.createElement('button',{className:'btn btn-secondary',style:{marginTop:8},onClick:reload},'Retry'));
@@ -1118,9 +1087,9 @@ function SupplierDashboard({data,loading,error,user,reload}){
         React.createElement('div',{className:'stat-sub'},s.sub))))
   );
 }
- 
+
 // ═══════════════════════════════════════════════════════════════
-// ORDERS PAGE — with Copy Details button per row
+// ORDERS PAGE — Copy Details + Readiness status + Reschedule popup
 // ═══════════════════════════════════════════════════════════════
 function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const[orders,setOrders]=useState([]);
@@ -1133,9 +1102,11 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const[statusFilter,setStatusFilter]=useState('');
   const[contactFilter,setContactFilter]=useState('');
   const[payFilter,setPayFilter]=useState('');
+  const[readinessFilter,setReadinessFilter]=useState('');
   const[contactingOrder,setContactingOrder]=useState(null);
+  const[reschedulingOrder,setReschedulingOrder]=useState(null);
   const[saving,setSaving]=useState(false);
- 
+
   const load=useCallback(async()=>{
     setLoading(true);
     const params={action:'getOrders'};
@@ -1146,44 +1117,73 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     if(sf.success)setStaffList(sf.data||[]);
     setLoading(false);
   },[isSupplier,user.username]);
- 
+
   useEffect(()=>{load();},[load]);
- 
+
   const filtered=useMemo(()=>{
     let r=orders.filter(o=>supplierOwnsOrder(o,products,user));
     if(statusFilter)r=r.filter(o=>statusOf(o)===statusFilter);
     if(contactFilter)r=r.filter(o=>(o.contactStatus||'Uncontacted')===contactFilter);
     if(payFilter)r=r.filter(o=>o.paymentStatus===payFilter);
+    if(readinessFilter)r=r.filter(o=>readinessOf(o)===readinessFilter);
     if(search){const s=search.toLowerCase();r=r.filter(o=>(o.customerName||'').toLowerCase().includes(s)||(o.contact||'').includes(s)||(o.contact2||'').includes(s)||(o.product||'').toLowerCase().includes(s));}
     return r;
-  },[orders,statusFilter,contactFilter,payFilter,search,products,user]);
- 
+  },[orders,statusFilter,contactFilter,payFilter,readinessFilter,search,products,user]);
+
+  // Daily reschedule tally — grouped by the date the customer rescheduled to.
+  const rescheduleTally=useMemo(()=>{
+    const m={};
+    filtered.forEach(o=>{
+      if(readinessOf(o)==='Rescheduled'&&o.rescheduledTo){
+        m[o.rescheduledTo]=(m[o.rescheduledTo]||0)+1;
+      }
+    });
+    return Object.entries(m).sort((a,b)=>a[0]<b[0]?-1:1);
+  },[filtered]);
+
   const updateField=useCallback(async(order,updates)=>{
     const updated={...order,...updates};
     setOrders(prev=>prev.map(o=>o.id===order.id?updated:o));
     const r=await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(updated)});
     if(!r.success){setOrders(prev=>prev.map(o=>o.id===order.id?order:o));toast(r.error||'Update failed','error');}
   },[]);
- 
+
   const del=async o=>{
     if(!confirm(`Delete order for ${o.customerName}?`))return;
     setOrders(prev=>prev.filter(x=>x.id!==o.id));
     const r=await API.call({action:'deleteOrder',id:o.id});
     if(r.success)toast('Order deleted');else{setOrders(prev=>[...prev,o]);toast(r.error||'Delete failed','error');}
   };
- 
+
   const markContacted=useCallback(async(order,byUsername)=>{
     await updateField(order,{contactStatus:'Contacted',contactedBy:byUsername});
     toast('Marked as contacted ✓');
   },[updateField]);
- 
+
+  // Set readiness status. "Rescheduled" opens a date popup; "Cancelled" also
+  // flips the delivery status to Canceled so analytics stay consistent.
+  const setReadiness=useCallback(async(order,status)=>{
+    if(status==='Rescheduled'){setReschedulingOrder(order);return;}
+    const updates={readinessStatus:status,rescheduledTo:''};
+    if(status==='Cancelled')updates.deliveryStatus='Canceled';
+    await updateField(order,updates);
+    toast(`Readiness set: ${status} ✓`);
+  },[updateField]);
+
+  const confirmReschedule=useCallback(async(order,dateStr)=>{
+    await updateField(order,{readinessStatus:'Rescheduled',rescheduledTo:dateStr,deliveryStatus:'Rescheduled'});
+    setReschedulingOrder(null);
+    toast(`Rescheduled to ${dateStr} ✓`);
+  },[updateField]);
+
   const canCreate=!isSupplier&&(isAdmin||can('add_orders'));
   const canEdit=isAdmin||can('edit_orders');
   const canDelete=isAdmin||can('delete_orders');
   const canContact=(isAdmin||isCC)&&!isSupplier;
+  const canSetReadiness=(isAdmin||isCC)&&!isSupplier;
   const canChangeDelivery=isAdmin||isSupplier;
   const canChangePay=isAdmin||isSupplier;
- 
+
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving order...'}),
     React.createElement('div',{className:'section-header'},
@@ -1191,6 +1191,14 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
         React.createElement('div',{className:'section-title'},'Orders'),
         React.createElement('div',{className:'section-sub'},`${filtered.length} of ${orders.length} orders`)),
       canCreate&&React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ New Order')
+    ),
+    // Daily reschedule summary
+    rescheduleTally.length>0&&React.createElement('div',{className:'reschedule-card'},
+      React.createElement('div',{className:'reschedule-title'},'📅 Rescheduled Deliveries — daily count'),
+      React.createElement('div',{className:'reschedule-grid'},rescheduleTally.map(([date,count])=>
+        React.createElement('div',{key:date,className:'reschedule-pill'},
+          React.createElement('span',{className:'rp-date'},date),
+          React.createElement('span',{className:'rp-count'},`${count} customer${count>1?'s':''}`))))
     ),
     React.createElement('div',{className:'filters-bar'},
       React.createElement('input',{className:'search-input',placeholder:'Search name, phone, product...',value:search,onChange:e=>setSearch(e.target.value)}),
@@ -1200,6 +1208,9 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
       React.createElement('select',{className:'form-select',style:{width:136},value:contactFilter,onChange:e=>setContactFilter(e.target.value)},
         React.createElement('option',{value:''},'All Contact'),
         CONTACT_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s))),
+      React.createElement('select',{className:'form-select',style:{width:160},value:readinessFilter,onChange:e=>setReadinessFilter(e.target.value)},
+        React.createElement('option',{value:''},'All Readiness'),
+        READINESS_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s))),
       React.createElement('select',{className:'form-select',style:{width:120},value:payFilter,onChange:e=>setPayFilter(e.target.value)},
         React.createElement('option',{value:''},'All Payment'),
         PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s))),
@@ -1211,17 +1222,17 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
         ?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📦'),React.createElement('div',{className:'empty-text'},'No orders match your filters'))
         :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
           React.createElement('thead',null,React.createElement('tr',null,
-            ['Date','Customer','Product','Contact','Delivery','Payment','Del. Price','Source','Actions'].map(h=>React.createElement('th',{key:h},h)))),
+            ['Date','Customer','Product','Contact','Readiness','Delivery','Payment','Del. Price','Source','Actions'].map(h=>React.createElement('th',{key:h},h)))),
           React.createElement('tbody',null,filtered.map(o=>{
             const cs=o.contactStatus||'Uncontacted';
             const ds=statusOf(o);
+            const rs=readinessOf(o);
             const isDelivered=ds==='Delivered';
+            const isContacted=cs==='Contacted';
             return React.createElement('tr',{key:o.id},
-              // Date column
               React.createElement('td',null,
                 React.createElement('div',null,o.date||'—'),
                 isDelivered&&o.deliveryDate&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)'}},`Delivered: ${o.deliveryDate}`)),
-              // Customer column — with Copy button
               React.createElement('td',null,
                 React.createElement('div',{style:{fontWeight:600}},o.customerName),
                 React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact),
@@ -1229,13 +1240,11 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
                 o.address&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',maxWidth:110,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.address),
                 React.createElement('div',{className:'copy-btn-row'},React.createElement(CopyDetailsBtn,{order:o}))
               ),
-              // Product column
               React.createElement('td',null,
                 React.createElement('div',{style:{fontWeight:600}},o.product),
                 o.bundleLabel&&React.createElement('div',{style:{fontSize:11,color:'var(--accent)'}},o.bundleLabel),
                 o.size&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},`Size: ${o.size}`),
                 o.sellingPrice&&React.createElement('div',{className:'td-mono',style:{fontSize:11}},fmtGHC(o.sellingPrice))),
-              // Contact column
               React.createElement('td',null,
                 contactBadge(cs),
                 o.contactedBy&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',marginTop:2}},`by ${o.contactedBy}`),
@@ -1244,7 +1253,17 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
                   style:{marginTop:4,fontSize:10,padding:'2px 6px'},
                   onClick:()=>{if(isAdmin){setContactingOrder(o);}else{markContacted(o,user.username);}}
                 },'Mark Contacted')),
-              // Delivery column
+              // Readiness column — set after the order is contacted
+              React.createElement('td',null,
+                rs?readinessBadge(rs):React.createElement('span',{style:{fontSize:11,color:'var(--text3)'}},'—'),
+                rs==='Rescheduled'&&o.rescheduledTo&&React.createElement('div',{style:{fontSize:10,color:'var(--blue)',marginTop:2}},`→ ${o.rescheduledTo}`),
+                canSetReadiness&&isContacted&&React.createElement('select',{
+                  className:'form-select',style:{marginTop:4,fontSize:11,padding:'3px 6px'},
+                  value:rs,
+                  onChange:e=>e.target.value&&setReadiness(o,e.target.value)
+                },React.createElement('option',{value:''},'— Set readiness —'),
+                  READINESS_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s))),
+                canSetReadiness&&!isContacted&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',marginTop:2}},'Contact first')),
               React.createElement('td',null,
                 statusBadge(ds),
                 canChangeDelivery&&React.createElement('select',{
@@ -1252,7 +1271,6 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
                   value:ds,
                   onChange:e=>updateField(o,{deliveryStatus:e.target.value,...(e.target.value==='Delivered'?{deliveryDate:today()}:{})})
                 },DELIVERY_STATUSES.map(s=>React.createElement('option',{key:s,value:s},s)))),
-              // Payment column
               React.createElement('td',null,
                 payBadge(paymentOf(o)),
                 canChangePay&&React.createElement('select',{
@@ -1260,16 +1278,13 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
                   value:paymentOf(o),
                   onChange:e=>updateField(o,{paymentStatus:e.target.value})
                 },PAYMENT_OPTIONS.map(s=>React.createElement('option',{key:s,value:s},s)))),
-              // Delivery price column
               React.createElement('td',null,
                 o.deliveryPrice?React.createElement('div',{className:'td-mono'},fmtGHC(o.deliveryPrice)):React.createElement('div',{style:{color:'var(--text3)',fontSize:12}},'—'),
                 (isAdmin||isSupplier)&&React.createElement(DeliveryPriceInput,{order:o,onUpdate:updateField})),
-              // Source column
               React.createElement('td',null,
                 o.source==='order_form'
                   ?React.createElement('span',{className:'badge',style:{background:'var(--blue-dim)',color:'var(--blue)'}},'🌐 Form')
                   :React.createElement('span',{style:{fontSize:11,color:'var(--text3)'}},'Manager')),
-              // Actions column
               React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
                 canEdit&&!isSupplier&&React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(o);setShowModal(true);}},'✏'),
                 canDelete&&!isSupplier&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(o)},'🗑')
@@ -1287,10 +1302,15 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
       order:contactingOrder,staffList,
       onConfirm:(username)=>{markContacted(contactingOrder,username);setContactingOrder(null);},
       onClose:()=>setContactingOrder(null)
+    }),
+    reschedulingOrder&&React.createElement(RescheduleModal,{
+      order:reschedulingOrder,
+      onConfirm:(dateStr)=>confirmReschedule(reschedulingOrder,dateStr),
+      onClose:()=>setReschedulingOrder(null)
     })
   );
 }
- 
+
 function DeliveryPriceInput({order,onUpdate}){
   const[val,setVal]=useState(order.deliveryPrice||'');
   useEffect(()=>setVal(order.deliveryPrice||''),[order.deliveryPrice]);
@@ -1301,12 +1321,9 @@ function DeliveryPriceInput({order,onUpdate}){
     onBlur:e=>{const v=e.target.value;if(v!==String(order.deliveryPrice||''))onUpdate(order,{deliveryPrice:v});}
   });
 }
- 
+
 function ContactedByModal({staffList,onConfirm,onClose}){
   const[sel,setSel]=useState('');
-  const activeStaff=staffList.filter(s=>isActive(s.active)&&s.role!=='supplier'&&s.role!=='admin');
-  // FIX: Also include admin-role staff if needed, but only non-supplier non-supplier entries
-  // Actually include all non-supplier active staff (admin can also be contactedBy)
   const allStaff=staffList.filter(s=>isActive(s.active)&&s.role!=='supplier');
   return React.createElement('div',{className:'modal-overlay'},
     React.createElement('div',{className:'modal',style:{maxWidth:420}},
@@ -1326,14 +1343,35 @@ function ContactedByModal({staffList,onConfirm,onClose}){
     )
   );
 }
- 
+
+// Popup that captures the date the customer rescheduled their delivery to.
+function RescheduleModal({order,onConfirm,onClose}){
+  const[date,setDate]=useState(order.rescheduledTo||today());
+  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div',{className:'modal',style:{maxWidth:420}},
+      React.createElement('div',{className:'modal-header'},
+        React.createElement('div',{className:'modal-title'},'📅 Reschedule Delivery'),
+        React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
+      React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'alert-info',style:{marginBottom:14}},`When did ${order.customerName||'the customer'} ask to reschedule the delivery to?`),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'New Delivery Date'),
+          React.createElement('input',{className:'form-input',type:'date',value:date,onChange:e=>setDate(e.target.value)}))),
+      React.createElement('div',{className:'modal-footer'},
+        React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),
+        React.createElement('button',{className:'btn btn-primary',onClick:()=>date&&onConfirm(date),disabled:!date},'Save Reschedule'))
+    )
+  );
+}
+
 function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
   const isEdit=!!order;
   const[f,setF]=useState(()=>order?{...order}:{
     date:today(),deliveryDate:'',customerName:'',address:'',contact:'',contact2:'',
     product:'',bundleLabel:'',qty:'',size:'',sellingPrice:'',costOfProduct:'',
     deliveryPrice:'',paymentStatus:'Unpaid',notes:'',deliveryStatus:'Not Confirmed',
-    contactStatus:'Uncontacted',contactedBy:'',createdBy:user.username,supplierUsername:'',isCustom:false
+    contactStatus:'Uncontacted',contactedBy:'',readinessStatus:'',rescheduledTo:'',
+    createdBy:user.username,supplierUsername:'',isCustom:false
   });
   const[saving,setSaving]=useState(false);
   const[showContact2,setShowContact2]=useState(!!(order&&order.contact2));
@@ -1351,20 +1389,20 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
       setF(p=>({...p,bundleLabel:'',qty:'',sellingPrice:'',costOfProduct:'',isCustom:false,supplierUsername:su[0]||prod.supplierUsername||''}));
     }
   },[f.product,prod,isEdit]);
- 
+
   const isCustom=f.bundleLabel==='__custom__'||f.isCustom;
   const selectedBundle=useMemo(()=>{
     if(isCustom||!f.bundleLabel)return null;
     return bundles.find(b=>b.label===f.bundleLabel)||null;
   },[bundles,f.bundleLabel,isCustom]);
- 
+
   const pickBundle=sel=>{
     if(sel==='__custom__'){setF(p=>({...p,bundleLabel:'__custom__',isCustom:true,qty:'',sellingPrice:'',costOfProduct:'',deliveryPrice:'',paymentStatus:'Unpaid'}));return;}
     const b=bundles.find(x=>x.label===sel);if(!b)return;
     const su=readList(prod?.supplierUsernames||prod?.supplierUsername);
     setF(p=>({...p,bundleLabel:b.label,qty:b.qty,sellingPrice:b.sellingPrice||b.price||'',costOfProduct:b.costPrice||b.cost||'',isCustom:false,supplierUsername:su[0]||p.supplierUsername||''}));
   };
- 
+
   const validate=()=>{
     if(!f.customerName){toast('Customer name required','error');return false;}
     if(!f.contact){toast('Contact phone required','error');return false;}
@@ -1375,7 +1413,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
     if(isCustom&&!f.qty){toast('Qty required for custom orders','error');return false;}
     return true;
   };
- 
+
   const save=async()=>{
     if(!validate())return;setSaving(true);if(onSaving)onSaving(true);
     const payload={...f,bundleLabel:isCustom?`Custom x${f.qty}`:f.bundleLabel,source:f.source||'manager'};
@@ -1386,7 +1424,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
     if(r.success){const saved=isEdit?payload:{...payload,id:r.data?.id||('tmp_'+Date.now())};onSave(saved);}
     else toast(r.error||'Save failed','error');
   };
- 
+
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
     React.createElement('div',{className:'modal modal-lg'},
       React.createElement('div',{className:'modal-header'},
@@ -1452,7 +1490,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
     )
   );
 }
- 
+
 // ─── STAFF ANALYTICS ──────────────────────────────────────────
 function StaffAnalyticsPage({user}){
   const[orders,setOrders]=useState([]);
@@ -1461,7 +1499,7 @@ function StaffAnalyticsPage({user}){
   const[period,setPeriod]=useState('all');
   const[selMonth,setSelMonth]=useState(()=>today().slice(0,7));
   const[selYear,setSelYear]=useState(()=>today().slice(0,4));
- 
+
   useEffect(()=>{
     setLoading(true);
     Promise.all([API.call({action:'getOrders'}),API.call({action:'getPayoutRecords'})]).then(([or,pr])=>{
@@ -1470,20 +1508,20 @@ function StaffAnalyticsPage({user}){
       setLoading(false);
     });
   },[]);
- 
+
   const username=user.username;
   const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);
   const years=useMemo(()=>{
     const s=new Set(myOrders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));
     return[...s].sort().reverse();
   },[myOrders]);
- 
+
   const filtered=useMemo(()=>{
     if(period==='month')return myOrders.filter(o=>String(o.date||'').startsWith(selMonth));
     if(period==='year')return myOrders.filter(o=>String(o.date||'').startsWith(selYear));
     return myOrders;
   },[myOrders,period,selMonth,selYear]);
- 
+
   const delivered=filtered.filter(o=>statusOf(o)==='Delivered');
   const deliveredPaid=delivered.filter(o=>paymentOf(o)==='Paid');
   const pending=filtered.filter(o=>!['Delivered','Canceled'].includes(statusOf(o)));
@@ -1497,9 +1535,10 @@ function StaffAnalyticsPage({user}){
   const allTimeConv=myOrders.length>0?Math.round(allDeliveredPaidAllTime.length/myOrders.length*100):0;
   const filteredConv=filtered.length>0?Math.round(deliveredPaid.length/filtered.length*100):0;
   const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
- 
+  const rescheduledCount=filtered.filter(o=>readinessOf(o)==='Rescheduled').length;
+
   if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading analytics...'));
- 
+
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},
       React.createElement('div',null,
@@ -1522,6 +1561,7 @@ function StaffAnalyticsPage({user}){
       {label:'Delivered',value:delivered.length,sub:'Successfully delivered',cls:'green'},
       {label:'Delivered & Paid',value:deliveredPaid.length,sub:'Eligible for payout',cls:'green'},
       {label:'Pending',value:pending.length,sub:'In progress',cls:'orange'},
+      {label:'Rescheduled',value:rescheduledCount,sub:'Customer rescheduled',cls:'blue'},
       {label:'Canceled',value:canceled.length,sub:'Lost orders',cls:'red'},
       {label:'Period Conversion',value:`${filteredConv}%`,sub:'Delivered+paid ÷ Contacted',cls:'purple'},
       {label:'All-Time Conversion',value:`${allTimeConv}%`,sub:'Across all my orders',cls:'orange'},
@@ -1545,834 +1585,1084 @@ function StaffAnalyticsPage({user}){
       }))
   );
 }
- 
-// ─── FINANCIALS PAGE ───────────────────────────────────────────
-function FinancialsPage({isAdmin}){
-  const[tab,setTab]=useState('overview');
-  const[orders,setOrders]=useState([]);const[expenses,setExpenses]=useState([]);
-  const[withdrawals,setWithdrawals]=useState([]);const[payoutRecords,setPayoutRecords]=useState([]);
-  const[loading,setLoading]=useState(true);const[showWDModal,setShowWDModal]=useState(false);const[saving,setSaving]=useState(false);
- 
+
+// ═══════════════════════════════════════════════════════════════
+// FINANCIALS PAGE (admin) — revenue, withdrawals, staff payouts
+// ═══════════════════════════════════════════════════════════════
+function FinancialsPage({user,isAdmin}){
+  const[dash,setDash]=useState(null);
+  const[withdrawals,setWithdrawals]=useState([]);
+  const[payouts,setPayouts]=useState([]);
+  const[staff,setStaff]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[showWithdraw,setShowWithdraw]=useState(false);
+  const[saving,setSaving]=useState(false);
+
   const load=useCallback(async()=>{
     setLoading(true);
-    const[or,ex,wd,pr]=await Promise.all([API.call({action:'getOrders'}),API.call({action:'getExpenses'}),API.call({action:'getWithdrawals'}),API.call({action:'getPayoutRecords'})]);
-    if(or.success)setOrders(or.data||[]);if(ex.success)setExpenses(ex.data||[]);
-    if(wd.success)setWithdrawals(wd.data||[]);if(pr.success)setPayoutRecords(pr.data||[]);
+    const[d,w,p,s]=await Promise.all([
+      API.call({action:'getDashboard'}),
+      API.call({action:'getWithdrawals'}),
+      API.call({action:'getPayoutRecords'}),
+      API.call({action:'getStaff'}),
+    ]);
+    if(d.success)setDash(d.data||{});
+    if(w.success)setWithdrawals(w.data||[]);
+    if(p.success)setPayouts(p.data||[]);
+    if(s.success)setStaff(s.data||[]);
     setLoading(false);
   },[]);
   useEffect(()=>{load();},[load]);
- 
-  const lastExRate=useMemo(()=>{const s=[...withdrawals].sort((a,b)=>new Date(b.date)-new Date(a.date));return s[0]?.exchangeRate?s[0].exchangeRate:null;},[withdrawals]);
-  const paid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
-  const delivUnpaid=orders.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)!=='Paid');
-  const totalRevGHC=paid.reduce((s,o)=>s+sp(o.sellingPrice),0);
-  const totalCostGHC=paid.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);
-  const profitGHC=totalRevGHC-totalCostGHC;
-  const totalAdSpend=expenses.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
-  const totalWdNGN=withdrawals.reduce((s,w)=>s+sp(w.amountNGN),0);
-  const totalWdGHC=withdrawals.reduce((s,w)=>s+sp(w.amountGHC),0);
-  const netProfitNGN=lastExRate!=null?(profitGHC*sp(lastExRate)-totalAdSpend):0;
-  const pendRevGHC=delivUnpaid.reduce((s,o)=>s+sp(o.sellingPrice),0);
- 
-  return React.createElement('div',null,
-    saving&&React.createElement(SaveOverlay,{label:'Processing...'}),
-    React.createElement('div',{className:'tabs'},
-      [{id:'overview',label:'Overview'},{id:'orders',label:'Paid Orders'},{id:'staff',label:'Staff Payouts'},{id:'withdrawals',label:'Withdrawals'}].map(t=>
-        React.createElement('div',{key:t.id,className:`tab ${tab===t.id?'active':''}`,onClick:()=>setTab(t.id)},t.label))),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    tab==='overview'?React.createElement('div',{className:'stat-grid'},[
-      {label:'Revenue in GHC',value:fmtGHC(totalRevGHC),sub:'From paid orders',cls:'green'},
-      {label:'Revenue in NGN',value:fmtNGN(totalWdNGN),sub:'Total withdrawn',cls:'green'},
-      {label:'Gross Profit (GHC)',value:fmtGHC(profitGHC),sub:'After product+delivery costs',cls:'orange'},
-      {label:'Net Profit After Ads',value:lastExRate!=null?fmtNGN(netProfitNGN):'Set exchange rate first',sub:`Ad spend: ${fmtNGN(totalAdSpend)}`,cls:netProfitNGN>=0?'green':'red'},
-      {label:'Pending Revenue (GHC)',value:fmtGHC(pendRevGHC),sub:'Delivered, not yet paid',cls:'orange'},
-      {label:'Last Exchange Rate',value:lastExRate?`₦${lastExRate}/GH₵`:'Not set',sub:'From last withdrawal',cls:'blue'},
-      {label:'Total GHC Withdrawn',value:fmtGHC(totalWdGHC),sub:'GHC converted to NGN',cls:'blue'},
-      {label:'Total NGN Received',value:fmtNGN(totalWdNGN),sub:'Across all withdrawals',cls:'blue'},
-    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))):
-    tab==='orders'?React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Paid Orders Breakdown')),
-      paid.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💰'),React.createElement('div',{className:'empty-text'},'No paid orders yet')):
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Date','Customer','Product','Bundle','Selling','Cost','Delivery','Profit GHC'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,paid.map(o=>{
-          const s2=sp(o.sellingPrice),c=sp(o.costOfProduct),d=sp(o.deliveryPrice),p=s2-c-d;
-          return React.createElement('tr',{key:o.id},
-            React.createElement('td',null,o.date),React.createElement('td',null,o.customerName),
-            React.createElement('td',null,o.product),React.createElement('td',null,o.bundleLabel||`${o.qty||1}×`),
-            React.createElement('td',{className:'td-mono'},fmtGHC(s2)),React.createElement('td',{className:'td-mono'},fmtGHC(c)),
-            React.createElement('td',{className:'td-mono'},fmtGHC(d)),React.createElement('td',{className:p>=0?'profit-positive':'profit-negative'},fmtGHC(p)));
-        }))))):
-    tab==='staff'?React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-header'},
-        React.createElement('div',null,
-          React.createElement('div',{className:'section-title'},'Staff Payout Breakdown'),
-          React.createElement('div',{className:'section-sub'},'₦2,000 per delivered+paid order they contacted'))),
-      React.createElement(StaffPayoutTable,{orders,payoutRecords,isAdmin,onPaid:async(staffUsername,amount)=>{
-        setSaving(true);
-        const r=await API.call({action:'addPayoutRecord',record:JSON.stringify({staffName:staffUsername,amountNGN:amount,date:today()})});
-        setSaving(false);
-        if(r.success){toast(`Payout of ${fmtNGN(amount)} marked for ${staffUsername} ✓`);load();}
-        else toast(r.error||'Failed','error');
-      }})):
-    React.createElement('div',null,
-      React.createElement('div',{className:'section-header'},
-        React.createElement('div',null,React.createElement('div',{className:'section-title'},'Withdrawals'),React.createElement('div',{className:'section-sub'},'Log GHC→NGN conversions')),
-        isAdmin&&React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowWDModal(true)},'+ Log Withdrawal')),
-      withdrawals.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💱'),React.createElement('div',{className:'empty-text'},'No withdrawals logged yet')):
-      React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Date','GHC Sent','NGN Received','Rate (₦/GH₵)','Notes'].map(h=>React.createElement('th',{key:h},h)))),
-        React.createElement('tbody',null,withdrawals.map(w=>
-          React.createElement('tr',{key:w.id},React.createElement('td',null,w.date),React.createElement('td',{className:'td-mono'},fmtGHC(w.amountGHC)),React.createElement('td',{className:'td-mono'},fmtNGN(w.amountNGN)),React.createElement('td',{style:{fontWeight:700,color:'var(--accent)',fontFamily:'var(--font-mono)'}},w.exchangeRate||'—'),React.createElement('td',null,w.notes||'—')))))),
-      showWDModal&&React.createElement(WithdrawalModal,{onSave:()=>{setShowWDModal(false);load();toast('Withdrawal logged ✓');},onClose:()=>setShowWDModal(false),onSaving:setSaving})
-    )
-  );
-}
- 
-function StaffPayoutTable({orders,payoutRecords,isAdmin,onPaid}){
-  const byStaff={};
-  orders.forEach(o=>{
-    const n=o.contactedBy;if(!n)return;
-    if(!byStaff[n])byStaff[n]={username:n,earned:0,pending:0,count:0};
-    const isPaid=paymentOf(o)==='Paid';const isDel=statusOf(o)==='Delivered';
-    if(isDel&&isPaid){byStaff[n].earned+=STAFF_PAYOUT_NGN;byStaff[n].count++;}
-    else if(isDel&&!isPaid)byStaff[n].pending+=STAFF_PAYOUT_NGN;
-  });
-  const paidOut={};
-  (payoutRecords||[]).forEach(r=>{paidOut[r.staffName]=(paidOut[r.staffName]||0)+sp(r.amountNGN);});
-  const rows=Object.values(byStaff);
-  if(rows.length===0)return React.createElement('div',{className:'alert-info'},'No orders with "Contacted By" assigned yet.');
-  return React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-    React.createElement('thead',null,React.createElement('tr',null,
-      ['Staff Username','Deliveries','Earned (NGN)','Pending (NGN)','Paid Out (NGN)','Unpaid Balance',...(isAdmin?['Action']:[])].map(h=>React.createElement('th',{key:h},h)))),
-    React.createElement('tbody',null,rows.map(r=>{
-      const paid=paidOut[r.username]||0;const balance=r.earned-paid;
-      return React.createElement('tr',{key:r.username},
-        React.createElement('td',{className:'td-mono'},r.username),
-        React.createElement('td',null,r.count),
-        React.createElement('td',{className:'profit-positive'},fmtNGN(r.earned)),
-        React.createElement('td',{className:r.pending>0?'profit-negative':'td-mono'},fmtNGN(r.pending)),
-        React.createElement('td',{style:{color:'var(--green)',fontFamily:'var(--font-mono)',fontSize:12}},fmtNGN(paid)),
-        React.createElement('td',{className:balance>0?'profit-negative':'profit-positive'},fmtNGN(balance)),
-        ...(isAdmin?[React.createElement('td',{key:'act'},balance>0&&React.createElement('button',{className:'btn btn-success btn-sm',onClick:()=>{if(confirm(`Mark ₦${balance.toLocaleString()} paid to ${r.username}?`))onPaid(r.username,balance);}},'Mark Paid'))]:[]));
-    }))
-  ));
-}
- 
-function WithdrawalModal({onSave,onClose,onSaving}){
-  const[f,setF]=useState({date:today(),amountGHC:'',amountNGN:'',notes:''});const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const rate=f.amountGHC&&f.amountNGN?(sp(f.amountNGN)/sp(f.amountGHC)).toFixed(2):null;
-  const save=async()=>{
-    setSaving(true);if(onSaving)onSaving(true);
-    const r=await API.call({action:'addWithdrawal',withdrawal:JSON.stringify({...f,exchangeRate:rate})});
-    setSaving(false);if(onSaving)onSaving(false);
-    if(r.success)onSave();else toast(r.error||'Failed','error');
-  };
-  return React.createElement('div',{className:'modal-overlay'},
-    React.createElement('div',{className:'modal',style:{maxWidth:480}},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},'Log Withdrawal'),React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'alert-info'},'Enter GHC sent and NGN received — rate is calculated automatically.'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Date'),React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'GHC Sent'),React.createElement('input',{className:'form-input',type:'number',value:f.amountGHC,onChange:set('amountGHC')}))),
-        React.createElement('div',{className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},'NGN Received'),React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')})),
-        rate&&React.createElement('div',{className:'alert-info',style:{marginBottom:14}},`📊 Exchange Rate: ₦${rate} per GH₵1`),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Notes'),React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes')}))),
-      React.createElement('div',{className:'modal-footer'},
-        React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),
-        React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving||!f.amountGHC||!f.amountNGN},
-          saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Log Withdrawal'))));
-}
- 
-// ─── ANALYTICS PAGE ───────────────────────────────────────────
-function AnalyticsPage({user,isAdmin,isSupplier}){
-  const[orders,setOrders]=useState([]);const[loading,setLoading]=useState(true);
-  const[period,setPeriod]=useState('month');
-  const[selMonth,setSelMonth]=useState(()=>today().slice(0,7));
-  const[selYear,setSelYear]=useState(()=>today().slice(0,4));
- 
-  useEffect(()=>{
-    const params={action:'getOrders'};
-    if(isSupplier)params.supplierUsername=user.username;
-    API.call(params).then(r=>{if(r.success)setOrders(r.data||[]);setLoading(false);});
-  },[isSupplier,user.username]);
- 
-  const years=useMemo(()=>{
-    const s=new Set(orders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));
-    return[...s].sort().reverse();
-  },[orders]);
- 
-  const filtered=useMemo(()=>orders.filter(o=>{
-    if(!o.date)return false;
-    if(period==='month')return String(o.date||'').startsWith(selMonth);
-    if(period==='year')return String(o.date||'').startsWith(selYear);
-    return true;
-  }),[orders,period,selMonth,selYear]);
- 
-  const byStatus=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>{m[s]=filtered.filter(o=>statusOf(o)===s).length;});return m;},[filtered]);
-  const byProduct=useMemo(()=>{const m={};filtered.forEach(o=>{if(o.product)m[o.product]=(m[o.product]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,8);},[filtered]);
-  const paidD=filtered.filter(o=>statusOf(o)==='Delivered'&&paymentOf(o)==='Paid');
-  const rev=paidD.reduce((s,o)=>s+sp(o.sellingPrice),0);
-  const cost=paidD.reduce((s,o)=>s+sp(o.costOfProduct)+sp(o.deliveryPrice),0);
-  const convRate=filtered.length>0?Math.round((byStatus['Delivered']||0)/filtered.length*100):0;
- 
-  if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading analytics...'));
- 
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Analytics')),
-    React.createElement('div',{className:'card',style:{marginBottom:20}},
-      React.createElement('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},
-        React.createElement('div',{className:'tabs',style:{margin:0}},
-          [{id:'all',label:'All Time'},{id:'year',label:'By Year'},{id:'month',label:'By Month'}].map(t=>
-            React.createElement('div',{key:t.id,className:`tab ${period===t.id?'active':''}`,onClick:()=>setPeriod(t.id)},t.label))),
-        period==='month'&&React.createElement('input',{type:'month',className:'form-input',style:{width:160},value:selMonth,onChange:e=>setSelMonth(e.target.value)}),
-        period==='year'&&React.createElement('select',{className:'form-select',style:{width:120},value:selYear,onChange:e=>setSelYear(e.target.value)},
-          years.map(y=>React.createElement('option',{key:y,value:y},y))))),
-    React.createElement('div',{className:'stat-grid'},[
-      {label:'Total Orders',value:filtered.length,cls:'blue'},
-      {label:'Delivered',value:byStatus['Delivered']||0,cls:'green'},
-      {label:'Canceled',value:byStatus['Canceled']||0,cls:'red'},
-      {label:'Conversion Rate',value:`${convRate}%`,cls:'orange'},
-      {label:'Revenue (GHC)',value:fmtGHC(rev),cls:'green'},
-      {label:'Gross Profit (GHC)',value:fmtGHC(rev-cost),cls:'orange'},
-    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value)))),
-    React.createElement('div',{className:'form-grid form-grid-2'},
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Orders by Status'),
-        DELIVERY_STATUSES.map(s=>{
-          const c=byStatus[s]||0;const pct=filtered.length>0?Math.round(c/filtered.length*100):0;
-          return React.createElement('div',{key:s,style:{marginBottom:10}},
-            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),
-            React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--accent)'}})));
-        })),
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Top Products'),
-        byProduct.length===0?React.createElement('div',{className:'text-muted'},'No data for selected period'):
-        byProduct.map(([name,c])=>{
-          const pct=filtered.length>0?Math.round(c/filtered.length*100):0;
-          return React.createElement('div',{key:name,style:{marginBottom:10}},
-            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
-              React.createElement('span',{style:{maxWidth:'65%',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},name),
-              React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),
-            React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--blue)'}})));
-        })))
-  );
-}
- 
-// ─── EXPENSES PAGE ────────────────────────────────────────────
-function ExpensesPage({isAdmin}){
-  const{data,loading,reload}=useData('getExpenses');
-  const[showAdd,setShowAdd]=useState(false);
-  const[f,setF]=useState({date:today(),category:'Ad Cost',amountNGN:'',notes:''});
-  const[saving,setSaving]=useState(false);
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const add=async()=>{
+
+  const recordPayout=async(staffName,amountNGN)=>{
+    if(!amountNGN||sp(amountNGN)<=0){toast('Enter a valid amount','error');return;}
     setSaving(true);
-    const r=await API.call({action:'addExpense',expense:JSON.stringify(f)});
+    const rec={staffName,amountNGN:String(amountNGN),date:today()};
+    const r=await API.call({action:'addPayoutRecord',record:JSON.stringify(rec)});
     setSaving(false);
-    if(r.success){toast('Expense added ✓');setShowAdd(false);setF({date:today(),category:'Ad Cost',amountNGN:'',notes:''});reload();}
-    else toast(r.error,'error');
+    if(r.success){toast(`Paid ${fmtNGN(amountNGN)} to ${staffName} ✓`);cacheBust(['getPayoutRecords','getDashboard','getMyDashboard']);load();}
+    else toast(r.error||'Failed to record payout','error');
   };
-  const del=async e=>{if(!confirm('Delete this expense?'))return;await API.call({action:'deleteExpense',id:e.id});toast('Deleted');reload();};
-  const list=data||[];
-  const total=list.reduce((s,e)=>s+sp(e.amountNGN),0);
-  const adTotal=list.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
-  return React.createElement('div',null,
-    saving&&React.createElement(SaveOverlay,{label:'Adding expense...'}),
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',{className:'section-title'},'Expenses'),
-      isAdmin&&React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowAdd(s=>!s)},showAdd?'✕ Cancel':'+ Add Expense')),
-    React.createElement('div',{className:'stat-grid'},[
-      {label:'Ad Spend (NGN)',value:fmtNGN(adTotal),cls:'red'},
-      {label:'Other Expenses',value:fmtNGN(total-adTotal),cls:'orange'},
-      {label:'Total (NGN)',value:fmtNGN(total),cls:'red'},
-    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value)))),
-    showAdd&&React.createElement('div',{className:'card',style:{marginBottom:16}},
-      React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:12}},
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Date'),React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Category'),React.createElement('select',{className:'form-select',value:f.category,onChange:set('category')},['Ad Cost','Logistics','Other'].map(c=>React.createElement('option',{key:c,value:c},c)))),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Amount (NGN)'),React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')})),
-        React.createElement('div',{className:'form-group',style:{gridColumn:'span 3'}},React.createElement('label',{className:'form-label'},'Notes'),React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes')}))),
-      React.createElement('div',{style:{display:'flex',justifyContent:'flex-end'}},
-        React.createElement('button',{className:'btn btn-primary',onClick:add,disabled:saving||!f.amountNGN},
-          saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Adding...'):'Add Expense'))),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    list.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📉'),React.createElement('div',{className:'empty-text'},'No expenses recorded yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Date','Category','Amount (NGN)','Notes',''].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,list.map(e=>
-        React.createElement('tr',{key:e.id},
-          React.createElement('td',null,e.date),
-          React.createElement('td',null,React.createElement('span',{className:'badge badge-processing'},e.category)),
-          React.createElement('td',{className:'td-mono'},fmtNGN(e.amountNGN)),
-          React.createElement('td',null,e.notes||'—'),
-          React.createElement('td',null,isAdmin&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(e)},'🗑')))))))
-  );
-}
- 
-// ─── PRODUCTS PAGE ────────────────────────────────────────────
-function ProductsPage(){
-  const{data,loading,reload}=useData('getProducts');const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const list=data||[];
-  const del=async p=>{if(!confirm(`Delete ${p.name}?`))return;await API.call({action:'deleteProduct',id:p.id});toast('Deleted');reload();};
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',{className:'section-title'},'Products'),
-      React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Product')),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    list.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🏷️'),React.createElement('div',{className:'empty-text'},'No products yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Product','Bundles','Sizes','Suppliers','Status',''].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,list.map(p=>{
-        let bundles=[];try{bundles=JSON.parse(p.bundles||'[]');}catch{}
-        const productSuppliers=readList(p.supplierNames||p.supplierUsernames||p.supplierUsername).join(', ');
-        const bundleCount=bundles.length;
-        const priceRange=bundleCount>0?`${fmtGHC(Math.min(...bundles.map(b=>sp(b.sellingPrice||b.price||0))))} – ${fmtGHC(Math.max(...bundles.map(b=>sp(b.sellingPrice||b.price||0))))}`:null;
-        return React.createElement('tr',{key:p.id},
-          React.createElement('td',null,React.createElement('div',{style:{fontWeight:600}},p.name),p.description&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},p.description),priceRange&&React.createElement('div',{className:'td-mono',style:{fontSize:11,marginTop:2,color:'var(--accent)'}},priceRange)),
-          React.createElement('td',null,bundleCount>0?React.createElement('div',null,React.createElement('div',null,`${bundleCount} bundle${bundleCount>1?'s':''}`),bundles.some(b=>b.hasFreeGift)&&React.createElement('div',{style:{fontSize:10,color:'var(--green)',marginTop:2}},'🎁 Some have free gifts')):'—'),
-          React.createElement('td',null,(p.hasSizes===true||p.hasSizes==='true')?'✓':'—'),
-          React.createElement('td',null,productSuppliers||React.createElement('span',{style:{color:'var(--text3)',fontSize:12}},'Unassigned')),
-          React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(p.active)?'badge-delivered':'badge-canceled'}`},isActive(p.active)?'Active':'Inactive')),
-          React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(p);setShowModal(true);}},'✏'),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(p)},'🗑'))));
-      })))),
-    showModal&&React.createElement(ProductModal,{product:editing,onSave:()=>{setShowModal(false);reload();toast('Saved ✓');},onClose:()=>setShowModal(false)})
-  );
-}
- 
-function ProductModal({product,onSave,onClose}){
-  const isEdit=!!product;
-  const[f,setF]=useState(product?{...product}:{name:'',description:'',active:true,hasSizes:false});
-  const[saving,setSaving]=useState(false);
-  const[sizes,setSizes]=useState(()=>{try{return JSON.parse(product?.sizes||'[]');}catch{return[];}});
-  const[sizeInput,setSizeInput]=useState('');
-  const[bundles,setBundles]=useState(()=>{
-    try{
-      const raw=JSON.parse(product?.bundles||'[]');
-      return raw.map(b=>({label:b.label||'',qty:b.qty||1,sellingPrice:b.sellingPrice||b.price||'',costPrice:b.costPrice||b.cost||'',hasFreeGift:b.hasFreeGift||false,freeGiftCost:b.freeGiftCost||'',freeGiftName:b.freeGiftName||''}));
-    }catch{return[];}
-  });
-  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const addSize=()=>{if(sizeInput.trim()){setSizes(s=>[...s,sizeInput.trim()]);setSizeInput('');}};
-  const rmSize=s=>setSizes(p=>p.filter(x=>x!==s));
-  const addBundle=()=>setBundles(b=>[...b,{label:'',qty:1,sellingPrice:'',costPrice:'',hasFreeGift:false,freeGiftCost:'',freeGiftName:''}]);
-  const updBundle=(i,k,v)=>setBundles(b=>b.map((x,j)=>j===i?{...x,[k]:v}:x));
-  const rmBundle=i=>setBundles(b=>b.filter((_,j)=>j!==i));
-  const hasSizes=f.hasSizes===true||f.hasSizes==='true';
- 
-  const save=async()=>{
-    if(!f.name){toast('Product name required','error');return;}
-    if(bundles.some(b=>!b.label)){toast('All bundles need a label','error');return;}
-    setSaving(true);
-    const data={...f,sizes:JSON.stringify(sizes),bundles:JSON.stringify(bundles),costGHC:bundles[0]?.costPrice||'',sellingPriceGHC:bundles[0]?.sellingPrice||''};
-    if(isEdit){data.supplierUsername=product.supplierUsername||'';data.supplierUsernames=product.supplierUsernames||'[]';data.supplierNames=product.supplierNames||'';}
-    const r=isEdit?await API.call({action:'updateProduct',id:product.id,product:JSON.stringify(data)}):await API.call({action:'addProduct',product:JSON.stringify(data)});
-    setSaving(false);if(r.success)onSave();else toast(r.error||'Failed','error');
-  };
- 
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    saving&&React.createElement(SaveOverlay,{label:'Saving product...'}),
-    React.createElement('div',{className:'modal modal-lg'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Product':'New Product'),React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'section-divider'},'Basic Info'),
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Product Name *'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Description'),React.createElement('input',{className:'form-input',value:f.description||'',onChange:set('description')}))),
-        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
-          React.createElement('label',{className:'form-label'},'Status'),
-          React.createElement('select',{className:'form-select',style:{width:160},value:String(f.active),onChange:e=>setF(p=>({...p,active:e.target.value==='true'}))},React.createElement('option',{value:'true'},'Active'),React.createElement('option',{value:'false'},'Inactive'))),
-        React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'💡 To assign suppliers to this product, go to the Suppliers page and edit the supplier.'),
-        React.createElement('div',{className:'section-divider'},'Bundles / Pricing'),
-        bundles.map((b,i)=>React.createElement('div',{key:i,className:'bundle-row'},
-          React.createElement('button',{className:'btn btn-danger btn-sm',style:{position:'absolute',top:8,right:8},onClick:()=>rmBundle(i)},'✕'),
-          React.createElement('div',{className:'bundle-row-header'},
-            React.createElement('div',{className:'form-group',style:{flex:2,minWidth:120}},i===0&&React.createElement('label',{className:'form-label'},'Label'),React.createElement('input',{className:'form-input',value:b.label,onChange:e=>updBundle(i,'label',e.target.value),placeholder:'e.g. 1 Unit, 2 Units'})),
-            React.createElement('div',{className:'form-group',style:{width:80}},i===0&&React.createElement('label',{className:'form-label'},'Qty'),React.createElement('input',{className:'form-input',type:'number',value:b.qty,onChange:e=>updBundle(i,'qty',e.target.value)})),
-            React.createElement('div',{className:'form-group',style:{width:130}},i===0&&React.createElement('label',{className:'form-label'},'Selling Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:b.sellingPrice,onChange:e=>updBundle(i,'sellingPrice',e.target.value)})),
-            React.createElement('div',{className:'form-group',style:{width:130}},i===0&&React.createElement('label',{className:'form-label'},'Cost Price (GHC)'),React.createElement('input',{className:'form-input',type:'number',value:b.costPrice,onChange:e=>updBundle(i,'costPrice',e.target.value)}))),
-          React.createElement('div',{className:'bundle-free-gift-row'},
-            React.createElement('span',{style:{fontSize:11,fontWeight:600,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.4px',marginRight:8}},'Free Gift?'),
-            React.createElement('label',null,React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',false)}),React.createElement('span',{style:{marginLeft:4}},'No')),
-            React.createElement('label',null,React.createElement('input',{type:'radio',name:`fg_${i}`,checked:!!b.hasFreeGift,onChange:()=>updBundle(i,'hasFreeGift',true)}),React.createElement('span',{style:{marginLeft:4}},'Yes')),
-            b.hasFreeGift&&React.createElement('div',{className:'bundle-gift-cost'},
-              React.createElement('input',{className:'form-input',type:'number',style:{width:110,padding:'5px 8px',fontSize:12},value:b.freeGiftCost,onChange:e=>updBundle(i,'freeGiftCost',e.target.value),placeholder:'Gift cost'}),
-              React.createElement('input',{className:'form-input',style:{width:140,padding:'5px 8px',fontSize:12},value:b.freeGiftName,onChange:e=>updBundle(i,'freeGiftName',e.target.value),placeholder:'Gift name'})))
-        )),
-        React.createElement('button',{className:'btn btn-secondary btn-sm',style:{marginBottom:14},onClick:addBundle},'+ Add Bundle'),
-        React.createElement('div',{className:'section-divider'},'Sizes'),
-        React.createElement('div',{className:'form-group',style:{marginBottom:10}},
-          React.createElement('label',{className:'form-label'},'Requires Sizes?'),
-          React.createElement('select',{className:'form-select',style:{width:120},value:String(f.hasSizes||false),onChange:e=>setF(p=>({...p,hasSizes:e.target.value==='true'}))},React.createElement('option',{value:'false'},'No'),React.createElement('option',{value:'true'},'Yes'))),
-        hasSizes&&React.createElement('div',{style:{marginBottom:14}},
-          React.createElement('div',{style:{display:'flex',gap:8,marginBottom:8}},
-            React.createElement('input',{className:'form-input',value:sizeInput,onChange:e=>setSizeInput(e.target.value),placeholder:'Type a size and press Enter',onKeyDown:e=>e.key==='Enter'&&addSize()}),
-            React.createElement('button',{className:'btn btn-secondary',onClick:addSize},'Add')),
-          React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},sizes.map(s=>
-            React.createElement('div',{key:s,className:'tag'},s,React.createElement('span',{className:'tag-remove',onClick:()=>rmSize(s)},'×')))))
-      ),
-      React.createElement('div',{className:'modal-footer'},
-        React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),
-        React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},
-          saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Product'))
-    )
-  );
-}
- 
-// ─── STAFF PAGE ────────────────────────────────────────────────
-function StaffPage(){
-  const{data,loading,reload}=useData('getStaff');const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const staff=data||[];const[saving,setSaving]=useState(false);
-  const del=async s=>{if(s.role==='admin'){toast('Cannot delete admin account','error');return;}if(!confirm(`Remove ${s.name||s.username}?`))return;const r=await API.call({action:'deleteStaff',id:s.id});if(r.success){toast('Staff removed');reload();}else toast(r.error||'Failed','error');};
-  const[staffToken,setStaffToken]=useState(()=>getOrCreateToken('staff'));const[copied,setCopied]=useState(false);
-  const signupUrl=`${window.location.origin}${window.location.pathname}?signup=staff&token=${staffToken}`;
-  const copyLink=()=>{navigator.clipboard.writeText(signupUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
-  const revokeStaffToken=()=>{const t=revokeToken('staff');setStaffToken(t);toast('Signup link revoked — generate and share a new one');};
+
+  if(loading&&!dash)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading financials...'));
+  const d=dash||{};
+  const totalWithdrawnNGN=withdrawals.reduce((s,w)=>s+sp(w.amountNGN),0);
+  const totalWithdrawnGHC=withdrawals.reduce((s,w)=>s+sp(w.amountGHC),0);
+  const totalPaidOut=payouts.reduce((s,p)=>s+sp(p.amountNGN),0);
+
+  const fStats=[
+    {label:'Revenue (GHC)',value:fmtGHC(d.revenueGHC),sub:'Paid + delivered',cls:'green'},
+    {label:'Pending Revenue',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered, unpaid',cls:'orange'},
+    {label:'Total Withdrawn (GHC)',value:fmtGHC(totalWithdrawnGHC),sub:'Moved to NGN',cls:'blue'},
+    {label:'Total Withdrawn (NGN)',value:fmtNGN(totalWithdrawnNGN),sub:'Received in Naira',cls:'green'},
+    {label:'Net Profit After Ads',value:fmtNGN(d.netProfitNGN),sub:`Ads: ${fmtNGN(d.totalAdSpend)}`,cls:sp(d.netProfitNGN)>=0?'green':'red'},
+    {label:'Total Paid to Staff',value:fmtNGN(totalPaidOut),sub:'All payouts',cls:'purple'},
+    {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Still owed',cls:'orange'},
+    {label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'blue'},
+  ];
+
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving...'}),
-    React.createElement('div',{className:'card',style:{marginBottom:20}},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},
-        React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Staff Self-Registration Link'),React.createElement('div',{className:'text-muted'},'Share this link so staff can create their own accounts.')),
-        React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeStaffToken},'↺ Revoke Link')),
-      React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},signupUrl),React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy'))),
-    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Staff Access'),React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Staff')),
-    React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'ℹ️ Staff usernames are used to track which orders they contacted. Make sure usernames match exactly when assigning orders.'),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    staff.filter(s=>s.role!=='admin').length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No staff added yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Phone','Email','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,staff.filter(s=>s.role!=='admin').map(s=>
-        React.createElement('tr',{key:s.id||s.username},
-          React.createElement('td',null,s.name||'-'),
-          React.createElement('td',{className:'td-mono'},s.username),
-          React.createElement('td',null,React.createElement('div',null,s.phone||'—'),s.phone2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},s.phone2)),
-          React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},'✉ '+s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),
-          React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),
-          React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'Edit'),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete')))))))),
-    showModal&&React.createElement(StaffModal,{staff:editing,onSave:()=>{setShowModal(false);reload();toast('Saved');},onClose:()=>setShowModal(false),onSaving:setSaving})
-  );
-}
- 
-function StaffModal({staff,onSave,onClose,onSaving}){
-  const isEdit=!!staff;const[f,setF]=useState(staff?{...staff}:{name:'',username:'',password:'',phone:'',phone2:'',email:'',role:'customer_care',active:true});const[showPhone2,setShowPhone2]=useState(!!(staff&&staff.phone2));const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
-  const save=async()=>{
-    if(!f.username||(!isEdit&&!f.password)){toast('Username and password required','error');return;}
-    const data={...f,role:'customer_care',permissions:'view_orders,add_orders,edit_orders,view_dashboard'};
-    setSaving(true);if(onSaving)onSaving(true);
-    const r=await API.call(isEdit?{action:'updateStaff',id:staff.id,staff:JSON.stringify(data)}:{action:'addStaff',staff:JSON.stringify(data)});
-    setSaving(false);if(onSaving)onSaving(false);
-    if(r.success)onSave();else toast(r.error||'Save failed','error');
-  };
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Staff':'Add Staff'),React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Full Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username *'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Password *'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Email'),React.createElement('input',{className:'form-input',type:'email',value:f.email||'',onChange:set('email'),placeholder:'staff@email.com'})),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Phone'),
-            React.createElement('input',{className:'form-input',value:f.phone||'',onChange:set('phone')}),
-            !showPhone2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginTop:6,alignSelf:'flex-start'},onClick:()=>setShowPhone2(true)},'+ 2nd Phone'),
-            showPhone2&&React.createElement('input',{className:'form-input',style:{marginTop:6},value:f.phone2||'',onChange:set('phone2')})))),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save'))));
-}
- 
-// ─── SUPPLIERS PAGE ────────────────────────────────────────────
-function SuppliersPage(){
-  const[suppliers,setSuppliers]=useState([]);const[products,setProducts]=useState([]);const[loading,setLoading]=useState(true);const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);const[saving,setSaving]=useState(false);
-  const[supplierToken,setSupplierToken]=useState(()=>getOrCreateToken('supplier'));const[copied,setCopied]=useState(false);
-  const signupUrl=`${window.location.origin}${window.location.pathname}?signup=supplier&token=${supplierToken}`;
-  const copyLink=()=>{navigator.clipboard.writeText(signupUrl).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);});};
-  const revokeSupplierToken=()=>{const t=revokeToken('supplier');setSupplierToken(t);toast('Supplier signup link revoked');};
-  const toArray=(v)=>{if(Array.isArray(v))return v;if(Array.isArray(v?.data))return v.data;return[];};
-  const load=useCallback(async()=>{
-    try{setLoading(true);const[su,pr]=await Promise.all([API.call({action:'getSuppliers'}),API.call({action:'getProducts'})]);setSuppliers(toArray(su?.data));setProducts(toArray(pr?.data));}
-    catch{setSuppliers([]);setProducts([]);}
-    finally{setLoading(false);}
-  },[]);
-  useEffect(()=>{load();},[load]);
-  const del=async s=>{if(!confirm(`Remove ${s?.name||s?.username}?`))return;const r=await API.call({action:'deleteSupplier',id:s?.id});if(r.success){toast('Removed');load();}else toast(r.error||'Failed','error');};
-  const safeSuppliers=Array.isArray(suppliers)?suppliers:[];const safeProducts=Array.isArray(products)?products:[];
-  return React.createElement('div',null,
-    saving&&React.createElement(SaveOverlay,{label:'Saving supplier...'}),
-    React.createElement('div',{className:'card',style:{marginBottom:20}},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:12,flexWrap:'wrap',gap:8}},
-        React.createElement('div',null,React.createElement('div',{style:{fontWeight:700,fontSize:14,marginBottom:2}},'Supplier Self-Registration Link'),React.createElement('div',{className:'text-muted'},'Share so suppliers can register themselves.')),
-        React.createElement('button',{className:'btn btn-danger btn-sm',onClick:revokeSupplierToken},'↺ Revoke Link')),
-      React.createElement('div',{className:'copy-link-box'},React.createElement('span',{style:{flex:1}},signupUrl),React.createElement('button',{className:'copy-link-btn',onClick:copyLink},copied?'✓ Copied!':'Copy'))),
-    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},'Suppliers'),React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ Add Supplier')),
-    loading?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-    safeSuppliers.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-text'},'No suppliers yet')):
-    React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-      React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Phone','Email','Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
-      React.createElement('tbody',null,safeSuppliers.map(s=>{
-        const assigned=readList(s?.assignedProducts||s?.products||[]);
-        const hasNoProducts=assigned.length===0||assigned.every(x=>!x);
-        return React.createElement('tr',{key:s?.id||s?.username},
-          React.createElement('td',null,s?.name||'-'),
-          React.createElement('td',{className:'td-mono'},s?.username||'-'),
-          React.createElement('td',null,React.createElement('div',null,s?.phone||'—'),s?.phone2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},s.phone2)),
-          React.createElement('td',null,s?.email?React.createElement('span',{className:'badge badge-email-set'},'✉ '+s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),
-          React.createElement('td',null,hasNoProducts?React.createElement('span',{className:'badge badge-unassigned'},'⚠ None assigned'):React.createElement('span',null,assigned.join(', '))),
-          React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s?.active)?'badge-delivered':'badge-canceled'}`},isActive(s?.active)?'Active':'Inactive')),
-          React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},hasNoProducts?'✏ Assign Products':'✏ Edit'),
-            React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'Delete'))));
-      })))),
-    showModal&&React.createElement(SupplierModal,{supplier:editing,products:safeProducts,onSave:()=>{setShowModal(false);load();toast('Saved');},onClose:()=>setShowModal(false),onSaving:setSaving})
-  );
-}
- 
-function SupplierModal({supplier,products,onSave,onClose,onSaving}){
-  const isEdit=!!supplier;const[f,setF]=useState(supplier?{...supplier}:{name:'',username:'',password:'',phone:'',phone2:'',email:'',active:true});const[showPhone2,setShowPhone2]=useState(!!(supplier&&supplier.phone2));const[selected,setSelected]=useState(()=>readList(supplier?.assignedProducts||supplier?.products));const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));const toggleProduct=name=>setSelected(prev=>prev.includes(name)?prev.filter(x=>x!==name):[...prev,name]);
-  const save=async()=>{
-    if(!f.username){toast('Username required','error');return;}if(!isEdit&&!f.password){toast('Password required','error');return;}
-    const data={...f,role:'supplier',assignedProducts:JSON.stringify(selected),products:selected.join(',')};
-    setSaving(true);if(onSaving)onSaving(true);
-    const r=await API.call(isEdit?{action:'updateSupplier',id:supplier.id,supplier:JSON.stringify(data)}:{action:'addSupplier',supplier:JSON.stringify(data)});
-    if(r.success){
-      const allProducts=products||[];
-      await Promise.all(allProducts.map(async p=>{
-        let existing=readList(p.supplierUsernames||p.supplierUsername);
-        const wasAssigned=existing.includes(f.username);const nowAssigned=selected.includes(p.name);
-        if(wasAssigned===nowAssigned)return;
-        if(nowAssigned)existing=[...new Set([...existing,f.username])];else existing=existing.filter(x=>x!==f.username);
-        await API.call({action:'updateProduct',id:p.id,product:JSON.stringify({...p,supplierUsernames:JSON.stringify(existing),supplierUsername:existing[0]||''})});
-      }));
-      cacheBust(['getProducts']);
-    }
-    setSaving(false);if(onSaving)onSaving(false);
-    if(r.success)onSave();else toast(r.error||'Failed','error');
-  };
-  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal'},
-      React.createElement('div',{className:'modal-header'},React.createElement('div',{className:'modal-title'},isEdit?'Edit Supplier':'Add Supplier'),React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
-      React.createElement('div',{className:'modal-body'},
-        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Name'),React.createElement('input',{className:'form-input',value:f.name||'',onChange:set('name')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Username *'),React.createElement('input',{className:'form-input',value:f.username||'',onChange:set('username'),disabled:isEdit})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},isEdit?'New Password (blank = keep)':'Password *'),React.createElement('input',{className:'form-input',type:'text',value:f.password||'',onChange:set('password')})),
-          React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Email'),React.createElement('input',{className:'form-input',type:'email',value:f.email||'',onChange:set('email'),placeholder:'supplier@email.com'})),
-          React.createElement('div',{className:'form-group'},
-            React.createElement('label',{className:'form-label'},'Phone'),
-            React.createElement('input',{className:'form-input',value:f.phone||'',onChange:set('phone')}),
-            !showPhone2&&React.createElement('button',{type:'button',className:'btn btn-secondary btn-sm',style:{marginTop:6,alignSelf:'flex-start'},onClick:()=>setShowPhone2(true)},'+ 2nd Phone'),
-            showPhone2&&React.createElement('input',{className:'form-input',style:{marginTop:6},value:f.phone2||'',onChange:set('phone2')}))),
-        selected.length===0&&React.createElement('div',{className:'alert-warning',style:{marginBottom:12}},'⚠️ No products assigned yet.'),
-        React.createElement('div',{className:'form-group'},
-          React.createElement('label',{className:'form-label'},'Assigned Products'),
-          React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8,marginTop:8}},
-            (products||[]).map(p=>React.createElement('div',{key:p.name,className:`product-chip ${selected.includes(p.name)?'active':''}`,onClick:()=>toggleProduct(p.name)},p.name))))),
-      React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save'))));
-}
- 
-// ═══════════════════════════════════════════════════════════════
-// SETTINGS PAGE
-// Tabs: Connection (admin) | My Email | Password | All Emails (admin) | Gmail Send (admin) | Order Forms (admin)
-// ═══════════════════════════════════════════════════════════════
-function SettingsPage({user,isAdmin,onUserUpdate}){
-  const[tab,setTab]=useState(()=>isAdmin?'connection':'email');
-  const[url,setUrl]=useState(()=>localStorage.getItem('apiUrl')||SITE_API_URL||'');
-  const[savedUrl,setSavedUrl]=useState(false);
-  const[myEmail,setMyEmail]=useState(user.email||'');
-  const[savingEmail,setSavingEmail]=useState(false);
-  const[pw,setPw]=useState({oldPassword:'',newPassword:'',confirmPassword:''});
-  const[savingPw,setSavingPw]=useState(false);
-  const[emailSettings,setEmailSettings]=useState(null);
-  const[loadingEmails,setLoadingEmails]=useState(false);
-  const[copied,setCopied]=useState('');
-  const[products,setProducts]=useState([]);
-  const[loadingProducts,setLoadingProducts]=useState(false);
-  // Gmail manual send state
-  const[gmailTest,setGmailTest]=useState({to:'',subject:'Test from Shittu Stores',body:'This is a test email from your Shittu Stores business manager.',sending:false,result:''});
-  // Thank-you URLs keyed by product name (loaded from localStorage)
-  const[tyUrls,setTyUrls]=useState({});
- 
-  const baseOrderUrl=`${window.location.origin}${window.location.pathname}?view=order`;
-  const getProductUrl=(pName)=>`${baseOrderUrl}&product=${encodeURIComponent(pName)}`;
-  const iframeCode=(pName)=>{const u=getProductUrl(pName);return`<iframe src="${u}" width="100%" height="720" frameborder="0" style="border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.12);" allow="clipboard-write"></iframe>`;};
-  const copyText=(text,key)=>{
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(()=>{setCopied(key);setTimeout(()=>setCopied(''),2500);});
-    }else{
-      const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');setCopied(key);setTimeout(()=>setCopied(''),2500);}catch{}document.body.removeChild(ta);
-    }
-  };
- 
-  const saveUrl=()=>{API.setUrl(url.trim());setSavedUrl(true);toast('API URL saved');setTimeout(()=>setSavedUrl(false),1800);};
- 
-  const saveMyEmail=async()=>{
-    if(!myEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(myEmail)){toast('Enter a valid email address','error');return;}
-    setSavingEmail(true);
-    const r=await API.call({action:'saveEmail',username:user.username,role:user.role,email:myEmail});
-    setSavingEmail(false);
-    if(r.success){toast('Email saved ✓');if(onUserUpdate)onUserUpdate({...user,email:myEmail});}
-    else toast(r.error||'Failed','error');
-  };
- 
-  const loadEmailSettings=async()=>{setLoadingEmails(true);const r=await API.call({action:'getEmailSettings'});setLoadingEmails(false);if(r.success)setEmailSettings(r.data);};
-  useEffect(()=>{if(isAdmin&&tab==='emails')loadEmailSettings();},[tab,isAdmin]);
- 
-  // Load products for embed tab
-  useEffect(()=>{
-    if(isAdmin&&tab==='embed'&&products.length===0){
-      setLoadingProducts(true);
-      API.call({action:'getProducts'}).then(r=>{
-        setLoadingProducts(false);
-        if(r.success){
-          const active=(r.data||[]).filter(p=>isActive(p.active));
-          setProducts(active);
-          // Load any saved thank-you URLs from localStorage
-          const urls={};active.forEach(p=>{const u=getTyUrl(p.name);if(u)urls[p.name]=u;});
-          setTyUrls(urls);
-        }
-      });
-    }
-  },[tab,isAdmin,products.length]);
- 
-  const setPwField=k=>e=>setPw(p=>({...p,[k]:e.target.value}));
-  const changePassword=async()=>{
-    if(!pw.oldPassword){toast('Enter current password','error');return;}
-    if(!pw.newPassword){toast('Enter new password','error');return;}
-    if(pw.newPassword!==pw.confirmPassword){toast('Passwords do not match','error');return;}
-    setSavingPw(true);
-    const r=await API.call({action:'changePassword',username:user.username,role:user.role,oldPassword:pw.oldPassword,newPassword:pw.newPassword});
-    setSavingPw(false);
-    if(r.success){toast('Password changed ✓');setPw({oldPassword:'',newPassword:'',confirmPassword:''});}
-    else toast(r.error||'Failed','error');
-  };
- 
-  const sendGmailTest=async()=>{
-    if(!gmailTest.to){toast('Enter a recipient email','error');return;}
-    setGmailTest(s=>({...s,sending:true,result:''}));
-    const res=await sendEmailViaGmail(gmailTest.to,gmailTest.subject,gmailTest.body);
-    setGmailTest(s=>({...s,sending:false,result:res.success?'✅ Email sent successfully via Gmail!':'❌ '+(res.error||res.message||'Failed to send. Check your Gmail connection.')}));
-  };
- 
-  // Save thank-you URL for a product to localStorage
-  const saveTyUrlForProduct=(productName,url)=>{
-    setTyUrl(productName,url);  // global localStorage helper
-    setTyUrls(prev=>({...prev,[productName]:url}));
-    toast('Thank-you URL saved ✓');
-  };
- 
-  const settingsTabs=[
-    ...(isAdmin?[{id:'connection',label:'🔌 Connection'}]:[]),
-    {id:'email',label:'📧 My Email'},
-    {id:'password',label:'🔑 Password'},
-    ...(isAdmin?[
-      {id:'emails',label:'📬 All Emails'},
-      {id:'gmail',label:'✉️ Gmail Send'},
-      {id:'embed',label:'🔗 Order Forms'},
-    ]:[]),
-  ];
- 
-  return React.createElement('div',null,
-    savingPw&&React.createElement(SaveOverlay,{label:'Changing password...'}),
-    React.createElement('div',{className:'tabs'},settingsTabs.map(t=>
-      React.createElement('div',{key:t.id,className:`tab ${tab===t.id?'active':''}`,onClick:()=>setTab(t.id)},t.label))),
- 
-    // ── CONNECTION TAB ───────────────────────────────────────
-    tab==='connection'&&isAdmin&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:4}},'Database Connection'),
-      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'The API URL is hardcoded in this file. Use this to temporarily override for testing.'),
-      React.createElement('div',{className:'alert-success',style:{marginBottom:12}},'✅ API URL is hardcoded — all users can use the app without any setup.'),
-      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
-        React.createElement('label',{className:'form-label'},'Override URL (Admin only)'),
-        React.createElement('input',{className:'form-input',value:url,onChange:e=>setUrl(e.target.value),placeholder:'https://script.google.com/macros/s/.../exec'})),
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',{className:'section-title'},'Financials'),
       React.createElement('div',{style:{display:'flex',gap:8}},
-        React.createElement('button',{className:'btn btn-primary',onClick:saveUrl},savedUrl?'✓ Saved':'Save Override'),
-        localStorage.getItem('apiUrl')&&React.createElement('button',{className:'btn btn-danger',onClick:()=>{API.setUrl(null);setUrl(SITE_API_URL);toast('Override cleared');}},'Clear Override'))),
- 
-    // ── MY EMAIL TAB ─────────────────────────────────────────
-    tab==='email'&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:4}},'My Email Address'),
-      React.createElement('div',{className:'text-muted',style:{marginBottom:16}},'Receive order notifications via email.'),
-      user.email&&React.createElement('div',{className:'alert-success',style:{marginBottom:16}},`✅ Current email: ${user.email}`),
-      React.createElement('div',{className:'form-group',style:{marginBottom:14}},
-        React.createElement('label',{className:'form-label'},'Email Address'),
-        React.createElement('div',{className:'email-row'},
-          React.createElement('input',{className:'form-input',type:'email',value:myEmail,onChange:e=>setMyEmail(e.target.value),placeholder:'your@email.com'}),
-          React.createElement('button',{className:'btn btn-primary',onClick:saveMyEmail,disabled:savingEmail},savingEmail?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Email'))),
-      React.createElement('div',{className:'alert-info'},'📧 You\'ll receive order notifications once your email is saved.')),
- 
-    // ── PASSWORD TAB ─────────────────────────────────────────
-    tab==='password'&&React.createElement('div',{className:'card'},
-      React.createElement('div',{className:'section-title',style:{marginBottom:16}},'Change Password'),
-      React.createElement('div',{className:'form-grid form-grid-3'},
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Current Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.oldPassword,onChange:setPwField('oldPassword')})),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'New Password'),React.createElement('input',{className:'form-input',type:'password',value:pw.newPassword,onChange:setPwField('newPassword')})),
-        React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Confirm New'),React.createElement('input',{className:'form-input',type:'password',value:pw.confirmPassword,onChange:setPwField('confirmPassword')}))),
-      React.createElement('div',{style:{display:'flex',justifyContent:'flex-end',marginTop:14}},
-        React.createElement('button',{className:'btn btn-primary',onClick:changePassword,disabled:savingPw},'Change Password'))),
- 
-    // ── ALL EMAILS TAB ────────────────────────────────────────
-    tab==='emails'&&isAdmin&&React.createElement('div',null,
-      React.createElement('div',{className:'section-header'},
-        React.createElement('div',null,React.createElement('div',{className:'section-title'},'Email Notification Status')),
-        React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:loadEmailSettings},'↻ Refresh')),
-      React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'Everyone with an email set receives order notifications automatically via Google Apps Script MailApp.'),
-      loadingEmails?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-      emailSettings?React.createElement('div',null,
-        React.createElement('div',{className:'card',style:{marginBottom:16}},
-          React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'Staff Emails'),
-          emailSettings.staff&&emailSettings.staff.length>0
-            ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-              React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Role','Email','Status'].map(h=>React.createElement('th',{key:h},h)))),
-              React.createElement('tbody',null,emailSettings.staff.map(s=>
-                React.createElement('tr',{key:s.username},
-                  React.createElement('td',null,s.name||s.username),React.createElement('td',{className:'td-mono'},s.username),
-                  React.createElement('td',null,React.createElement('span',{className:'badge badge-processing'},s.role)),
-                  React.createElement('td',{className:'td-mono',style:{fontSize:12}},s.email||'—'),
-                  React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},'✅ Set'):React.createElement('span',{className:'badge badge-email-missing'},'❌ Missing')))))))
-            :React.createElement('div',{className:'text-muted'},'No staff yet.')),
-        React.createElement('div',{className:'card'},
-          React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'Supplier Emails'),
-          emailSettings.suppliers&&emailSettings.suppliers.length>0
-            ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-              React.createElement('thead',null,React.createElement('tr',null,['Name','Email','Status'].map(h=>React.createElement('th',{key:h},h)))),
-              React.createElement('tbody',null,emailSettings.suppliers.map(s=>
-                React.createElement('tr',{key:s.username},
-                  React.createElement('td',null,s.name||s.username),
-                  React.createElement('td',{className:'td-mono',style:{fontSize:12}},s.email||'—'),
-                  React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},'✅ Set'):React.createElement('span',{className:'badge badge-email-missing'},'❌ Missing')))))))
-            :React.createElement('div',{className:'text-muted'},'No suppliers yet.'))
-      ):React.createElement('div',{className:'card'},React.createElement('div',{className:'text-muted'},'Click Refresh to load.'))),
- 
-    // ── GMAIL SEND TAB ────────────────────────────────────────
-    tab==='gmail'&&isAdmin&&React.createElement('div',null,
-      React.createElement('div',{className:'gmail-connect-card'},
-        React.createElement('div',{className:'gmail-connect-title'},'✉️ Gmail — Direct Send via Connected Account'),
-        React.createElement('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.6,marginBottom:12}},'Send emails directly from your connected Gmail account via the Anthropic API + Gmail MCP. This is for manual sends and testing. Automatic order notifications are handled by Google Apps Script MailApp on the backend.'),
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},React.createElement('span',{className:'gmail-status-on'},'🟢 Gmail MCP Connected'))
-      ),
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{className:'section-title',style:{marginBottom:16}},'Send a Manual Email'),
-        React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'💡 Emails sent here come from your connected Gmail account. Automatic order notifications use GAS MailApp separately.'),
+        React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:load},'↻ Refresh'),
+        React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowWithdraw(true)},'+ Record Withdrawal'))),
+    React.createElement('div',{className:'stat-grid'},fStats.map(s=>
+      React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
+        React.createElement('div',{className:'stat-label'},s.label),
+        React.createElement('div',{className:'stat-value'},s.value),
+        React.createElement('div',{className:'stat-sub'},s.sub)))),
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Staff Payouts'),
+      React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'ℹ️ Balance is earnings (₦2,000 per delivered + paid order they contacted) minus what has already been paid.'),
+      (d.staffPayouts&&d.staffPayouts.length>0)
+        ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+            React.createElement('thead',null,React.createElement('tr',null,['Staff','Deliveries','Earned','Paid','Balance','Action'].map(h=>React.createElement('th',{key:h},h)))),
+            React.createElement('tbody',null,d.staffPayouts.map(s=>
+              React.createElement(StaffPayoutRow,{key:s.name,staff:s,onPay:recordPayout})))
+          ))
+        :React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💸'),React.createElement('div',{className:'empty-text'},'No staff payout data yet'))),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Withdrawal History (GHC → NGN)'),
+      withdrawals.length>0
+        ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+            React.createElement('thead',null,React.createElement('tr',null,['Date','Amount (GHC)','Amount (NGN)','Rate','Notes'].map(h=>React.createElement('th',{key:h},h)))),
+            React.createElement('tbody',null,withdrawals.map(w=>
+              React.createElement('tr',{key:w.id},
+                React.createElement('td',null,w.date||'—'),
+                React.createElement('td',{className:'td-mono'},fmtGHC(w.amountGHC)),
+                React.createElement('td',{className:'td-mono',style:{color:'var(--green)'}},fmtNGN(w.amountNGN)),
+                React.createElement('td',{className:'td-mono'},w.exchangeRate?`₦${w.exchangeRate}`:'—'),
+                React.createElement('td',{style:{color:'var(--text3)',fontSize:12}},w.notes||'—'))))
+          ))
+        :React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🏦'),React.createElement('div',{className:'empty-text'},'No withdrawals recorded yet'))),
+    showWithdraw&&React.createElement(WithdrawalModal,{
+      onClose:()=>setShowWithdraw(false),
+      onSaving:setSaving,
+      onSaved:()=>{setShowWithdraw(false);cacheBust(['getWithdrawals','getDashboard']);load();}
+    })
+  );
+}
+
+function StaffPayoutRow({staff,onPay}){
+  const balance=sp(staff.balance||0);
+  const[amt,setAmt]=useState(balance>0?String(balance):'');
+  return React.createElement('tr',null,
+    React.createElement('td',null,staff.name),
+    React.createElement('td',null,staff.count||0),
+    React.createElement('td',{className:'profit-positive'},fmtNGN(staff.earned)),
+    React.createElement('td',{style:{color:'var(--green)',fontFamily:'var(--font-mono)',fontSize:12}},fmtNGN(staff.paid||0)),
+    React.createElement('td',{className:balance>0?'profit-negative':'profit-positive'},fmtNGN(balance)),
+    React.createElement('td',null,
+      balance>0
+        ?React.createElement('div',{style:{display:'flex',gap:6,alignItems:'center'}},
+            React.createElement('input',{className:'form-input',type:'number',value:amt,onChange:e=>setAmt(e.target.value),style:{width:100,padding:'4px 8px',fontSize:12},placeholder:'₦ amount'}),
+            React.createElement('button',{className:'btn btn-success btn-sm',onClick:()=>onPay(staff.name,amt)},'Pay'))
+        :React.createElement('span',{className:'badge badge-paid'},'Settled')));
+}
+
+function WithdrawalModal({onClose,onSaving,onSaved}){
+  const[f,setF]=useState({date:today(),amountGHC:'',amountNGN:'',notes:''});
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const rate=(sp(f.amountGHC)>0&&sp(f.amountNGN)>0)?(sp(f.amountNGN)/sp(f.amountGHC)).toFixed(2):'';
+  const save=async()=>{
+    if(sp(f.amountGHC)<=0){toast('Enter the GHC amount','error');return;}
+    if(sp(f.amountNGN)<=0){toast('Enter the NGN amount received','error');return;}
+    if(onSaving)onSaving(true);
+    const w={...f,exchangeRate:rate};
+    const r=await API.call({action:'addWithdrawal',withdrawal:JSON.stringify(w)});
+    if(onSaving)onSaving(false);
+    if(r.success){toast('Withdrawal recorded ✓');onSaved();}else toast(r.error||'Failed','error');
+  };
+  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div',{className:'modal',style:{maxWidth:480}},
+      React.createElement('div',{className:'modal-header'},
+        React.createElement('div',{className:'modal-title'},'Record Withdrawal'),
+        React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
+      React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'Log money moved from your GHC balance into NGN. The exchange rate is calculated automatically.'),
         React.createElement('div',{className:'form-group',style:{marginBottom:12}},
-          React.createElement('label',{className:'form-label'},'To (Email Address) *'),
-          React.createElement('input',{className:'form-input',type:'email',value:gmailTest.to,onChange:e=>setGmailTest(s=>({...s,to:e.target.value})),placeholder:'recipient@email.com'})),
-        React.createElement('div',{className:'form-group',style:{marginBottom:12}},
-          React.createElement('label',{className:'form-label'},'Subject'),
-          React.createElement('input',{className:'form-input',value:gmailTest.subject,onChange:e=>setGmailTest(s=>({...s,subject:e.target.value}))})),
-        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
-          React.createElement('label',{className:'form-label'},'Message Body'),
-          React.createElement('textarea',{className:'form-textarea',rows:5,value:gmailTest.body,onChange:e=>setGmailTest(s=>({...s,body:e.target.value}))})),
-        gmailTest.result&&React.createElement('div',{className:`alert-${gmailTest.result.startsWith('✅')?'success':'warning'}`,style:{marginBottom:12}},gmailTest.result),
-        React.createElement('button',{className:'btn btn-primary',onClick:sendGmailTest,disabled:gmailTest.sending||!gmailTest.to},
-          gmailTest.sending?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Sending...'):'✉️ Send via Gmail')
-      )),
- 
-    // ── ORDER FORMS (EMBED) TAB ──────────────────────────────
-    tab==='embed'&&isAdmin&&React.createElement('div',null,
-      React.createElement('div',{className:'section-header'},
-        React.createElement('div',null,
-          React.createElement('div',{className:'section-title'},'Customer Order Forms'),
-          React.createElement('div',{className:'section-sub'},'Built into this same file — no separate file needed')),
-        React.createElement('a',{href:baseOrderUrl,target:'_blank',className:'btn btn-blue btn-sm'},'🔗 View All-Products Form')
-      ),
-      React.createElement('div',{className:'alert-success',style:{marginBottom:20}},'✅ Share these links directly or embed via iFrame on Systeme.io. You can also set a thank-you page redirect per product.'),
-      // General form link
-      React.createElement('div',{className:'form-url-wrap'},
-        React.createElement('div',{style:{fontWeight:700,fontSize:13,marginBottom:10}},'🌐 General Order Form (all products)'),
-        React.createElement('div',{className:'copy-link-box'},
-          React.createElement('span',{style:{flex:1}},baseOrderUrl),
-          React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(baseOrderUrl,'general')},copied==='general'?'✓ Copied!':'Copy'))),
-      React.createElement('div',{className:'section-divider'},'Per-Product Order Forms'),
-      loadingProducts?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'})):
-      products.length===0?React.createElement('div',{className:'alert-warning'},'No active products yet.'):
-      products.map(p=>{
-        let bundles=[];try{bundles=JSON.parse(p.bundles||'[]');}catch{}
-        const pUrl=getProductUrl(p.name);
-        const pKey=encodeURIComponent(p.name);
-        const currentTyUrl=tyUrls[p.name]||'';
-        return React.createElement('div',{key:p.id,className:'product-link-row'},
-          React.createElement('div',{className:'product-link-name'},
-            React.createElement('span',null,p.name),
-            bundles.length>0&&React.createElement('span',{className:'badge badge-processing'},`${bundles.length} packages`),
-            (p.hasSizes===true||p.hasSizes==='true')&&React.createElement('span',{className:'badge badge-confirmed'},'Sizes'),
-            React.createElement('a',{href:pUrl,target:'_blank',className:'btn btn-blue btn-sm',style:{marginLeft:'auto'}},'Preview ↗')),
-          p.description&&React.createElement('div',{className:'product-link-meta'},p.description),
-          // Order form link
-          React.createElement('div',{className:'copy-link-box'},
-            React.createElement('span',{style:{flex:1,fontSize:10}},pUrl),
-            React.createElement('button',{className:'copy-link-btn',onClick:()=>copyText(pUrl,`link-${pKey}`)},copied===`link-${pKey}`?'✓ Copied!':'Copy Link')),
-          React.createElement('div',{style:{display:'flex',gap:8,marginTop:8,flexWrap:'wrap'}},
-            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>copyText(iframeCode(p.name),`iframe-${pKey}`)},copied===`iframe-${pKey}`?'✓ Copied!':'📋 Copy iFrame')),
-          // ── THANK-YOU PAGE URL INPUT ──────────────────────
-          React.createElement('div',{style:{marginTop:10,padding:'10px 12px',background:'var(--bg4)',borderRadius:8,border:'1px solid var(--border)'}},
-            React.createElement('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'0.5px',marginBottom:4}},'🎯 Thank-You Page Redirect (optional)'),
-            React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:8}},'After placing an order, customers are automatically redirected to this URL. Leave blank to show the default success screen.'),
-            React.createElement(TyUrlInput,{productName:p.name,initialValue:currentTyUrl,onSave:(url)=>saveTyUrlForProduct(p.name,url)})
-          )
-        );
-      }),
-      // How-to embed guide
-      React.createElement('div',{className:'card',style:{marginTop:20}},
-        React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'How to embed on Systeme.io'),
-        ['Go to your Systeme.io funnel page editor.','Add a new section → insert an "HTML" or "Custom code" block.','Click "Copy iFrame" next to the product you want to embed.','Paste the code into the HTML block and publish.','Orders appear in your Orders page tagged as "🌐 Form".'].map((step,i)=>
-          React.createElement('div',{key:i,style:{display:'flex',gap:10,marginBottom:10,alignItems:'flex-start'}},
-            React.createElement('div',{style:{width:22,height:22,borderRadius:'50%',background:'var(--accent)',color:'#000',fontWeight:700,fontSize:11,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}},i+1),
-            React.createElement('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.6}},step)))
-      )
+          React.createElement('label',{className:'form-label'},'Date'),
+          React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:12}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Amount (GHC)'),
+            React.createElement('input',{className:'form-input',type:'number',value:f.amountGHC,onChange:set('amountGHC')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Amount Received (NGN)'),
+            React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')}))),
+        rate&&React.createElement('div',{className:'alert-success',style:{marginBottom:12}},`Exchange rate: ₦${rate} per GH₵1`),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'Notes'),
+          React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes'),placeholder:'Optional'}))),
+      React.createElement('div',{className:'modal-footer'},
+        React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),
+        React.createElement('button',{className:'btn btn-primary',onClick:save},'Save Withdrawal'))
     )
   );
 }
- 
-// ── THANK-YOU URL INPUT COMPONENT ─────────────────────────────
-// Controlled input that saves to localStorage via the parent callback
-function TyUrlInput({productName,initialValue,onSave}){
-  const[val,setVal]=useState(initialValue||'');
-  const[saved,setSaved]=useState(false);
-  // Sync if initialValue changes (e.g. products reloaded)
-  useEffect(()=>setVal(initialValue||''),[initialValue]);
-  const save=()=>{
-    onSave(val.trim());
-    setSaved(true);
-    setTimeout(()=>setSaved(false),2000);
-  };
-  const clear=()=>{setVal('');onSave('');};
-  return React.createElement('div',{className:'ty-url-row'},
-    React.createElement('input',{
-      className:'form-input',
-      value:val,
-      onChange:e=>setVal(e.target.value),
-      placeholder:'https://yoursite.com/thank-you',
-      onKeyDown:e=>e.key==='Enter'&&save()
-    }),
-    React.createElement('button',{className:`btn btn-sm ${saved?'btn-success':'btn-primary'}`,onClick:save},saved?'✓ Saved':'Save'),
-    val&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:clear,title:'Clear URL'},'✕')
+
+// ═══════════════════════════════════════════════════════════════
+// ANALYTICS PAGE (admin / supplier) — order & product performance
+// ═══════════════════════════════════════════════════════════════
+function AnalyticsPage({user,isAdmin,isSupplier}){
+  const[orders,setOrders]=useState([]);
+  const[products,setProducts]=useState([]);
+  const[loading,setLoading]=useState(true);
+
+  const load=useCallback(async()=>{
+    setLoading(true);
+    const params={action:'getOrders'};
+    if(isSupplier)params.supplierUsername=user.username;
+    const[or,pr]=await Promise.all([API.call(params),API.call({action:'getProducts'})]);
+    if(or.success)setOrders(or.data||[]);
+    if(pr.success)setProducts(pr.data||[]);
+    setLoading(false);
+  },[isSupplier,user.username]);
+  useEffect(()=>{load();},[load]);
+
+  const scoped=useMemo(()=>orders.filter(o=>supplierOwnsOrder(o,products,user)),[orders,products,user]);
+
+  const statusDist=useMemo(()=>{const m={};DELIVERY_STATUSES.forEach(s=>m[s]=0);scoped.forEach(o=>{const s=statusOf(o);m[s]=(m[s]||0)+1;});return m;},[scoped]);
+  const productPerf=useMemo(()=>{
+    const m={};
+    scoped.forEach(o=>{
+      const k=o.product||'Unknown';
+      if(!m[k])m[k]={name:k,orders:0,delivered:0,revenue:0};
+      m[k].orders++;
+      if(statusOf(o)==='Delivered'){m[k].delivered++;if(paymentOf(o)==='Paid')m[k].revenue+=sp(o.sellingPrice);}
+    });
+    return Object.values(m).sort((a,b)=>b.orders-a.orders);
+  },[scoped]);
+  const monthly=useMemo(()=>{
+    const months=[];
+    for(let i=5;i>=0;i--){const dt=new Date();dt.setMonth(dt.getMonth()-i);months.push({key:dt.toISOString().slice(0,7),label:dt.toLocaleString('default',{month:'short'}),value:0,delivered:0});}
+    scoped.forEach(o=>{const mk=String(o.date||'').slice(0,7);const m=months.find(x=>x.key===mk);if(m){m.value++;if(statusOf(o)==='Delivered')m.delivered++;}});
+    return months;
+  },[scoped]);
+
+  if(loading&&orders.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading analytics...'));
+
+  const total=scoped.length;
+  const delivered=scoped.filter(o=>statusOf(o)==='Delivered').length;
+  const conv=total>0?Math.round(delivered/total*100):0;
+
+  return React.createElement('div',null,
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',{className:'section-title'},'Analytics'),
+      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:load},'↻ Refresh')),
+    React.createElement('div',{className:'stat-grid'},[
+      {label:'Total Orders',value:total,sub:'All time',cls:'blue'},
+      {label:'Delivered',value:delivered,sub:'Successful',cls:'green'},
+      {label:'Conversion',value:`${conv}%`,sub:'Delivered ÷ Total',cls:'purple'},
+      {label:'Products Sold',value:productPerf.length,sub:'Distinct products',cls:'orange'},
+    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
+      React.createElement('div',{className:'stat-label'},s.label),
+      React.createElement('div',{className:'stat-value'},s.value),
+      React.createElement('div',{className:'stat-sub'},s.sub)))),
+    React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:20}},
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'Orders Per Month'),
+        React.createElement(BarChart,{data:monthly.map(m=>({label:m.label,value:m.value})),color:'var(--accent)',height:90})),
+      React.createElement('div',{className:'card'},
+        React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'Deliveries Per Month'),
+        React.createElement(LineChart,{data:monthly.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:90}))),
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{className:'section-title',style:{marginBottom:14}},'Status Distribution'),
+      DELIVERY_STATUSES.map(s=>{
+        const c=statusDist[s]||0;const pct=total>0?Math.round(c/total*100):0;
+        return React.createElement('div',{key:s,style:{marginBottom:10}},
+          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
+            React.createElement('span',null,s),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},`${c} (${pct}%)`)),
+          React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--blue)'}})));
+      })),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Product Performance'),
+      productPerf.length>0
+        ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+            React.createElement('thead',null,React.createElement('tr',null,['Product','Orders','Delivered','Conv.','Revenue (GHC)'].map(h=>React.createElement('th',{key:h},h)))),
+            React.createElement('tbody',null,productPerf.map(p=>
+              React.createElement('tr',{key:p.name},
+                React.createElement('td',{style:{fontWeight:600}},p.name),
+                React.createElement('td',null,p.orders),
+                React.createElement('td',null,p.delivered),
+                React.createElement('td',null,`${p.orders>0?Math.round(p.delivered/p.orders*100):0}%`),
+                React.createElement('td',{className:'profit-positive'},fmtGHC(p.revenue)))))
+          ))
+        :React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📊'),React.createElement('div',{className:'empty-text'},'No order data yet')))
   );
 }
- 
+
+// ═══════════════════════════════════════════════════════════════
+// EXPENSES PAGE (admin) — ad spend & other costs in NGN
+// ═══════════════════════════════════════════════════════════════
+const EXPENSE_CATEGORIES=['Ad Cost','Salary','Logistics','Packaging','Restock','Transport','Misc'];
+function ExpensesPage({user,isAdmin}){
+  const[expenses,setExpenses]=useState([]);
+  const[loading,setLoading]=useState(true);
+  const[showModal,setShowModal]=useState(false);
+  const[saving,setSaving]=useState(false);
+  const[catFilter,setCatFilter]=useState('');
+
+  const load=useCallback(async()=>{
+    setLoading(true);
+    const r=await API.call({action:'getExpenses'});
+    if(r.success)setExpenses(r.data||[]);
+    setLoading(false);
+  },[]);
+  useEffect(()=>{load();},[load]);
+
+  const filtered=useMemo(()=>{
+    let r=[...expenses].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+    if(catFilter)r=r.filter(e=>e.category===catFilter);
+    return r;
+  },[expenses,catFilter]);
+
+  const totalNGN=filtered.reduce((s,e)=>s+sp(e.amountNGN),0);
+  const adSpend=expenses.filter(e=>e.category==='Ad Cost').reduce((s,e)=>s+sp(e.amountNGN),0);
+  const byCat=useMemo(()=>{const m={};expenses.forEach(e=>{m[e.category]=(m[e.category]||0)+sp(e.amountNGN);});return m;},[expenses]);
+
+  const del=async e=>{
+    if(!confirm('Delete this expense?'))return;
+    setExpenses(prev=>prev.filter(x=>x.id!==e.id));
+    const r=await API.call({action:'deleteExpense',id:e.id});
+    if(r.success)toast('Expense deleted');else{setExpenses(prev=>[...prev,e]);toast(r.error||'Delete failed','error');}
+  };
+
+  if(loading&&expenses.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading expenses...'));
+
+  return React.createElement('div',null,
+    saving&&React.createElement(SaveOverlay,{label:'Saving expense...'}),
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',{className:'section-title'},'Expenses'),
+      React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowModal(true)},'+ Add Expense')),
+    React.createElement('div',{className:'stat-grid'},[
+      {label:'Total Expenses (NGN)',value:fmtNGN(totalNGN),sub:catFilter||'All categories',cls:'red'},
+      {label:'Total Ad Spend',value:fmtNGN(adSpend),sub:'Ad Cost category',cls:'orange'},
+      {label:'Entries',value:filtered.length,sub:'Records shown',cls:'blue'},
+    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
+      React.createElement('div',{className:'stat-label'},s.label),
+      React.createElement('div',{className:'stat-value'},s.value),
+      React.createElement('div',{className:'stat-sub'},s.sub)))),
+    Object.keys(byCat).length>0&&React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Spend by Category'),
+      Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>{
+        const pct=totalNGN>0?Math.round(amt/expenses.reduce((s,e)=>s+sp(e.amountNGN),0)*100):0;
+        return React.createElement('div',{key:cat,style:{marginBottom:10}},
+          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:3,fontSize:12}},
+            React.createElement('span',null,cat),React.createElement('span',{style:{fontFamily:'var(--font-mono)'}},fmtNGN(amt))),
+          React.createElement('div',{className:'bar-wrap'},React.createElement('div',{className:'bar-fill',style:{width:`${pct}%`,background:'var(--red)'}})));
+      })),
+    React.createElement('div',{className:'filters-bar'},
+      React.createElement('select',{className:'form-select',style:{width:160},value:catFilter,onChange:e=>setCatFilter(e.target.value)},
+        React.createElement('option',{value:''},'All Categories'),
+        EXPENSE_CATEGORIES.map(c=>React.createElement('option',{key:c,value:c},c)))),
+    React.createElement('div',{className:'card'},
+      filtered.length>0
+        ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+            React.createElement('thead',null,React.createElement('tr',null,['Date','Category','Amount (NGN)','Rate','Amount (GHC)','Notes','Action'].map(h=>React.createElement('th',{key:h},h)))),
+            React.createElement('tbody',null,filtered.map(e=>
+              React.createElement('tr',{key:e.id},
+                React.createElement('td',null,e.date||'—'),
+                React.createElement('td',null,React.createElement('span',{className:'tag'},e.category)),
+                React.createElement('td',{className:'td-mono',style:{color:'var(--red)'}},fmtNGN(e.amountNGN)),
+                React.createElement('td',{className:'td-mono'},e.exchangeRate?`₦${e.exchangeRate}`:'—'),
+                React.createElement('td',{className:'td-mono'},e.amountGHC?fmtGHC(e.amountGHC):'—'),
+                React.createElement('td',{style:{color:'var(--text3)',fontSize:12}},e.notes||'—'),
+                React.createElement('td',null,React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(e)},'🗑')))))
+          ))
+        :React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'📉'),React.createElement('div',{className:'empty-text'},'No expenses recorded'))),
+    showModal&&React.createElement(ExpenseModal,{
+      user,onClose:()=>setShowModal(false),onSaving:setSaving,
+      onSaved:()=>{setShowModal(false);cacheBust(['getExpenses','getDashboard']);load();}
+    })
+  );
+}
+
+function ExpenseModal({user,onClose,onSaving,onSaved}){
+  const[f,setF]=useState({date:today(),category:'Ad Cost',amountNGN:'',exchangeRate:'',notes:''});
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const amountGHC=(sp(f.amountNGN)>0&&sp(f.exchangeRate)>0)?(sp(f.amountNGN)/sp(f.exchangeRate)).toFixed(2):'';
+  const save=async()=>{
+    if(sp(f.amountNGN)<=0){toast('Enter the NGN amount','error');return;}
+    if(onSaving)onSaving(true);
+    const exp={...f,amountGHC,createdBy:user.username};
+    const r=await API.call({action:'addExpense',expense:JSON.stringify(exp)});
+    if(onSaving)onSaving(false);
+    if(r.success){toast('Expense added ✓');onSaved();}else toast(r.error||'Failed','error');
+  };
+  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div',{className:'modal',style:{maxWidth:480}},
+      React.createElement('div',{className:'modal-header'},
+        React.createElement('div',{className:'modal-title'},'Add Expense'),
+        React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
+      React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:12}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Date'),
+            React.createElement('input',{className:'form-input',type:'date',value:f.date,onChange:set('date')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Category'),
+            React.createElement('select',{className:'form-select',value:f.category,onChange:set('category')},
+              EXPENSE_CATEGORIES.map(c=>React.createElement('option',{key:c,value:c},c))))),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:12}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Amount (NGN)'),
+            React.createElement('input',{className:'form-input',type:'number',value:f.amountNGN,onChange:set('amountNGN')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Exchange Rate (₦/GH₵) — optional'),
+            React.createElement('input',{className:'form-input',type:'number',value:f.exchangeRate,onChange:set('exchangeRate'),placeholder:'e.g. 120'}))),
+        amountGHC&&React.createElement('div',{className:'alert-info',style:{marginBottom:12}},`≈ ${fmtGHC(amountGHC)} at ₦${f.exchangeRate}/GH₵`),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'Notes'),
+          React.createElement('input',{className:'form-input',value:f.notes,onChange:set('notes'),placeholder:'Optional'}))),
+      React.createElement('div',{className:'modal-footer'},
+        React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),
+        React.createElement('button',{className:'btn btn-primary',onClick:save},'Save Expense'))
+    )
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRODUCTS PAGE
+// ═══════════════════════════════════════════════════════════════
+function ProductsPage({user}){
+  const{data:products,loading,reload,setData}=useData('getProducts');
+  const{data:suppliers}=useData('getSuppliers');
+  const[showModal,setShowModal]=useState(false);
+  const[editing,setEditing]=useState(null);
+  const[saving,setSaving]=useState(false);
+  const[search,setSearch]=useState('');
+
+  const list=useMemo(()=>{
+    const arr=products||[];
+    if(!search)return arr;
+    const s=search.toLowerCase();
+    return arr.filter(p=>(p.name||'').toLowerCase().includes(s));
+  },[products,search]);
+
+  const del=async p=>{
+    if(!confirm(`Delete product "${p.name}"? This cannot be undone.`))return;
+    setData(prev=>(prev||[]).filter(x=>x.id!==p.id));
+    const r=await API.call({action:'deleteProduct',id:p.id});
+    if(r.success)toast('Product deleted');else{toast(r.error||'Delete failed','error');reload();}
+  };
+
+  if(loading&&!products)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading products...'));
+
+  return React.createElement('div',null,
+    saving&&React.createElement(SaveOverlay,{label:'Saving product...'}),
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',null,
+        React.createElement('div',{className:'section-title'},'Products'),
+        React.createElement('div',{className:'section-sub'},`${list.length} product${list.length!==1?'s':''}`)),
+      React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ New Product')),
+    React.createElement('div',{className:'filters-bar'},
+      React.createElement('input',{className:'search-input',placeholder:'Search products...',value:search,onChange:e=>setSearch(e.target.value)}),
+      React.createElement('button',{className:'btn btn-secondary',onClick:reload},'↻')),
+    list.length===0
+      ?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🏷️'),React.createElement('div',{className:'empty-text'},'No products yet. Create your first one.'))
+      :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+        React.createElement('thead',null,React.createElement('tr',null,
+          ['Product','Packages','Suppliers','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
+        React.createElement('tbody',null,list.map(p=>{
+          let bundles=[];try{bundles=JSON.parse(p.bundles||'[]');}catch{}
+          const supNames=readList(p.supplierNames||p.supplierUsernames||p.supplierUsername);
+          return React.createElement('tr',{key:p.id},
+            React.createElement('td',null,
+              React.createElement('div',{style:{fontWeight:600}},p.name),
+              p.description&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)',maxWidth:220,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},p.description)),
+            React.createElement('td',null,
+              bundles.length===0?React.createElement('span',{style:{color:'var(--text3)',fontSize:12}},'—')
+              :React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:2}},bundles.map((b,i)=>
+                React.createElement('span',{key:i,style:{fontSize:11}},`${b.label}: `,React.createElement('span',{style:{color:'var(--accent)'}},fmtGHC(b.sellingPrice||b.price||0)),b.hasFreeGift?' 🎁':'')))),
+            React.createElement('td',null,
+              supNames.length===0?React.createElement('span',{className:'badge badge-unassigned'},'Unassigned')
+              :React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:3}},supNames.map((n,i)=>React.createElement('span',{key:i,className:'badge badge-supplier'},n)))),
+            React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(p.active)?'badge-delivered':'badge-canceled'}`},isActive(p.active)?'Active':'Inactive')),
+            React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
+              React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(p);setShowModal(true);}},'✏'),
+              React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(p)},'🗑'))));
+        }))
+      )),
+    showModal&&React.createElement(ProductModal,{
+      product:editing,suppliers:suppliers||[],
+      onSaving:setSaving,
+      onSaved:()=>{setShowModal(false);setEditing(null);reload();},
+      onClose:()=>{setShowModal(false);setEditing(null);}
+    })
+  );
+}
+
+function ProductModal({product,suppliers,onSaving,onSaved,onClose}){
+  const isEdit=!!product;
+  const[name,setName]=useState(product?.name||'');
+  const[description,setDescription]=useState(product?.description||'');
+  const[active,setActive]=useState(product?isActive(product.active):true);
+  const[hasSizes,setHasSizes]=useState(product?(product.hasSizes===true||product.hasSizes==='true'):false);
+  const[sizesText,setSizesText]=useState(()=>{try{return JSON.parse(product?.sizes||'[]').join(', ');}catch{return'';}});
+  const[selSuppliers,setSelSuppliers]=useState(()=>readList(product?.supplierUsernames||product?.supplierUsername));
+  const[bundles,setBundles]=useState(()=>{try{const b=JSON.parse(product?.bundles||'[]');return Array.isArray(b)&&b.length?b:[{label:'',qty:1,sellingPrice:'',costPrice:'',hasFreeGift:false,freeGiftCost:'',freeGiftName:''}];}catch{return[{label:'',qty:1,sellingPrice:'',costPrice:'',hasFreeGift:false,freeGiftCost:'',freeGiftName:''}];}});
+  const[saving,setSaving]=useState(false);
+
+  const activeSuppliers=(suppliers||[]).filter(s=>isActive(s.active));
+  const toggleSupplier=u=>setSelSuppliers(prev=>prev.includes(u)?prev.filter(x=>x!==u):[...prev,u]);
+  const setBundle=(i,k,v)=>setBundles(prev=>prev.map((b,j)=>j===i?{...b,[k]:v}:b));
+  const addBundle=()=>setBundles(prev=>[...prev,{label:'',qty:1,sellingPrice:'',costPrice:'',hasFreeGift:false,freeGiftCost:'',freeGiftName:''}]);
+  const removeBundle=i=>setBundles(prev=>prev.filter((_,j)=>j!==i));
+
+  const save=async()=>{
+    if(!name.trim()){toast('Product name required','error');return;}
+    const cleanBundles=bundles.filter(b=>b.label&&b.label.trim()).map(b=>({
+      label:b.label.trim(),qty:sp(b.qty)||1,
+      sellingPrice:sp(b.sellingPrice),costPrice:sp(b.costPrice),
+      hasFreeGift:!!b.hasFreeGift,freeGiftCost:b.hasFreeGift?sp(b.freeGiftCost):0,
+      freeGiftName:b.hasFreeGift?(b.freeGiftName||'').trim():''
+    }));
+    if(cleanBundles.length===0){toast('Add at least one package','error');return;}
+    const sizesArr=hasSizes?sizesText.split(',').map(s=>s.trim()).filter(Boolean):[];
+    const supNames=selSuppliers.map(u=>{const s=activeSuppliers.find(x=>x.username===u);return s?(s.name||s.username):u;});
+    const payload={
+      name:name.trim(),description:description.trim(),active,
+      hasSizes,sizes:JSON.stringify(sizesArr),
+      bundles:JSON.stringify(cleanBundles),
+      supplierUsernames:JSON.stringify(selSuppliers),
+      supplierNames:JSON.stringify(supNames),
+      supplierUsername:selSuppliers[0]||''
+    };
+    setSaving(true);if(onSaving)onSaving(true);
+    const r=isEdit
+      ?await API.call({action:'updateProduct',id:product.id,product:JSON.stringify(payload)})
+      :await API.call({action:'addProduct',product:JSON.stringify(payload)});
+    setSaving(false);if(onSaving)onSaving(false);
+    if(r.success){toast('Product saved ✓');onSaved();}else toast(r.error||'Save failed','error');
+  };
+
+  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div',{className:'modal modal-lg'},
+      React.createElement('div',{className:'modal-header'},
+        React.createElement('div',{className:'modal-title'},isEdit?'Edit Product':'New Product'),
+        React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
+      React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Product Name *'),
+          React.createElement('input',{className:'form-input',value:name,onChange:e=>setName(e.target.value)})),
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Description'),
+          React.createElement('textarea',{className:'form-textarea',rows:2,value:description,onChange:e=>setDescription(e.target.value)})),
+        React.createElement('div',{style:{display:'flex',gap:20,marginBottom:14,flexWrap:'wrap'}},
+          React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},
+            React.createElement('input',{type:'checkbox',checked:active,onChange:e=>setActive(e.target.checked)}),'Active (visible in store & order form)'),
+          React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},
+            React.createElement('input',{type:'checkbox',checked:hasSizes,onChange:e=>setHasSizes(e.target.checked)}),'Has sizes')),
+        hasSizes&&React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{className:'form-label'},'Sizes (comma separated)'),
+          React.createElement('input',{className:'form-input',value:sizesText,onChange:e=>setSizesText(e.target.value),placeholder:'e.g. S, M, L, XL'})),
+        React.createElement('div',{className:'section-divider'},'Suppliers'),
+        activeSuppliers.length===0
+          ?React.createElement('div',{className:'text-muted',style:{marginBottom:14}},'No suppliers yet. Add suppliers to assign them.')
+          :React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}},activeSuppliers.map(s=>
+            React.createElement('div',{key:s.username,className:`product-chip ${selSuppliers.includes(s.username)?'active':''}`,onClick:()=>toggleSupplier(s.username)},
+              selSuppliers.includes(s.username)?'✓ ':'',s.name||s.username))),
+        React.createElement('div',{className:'section-divider'},'Packages / Bundles'),
+        bundles.map((b,i)=>React.createElement('div',{key:i,className:'bundle-row'},
+          React.createElement('div',{className:'bundle-row-header'},
+            React.createElement('div',{className:'form-group',style:{flex:2,minWidth:120}},
+              React.createElement('label',{className:'form-label'},'Package Label'),
+              React.createElement('input',{className:'form-input',value:b.label,onChange:e=>setBundle(i,'label',e.target.value),placeholder:'e.g. 1 Bottle'})),
+            React.createElement('div',{className:'form-group',style:{width:70}},
+              React.createElement('label',{className:'form-label'},'Qty'),
+              React.createElement('input',{className:'form-input',type:'number',value:b.qty,onChange:e=>setBundle(i,'qty',e.target.value)})),
+            React.createElement('div',{className:'form-group',style:{width:110}},
+              React.createElement('label',{className:'form-label'},'Sell (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:b.sellingPrice,onChange:e=>setBundle(i,'sellingPrice',e.target.value)})),
+            React.createElement('div',{className:'form-group',style:{width:110}},
+              React.createElement('label',{className:'form-label'},'Cost (GHC)'),
+              React.createElement('input',{className:'form-input',type:'number',value:b.costPrice,onChange:e=>setBundle(i,'costPrice',e.target.value)})),
+            bundles.length>1&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>removeBundle(i),style:{marginBottom:1}},'✕')),
+          React.createElement('div',{className:'bundle-free-gift-row'},
+            React.createElement('label',null,
+              React.createElement('input',{type:'checkbox',checked:!!b.hasFreeGift,onChange:e=>setBundle(i,'hasFreeGift',e.target.checked)}),'🎁 Free gift'),
+            b.hasFreeGift&&React.createElement('div',{className:'bundle-gift-cost'},
+              React.createElement('input',{className:'form-input',style:{width:140,padding:'5px 8px',fontSize:12},value:b.freeGiftName||'',onChange:e=>setBundle(i,'freeGiftName',e.target.value),placeholder:'Gift name'}),
+              React.createElement('input',{className:'form-input',style:{width:110,padding:'5px 8px',fontSize:12},type:'number',value:b.freeGiftCost||'',onChange:e=>setBundle(i,'freeGiftCost',e.target.value),placeholder:'Gift cost'}))))),
+        React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:addBundle,style:{marginTop:4}},'+ Add Package')),
+      React.createElement('div',{className:'modal-footer'},
+        React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),
+        React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Product'))
+    )
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STAFF PAGE
+// ═══════════════════════════════════════════════════════════════
+function StaffPage({user}){
+  const{data:staff,loading,reload,setData}=useData('getStaff');
+  const[showModal,setShowModal]=useState(false);
+  const[editing,setEditing]=useState(null);
+  const[saving,setSaving]=useState(false);
+
+  const list=(staff||[]).filter(s=>s.role!=='supplier');
+
+  const del=async s=>{
+    if(s.username==='admin'){toast('Cannot delete the admin account','error');return;}
+    if(!confirm(`Delete staff "${s.name||s.username}"?`))return;
+    setData(prev=>(prev||[]).filter(x=>x.id!==s.id));
+    const r=await API.call({action:'deleteStaff',id:s.id});
+    if(r.success)toast('Staff deleted');else{toast(r.error||'Delete failed','error');reload();}
+  };
+
+  const copySignupLink=()=>{
+    const token=getOrCreateToken('staff');
+    const link=`${window.location.origin}${window.location.pathname}?signup=staff&token=${token}`;
+    navigator.clipboard?.writeText(link).then(()=>toast('Staff signup link copied ✓')).catch(()=>toast('Copy failed','error'));
+  };
+
+  if(loading&&!staff)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading staff...'));
+
+  return React.createElement('div',null,
+    saving&&React.createElement(SaveOverlay,{label:'Saving staff...'}),
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',null,
+        React.createElement('div',{className:'section-title'},'Staff'),
+        React.createElement('div',{className:'section-sub'},`${list.length} staff member${list.length!==1?'s':''}`)),
+      React.createElement('div',{style:{display:'flex',gap:8}},
+        React.createElement('button',{className:'btn btn-secondary',onClick:copySignupLink},'🔗 Copy Signup Link'),
+        React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ New Staff'))),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'ℹ️ Share the signup link so staff can self-register, or add them manually. Each staff should set their email under Settings to receive order notifications.'),
+    list.length===0
+      ?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'👥'),React.createElement('div',{className:'empty-text'},'No staff yet.'))
+      :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+        React.createElement('thead',null,React.createElement('tr',null,
+          ['Name','Username','Role','Email','Phone','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
+        React.createElement('tbody',null,list.map(s=>
+          React.createElement('tr',{key:s.id},
+            React.createElement('td',{style:{fontWeight:600}},s.name||s.username),
+            React.createElement('td',{className:'td-mono'},s.username),
+            React.createElement('td',null,React.createElement('span',{className:`badge ${s.role==='admin'?'badge-confirmed':'badge-contacted'}`},s.role||'staff')),
+            React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),
+            React.createElement('td',{className:'td-mono',style:{fontSize:11}},s.phone||'—'),
+            React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),
+            React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
+              React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'✏'),
+              s.username!=='admin'&&React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'🗑')))))
+      ))),
+    showModal&&React.createElement(StaffModal,{
+      staff:editing,onSaving:setSaving,
+      onSaved:()=>{setShowModal(false);setEditing(null);reload();},
+      onClose:()=>{setShowModal(false);setEditing(null);}
+    })
+  );
+}
+
+function StaffModal({staff,onSaving,onSaved,onClose}){
+  const isEdit=!!staff;
+  const PERM_LIST=[
+    {id:'view_orders',label:'View Orders'},
+    {id:'add_orders',label:'Add Orders'},
+    {id:'edit_orders',label:'Edit Orders'},
+    {id:'delete_orders',label:'Delete Orders'},
+    {id:'view_dashboard',label:'View Dashboard'},
+    {id:'view_financials',label:'View Financials'},
+    {id:'manage_expenses',label:'Manage Expenses'},
+  ];
+  const[f,setF]=useState(()=>({
+    name:staff?.name||'',username:staff?.username||'',password:staff?.password||'',
+    role:staff?.role||'customer_care',email:staff?.email||'',
+    phone:staff?.phone||'',phone2:staff?.phone2||'',
+    active:staff?isActive(staff.active):true,
+  }));
+  const[perms,setPerms]=useState(()=>{
+    const p=staff?.permissions||'';
+    if(p==='all')return PERM_LIST.map(x=>x.id);
+    return p.split(',').map(s=>s.trim()).filter(Boolean);
+  });
+  const[saving,setSaving]=useState(false);
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const togglePerm=id=>setPerms(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
+
+  const save=async()=>{
+    if(!f.name.trim()){toast('Name required','error');return;}
+    if(!f.username.trim()){toast('Username required','error');return;}
+    if(!isEdit&&!f.password.trim()){toast('Password required','error');return;}
+    const isAdmin=f.role==='admin';
+    const payload={
+      name:f.name.trim(),username:f.username.trim(),
+      role:f.role,email:f.email.trim(),
+      phone:f.phone.trim(),phone2:f.phone2.trim(),
+      active:f.active,
+      permissions:isAdmin?'all':perms.join(','),
+    };
+    if(f.password.trim())payload.password=f.password.trim();
+    setSaving(true);if(onSaving)onSaving(true);
+    const r=isEdit
+      ?await API.call({action:'updateStaff',id:staff.id,staff:JSON.stringify(payload)})
+      :await API.call({action:'addStaff',staff:JSON.stringify(payload)});
+    setSaving(false);if(onSaving)onSaving(false);
+    if(r.success){toast('Staff saved ✓');onSaved();}else toast(r.error||'Save failed','error');
+  };
+
+  const isAdminRole=f.role==='admin';
+  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div',{className:'modal'},
+      React.createElement('div',{className:'modal-header'},
+        React.createElement('div',{className:'modal-title'},isEdit?'Edit Staff':'New Staff'),
+        React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
+      React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Full Name *'),
+            React.createElement('input',{className:'form-input',value:f.name,onChange:set('name')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Username *'),
+            React.createElement('input',{className:'form-input',value:f.username,onChange:set('username'),disabled:isEdit&&staff.username==='admin'}))),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},isEdit?'Password (leave blank to keep)':'Password *'),
+            React.createElement('input',{className:'form-input',type:'text',value:f.password,onChange:set('password'),placeholder:isEdit?'••••••':''})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Role'),
+            React.createElement('select',{className:'form-select',value:f.role,onChange:set('role'),disabled:isEdit&&staff.username==='admin'},
+              React.createElement('option',{value:'customer_care'},'Customer Care'),
+              React.createElement('option',{value:'admin'},'Admin')))),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Email'),
+            React.createElement('input',{className:'form-input',type:'email',value:f.email,onChange:set('email'),placeholder:'For order notifications'})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Phone'),
+            React.createElement('input',{className:'form-input',value:f.phone,onChange:set('phone')}))),
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+          React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},
+            React.createElement('input',{type:'checkbox',checked:f.active,onChange:e=>setF(p=>({...p,active:e.target.checked}))}),'Active account')),
+        !isAdminRole&&React.createElement('div',null,
+          React.createElement('div',{className:'section-divider'},'Permissions'),
+          React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:8}},PERM_LIST.map(p=>
+            React.createElement('div',{key:p.id,className:`product-chip ${perms.includes(p.id)?'active':''}`,onClick:()=>togglePerm(p.id)},
+              perms.includes(p.id)?'✓ ':'',p.label)))),
+        isAdminRole&&React.createElement('div',{className:'alert-warning'},'⚡ Admin role has full access to everything.')),
+      React.createElement('div',{className:'modal-footer'},
+        React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),
+        React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Staff'))
+    )
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SUPPLIERS PAGE
+// ═══════════════════════════════════════════════════════════════
+function SuppliersPage({user}){
+  const{data:suppliers,loading,reload,setData}=useData('getSuppliers');
+  const{data:products}=useData('getProducts');
+  const[showModal,setShowModal]=useState(false);
+  const[editing,setEditing]=useState(null);
+  const[saving,setSaving]=useState(false);
+
+  const list=suppliers||[];
+
+  const del=async s=>{
+    if(!confirm(`Delete supplier "${s.name||s.username}"?`))return;
+    setData(prev=>(prev||[]).filter(x=>x.id!==s.id));
+    const r=await API.call({action:'deleteSupplier',id:s.id});
+    if(r.success)toast('Supplier deleted');else{toast(r.error||'Delete failed','error');reload();}
+  };
+
+  const copySignupLink=()=>{
+    const token=getOrCreateToken('supplier');
+    const link=`${window.location.origin}${window.location.pathname}?signup=supplier&token=${token}`;
+    navigator.clipboard?.writeText(link).then(()=>toast('Supplier signup link copied ✓')).catch(()=>toast('Copy failed','error'));
+  };
+
+  const productsBySupplier=useMemo(()=>{
+    const m={};
+    (products||[]).forEach(p=>{
+      readList(p.supplierUsernames||p.supplierUsername).forEach(u=>{
+        if(!m[u])m[u]=[];m[u].push(p.name);
+      });
+    });
+    return m;
+  },[products]);
+
+  if(loading&&!suppliers)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading suppliers...'));
+
+  return React.createElement('div',null,
+    saving&&React.createElement(SaveOverlay,{label:'Saving supplier...'}),
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',null,
+        React.createElement('div',{className:'section-title'},'Suppliers'),
+        React.createElement('div',{className:'section-sub'},`${list.length} supplier${list.length!==1?'s':''}`)),
+      React.createElement('div',{style:{display:'flex',gap:8}},
+        React.createElement('button',{className:'btn btn-secondary',onClick:copySignupLink},'🔗 Copy Signup Link'),
+        React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},'+ New Supplier'))),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'ℹ️ Suppliers see only orders for products assigned to them. Assign products on the Products page. Each supplier should set their email under Settings to receive notifications.'),
+    list.length===0
+      ?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🚚'),React.createElement('div',{className:'empty-text'},'No suppliers yet.'))
+      :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+        React.createElement('thead',null,React.createElement('tr',null,
+          ['Name','Username','Email','Phone','Assigned Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
+        React.createElement('tbody',null,list.map(s=>{
+          const assigned=productsBySupplier[s.username]||[];
+          return React.createElement('tr',{key:s.id},
+            React.createElement('td',{style:{fontWeight:600}},s.name||s.username),
+            React.createElement('td',{className:'td-mono'},s.username),
+            React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),
+            React.createElement('td',{className:'td-mono',style:{fontSize:11}},s.phone||'—'),
+            React.createElement('td',null,assigned.length===0?React.createElement('span',{style:{color:'var(--text3)',fontSize:12}},'None')
+              :React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:3}},assigned.map((n,i)=>React.createElement('span',{key:i,className:'badge badge-supplier'},n)))),
+            React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),
+            React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
+              React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{setEditing(s);setShowModal(true);}},'✏'),
+              React.createElement('button',{className:'btn btn-danger btn-sm',onClick:()=>del(s)},'🗑'))));
+        }))
+      )),
+    showModal&&React.createElement(SupplierModal,{
+      supplier:editing,onSaving:setSaving,
+      onSaved:()=>{setShowModal(false);setEditing(null);reload();},
+      onClose:()=>{setShowModal(false);setEditing(null);}
+    })
+  );
+}
+
+function SupplierModal({supplier,onSaving,onSaved,onClose}){
+  const isEdit=!!supplier;
+  const[f,setF]=useState(()=>({
+    name:supplier?.name||'',username:supplier?.username||'',password:supplier?.password||'',
+    email:supplier?.email||'',phone:supplier?.phone||'',phone2:supplier?.phone2||'',
+    active:supplier?isActive(supplier.active):true,
+  }));
+  const[saving,setSaving]=useState(false);
+  const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+
+  const save=async()=>{
+    if(!f.name.trim()){toast('Name required','error');return;}
+    if(!f.username.trim()){toast('Username required','error');return;}
+    if(!isEdit&&!f.password.trim()){toast('Password required','error');return;}
+    const payload={
+      name:f.name.trim(),username:f.username.trim(),
+      email:f.email.trim(),phone:f.phone.trim(),phone2:f.phone2.trim(),
+      active:f.active,role:'supplier',
+    };
+    if(f.password.trim())payload.password=f.password.trim();
+    setSaving(true);if(onSaving)onSaving(true);
+    const r=isEdit
+      ?await API.call({action:'updateSupplier',id:supplier.id,supplier:JSON.stringify(payload)})
+      :await API.call({action:'addSupplier',supplier:JSON.stringify(payload)});
+    setSaving(false);if(onSaving)onSaving(false);
+    if(r.success){toast('Supplier saved ✓');onSaved();}else toast(r.error||'Save failed','error');
+  };
+
+  return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
+    React.createElement('div',{className:'modal'},
+      React.createElement('div',{className:'modal-header'},
+        React.createElement('div',{className:'modal-title'},isEdit?'Edit Supplier':'New Supplier'),
+        React.createElement('button',{className:'close-btn',onClick:onClose,disabled:saving},'×')),
+      React.createElement('div',{className:'modal-body'},
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Full Name *'),
+            React.createElement('input',{className:'form-input',value:f.name,onChange:set('name')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Username *'),
+            React.createElement('input',{className:'form-input',value:f.username,onChange:set('username')}))),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},isEdit?'Password (leave blank to keep)':'Password *'),
+            React.createElement('input',{className:'form-input',type:'text',value:f.password,onChange:set('password'),placeholder:isEdit?'••••••':''})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Email'),
+            React.createElement('input',{className:'form-input',type:'email',value:f.email,onChange:set('email'),placeholder:'For order notifications'}))),
+        React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Phone'),
+            React.createElement('input',{className:'form-input',value:f.phone,onChange:set('phone')})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'2nd Phone'),
+            React.createElement('input',{className:'form-input',value:f.phone2,onChange:set('phone2')}))),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},
+            React.createElement('input',{type:'checkbox',checked:f.active,onChange:e=>setF(p=>({...p,active:e.target.checked}))}),'Active account')),
+        React.createElement('div',{className:'alert-info',style:{marginTop:14}},'💡 Assign products to this supplier from the Products page.')),
+      React.createElement('div',{className:'modal-footer'},
+        React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),
+        React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Supplier'))
+    )
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS PAGE
+// ═══════════════════════════════════════════════════════════════
+function SettingsPage({user,isAdmin,isSupplier,isCC,onUserUpdate}){
+  const[tab,setTab]=useState('connection');
+  const tabs=[
+    {id:'connection',label:'🔌 Connection',show:isAdmin},
+    {id:'myemail',label:'📧 My Email',show:true},
+    {id:'password',label:'🔑 Password',show:true},
+    {id:'emails',label:'📋 All Emails',show:isAdmin},
+    {id:'sendemail',label:'✉️ Send Email',show:isAdmin||isCC},
+    {id:'forms',label:'🔗 Order Forms',show:isAdmin},
+  ].filter(t=>t.show);
+
+  return React.createElement('div',null,
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',{className:'section-title'},'Settings')),
+    React.createElement('div',{className:'tabs'},tabs.map(t=>
+      React.createElement('div',{key:t.id,className:`tab ${tab===t.id?'active':''}`,onClick:()=>setTab(t.id)},t.label))),
+    tab==='connection'&&React.createElement(ConnectionTab),
+    tab==='myemail'&&React.createElement(MyEmailTab,{user,onUserUpdate}),
+    tab==='password'&&React.createElement(PasswordTab,{user}),
+    tab==='emails'&&React.createElement(AllEmailsTab),
+    tab==='sendemail'&&React.createElement(SendEmailTab),
+    tab==='forms'&&React.createElement(OrderFormsTab)
+  );
+}
+
+function ConnectionTab(){
+  const[url,setUrl]=useState(API.url||'');
+  const save=()=>{API.setUrl(url.trim());toast('API URL saved ✓');cacheBust();};
+  return React.createElement('div',{className:'card'},
+    React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:8}},'Backend Connection'),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'ℹ️ This is your Google Apps Script Web App URL ending in /exec. After updating the script, redeploy as a NEW version so changes take effect.'),
+    React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+      React.createElement('label',{className:'form-label'},'Apps Script Web App URL'),
+      React.createElement('input',{className:'form-input',value:url,onChange:e=>setUrl(e.target.value),placeholder:'https://script.google.com/macros/s/.../exec'})),
+    React.createElement('button',{className:'btn btn-primary',onClick:save},'Save Connection'));
+}
+
+function MyEmailTab({user,onUserUpdate}){
+  const[email,setEmail]=useState(user.email||'');
+  const[saving,setSaving]=useState(false);
+  const save=async()=>{
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('Enter a valid email','error');return;}
+    setSaving(true);
+    const r=await API.call({action:'saveEmail',username:user.username,role:user.role,email:email.trim()});
+    setSaving(false);
+    if(r.success){toast('Email saved ✓ — confirmation sent');if(onUserUpdate)onUserUpdate({...user,email:email.trim()});}
+    else toast(r.error||'Save failed','error');
+  };
+  return React.createElement('div',{className:'card'},
+    React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:8}},'My Notification Email'),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'ℹ️ Set your email to receive a notification whenever a relevant new order comes in. A confirmation email is sent when you save.'),
+    React.createElement('div',{className:'email-row',style:{marginBottom:8}},
+      React.createElement('input',{className:'form-input',type:'email',value:email,onChange:e=>setEmail(e.target.value),placeholder:'you@example.com'}),
+      React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?'Saving...':'Save')));
+}
+
+function PasswordTab({user}){
+  const[oldPw,setOldPw]=useState('');
+  const[newPw,setNewPw]=useState('');
+  const[confirm,setConfirm]=useState('');
+  const[saving,setSaving]=useState(false);
+  const save=async()=>{
+    if(!oldPw||!newPw){toast('Fill all fields','error');return;}
+    if(newPw!==confirm){toast('New passwords do not match','error');return;}
+    if(newPw.length<4){toast('Password too short','error');return;}
+    setSaving(true);
+    const r=await API.call({action:'changePassword',username:user.username,role:user.role,oldPassword:oldPw,newPassword:newPw});
+    setSaving(false);
+    if(r.success){toast('Password changed ✓');setOldPw('');setNewPw('');setConfirm('');}
+    else toast(r.data?.error||r.error||'Change failed','error');
+  };
+  return React.createElement('div',{className:'card',style:{maxWidth:440}},
+    React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:14}},'Change Password'),
+    React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+      React.createElement('label',{className:'form-label'},'Current Password'),
+      React.createElement('input',{className:'form-input',type:'password',value:oldPw,onChange:e=>setOldPw(e.target.value)})),
+    React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+      React.createElement('label',{className:'form-label'},'New Password'),
+      React.createElement('input',{className:'form-input',type:'password',value:newPw,onChange:e=>setNewPw(e.target.value)})),
+    React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+      React.createElement('label',{className:'form-label'},'Confirm New Password'),
+      React.createElement('input',{className:'form-input',type:'password',value:confirm,onChange:e=>setConfirm(e.target.value)})),
+    React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?'Saving...':'Change Password'));
+}
+
+function AllEmailsTab(){
+  const{data,loading,reload}=useData('getEmailSettings');
+  if(loading&&!data)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
+  const d=data||{staff:[],suppliers:[]};
+  const renderRows=(arr,label)=>React.createElement('div',{className:'card',style:{marginBottom:16}},
+    React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},label),
+    (arr||[]).length===0
+      ?React.createElement('div',{className:'text-muted'},'None yet.')
+      :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+        React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Email'].map(h=>React.createElement('th',{key:h},h)))),
+        React.createElement('tbody',null,(arr||[]).map(s=>React.createElement('tr',{key:s.username},
+          React.createElement('td',null,s.name||s.username),
+          React.createElement('td',{className:'td-mono'},s.username),
+          React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email'))))))));
+  return React.createElement('div',null,
+    React.createElement('div',{className:'section-header'},
+      React.createElement('div',{className:'section-sub'},'Who receives order notifications'),
+      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
+    renderRows(d.staff,'👥 Staff Emails'),
+    renderRows(d.suppliers,'🚚 Supplier Emails'));
+}
+
+// Send a one-off email — FREE via Google (MailApp on the backend).
+function SendEmailTab(){
+  const[to,setTo]=useState('');
+  const[subject,setSubject]=useState('');
+  const[body,setBody]=useState('');
+  const[sending,setSending]=useState(false);
+  const send=async()=>{
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)){toast('Enter a valid recipient email','error');return;}
+    if(!subject.trim()){toast('Subject required','error');return;}
+    if(!body.trim()){toast('Message body required','error');return;}
+    setSending(true);
+    const r=await API.call({action:'sendManualEmail',to:to.trim(),subject:subject.trim(),body});
+    setSending(false);
+    if(r.success&&r.data&&r.data.sent){toast('Email sent ✓');setTo('');setSubject('');setBody('');}
+    else toast((r.data&&r.data.error)||r.error||'Send failed','error');
+  };
+  return React.createElement('div',null,
+    React.createElement('div',{className:'gmail-connect-card'},
+      React.createElement('div',{className:'gmail-connect-title'},'✉️ Send Email — Free via Google'),
+      React.createElement('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.6}},
+        'Emails are sent for free using your Google account through the Apps Script backend (MailApp). No paid service or third-party API is required. Daily sending limits apply per your Google account.')),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+        React.createElement('label',{className:'form-label'},'To'),
+        React.createElement('input',{className:'form-input',type:'email',value:to,onChange:e=>setTo(e.target.value),placeholder:'recipient@example.com'})),
+      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+        React.createElement('label',{className:'form-label'},'Subject'),
+        React.createElement('input',{className:'form-input',value:subject,onChange:e=>setSubject(e.target.value)})),
+      React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+        React.createElement('label',{className:'form-label'},'Message'),
+        React.createElement('textarea',{className:'form-textarea',rows:6,value:body,onChange:e=>setBody(e.target.value),placeholder:'Write your message...'})),
+      React.createElement('button',{className:'btn btn-primary',onClick:send,disabled:sending},
+        sending?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Sending...'):'Send Email')));
+}
+
+function OrderFormsTab(){
+  const{data:products,loading}=useData('getProducts');
+  const[tyUrls,setTyUrls]=useState({});
+  useEffect(()=>{
+    // Load saved thank-you URLs from the backend product records.
+    const m={};
+    (products||[]).forEach(p=>{if(p.thankYouUrl)m[p.id]=p.thankYouUrl;});
+    setTyUrls(m);
+  },[products]);
+
+  const saveTyUrlForProduct=async(product,url)=>{
+    const r=await API.call({action:'saveThankYouUrl',id:product.id,url});
+    if(r.success){
+      setTyUrls(prev=>({...prev,[product.id]:url}));
+      toast('Thank-you URL saved ✓');
+    }else toast(r.error||'Save failed','error');
+  };
+
+  if(loading&&!products)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
+  const active=(products||[]).filter(p=>isActive(p.active));
+  const base=`${window.location.origin}${window.location.pathname}`;
+
+  return React.createElement('div',null,
+    React.createElement('div',{className:'alert-info',style:{marginBottom:16}},'ℹ️ Share these links or embed them on your landing pages. Set a "Thank-You URL" per product to redirect the customer after they place an order — this is saved on the server so it works on every visitor\'s device.'),
+    active.length===0
+      ?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🔗'),React.createElement('div',{className:'empty-text'},'No active products to share.'))
+      :active.map(p=>{
+        const link=`${base}?view=order&product=${encodeURIComponent(p.name)}`;
+        const embed=`<iframe src="${link}" style="width:100%;height:900px;border:none;" title="Order ${p.name}"></iframe>`;
+        return React.createElement('div',{key:p.id,className:'product-link-row'},
+          React.createElement('div',{className:'product-link-name'},'🏷️ ',p.name),
+          React.createElement('div',{className:'product-link-meta'},'Direct order link:'),
+          React.createElement('div',{className:'copy-link-box'},
+            React.createElement('span',{style:{flex:1}},link),
+            React.createElement('button',{className:'copy-link-btn',onClick:()=>{navigator.clipboard?.writeText(link).then(()=>toast('Link copied ✓'));}},'Copy')),
+          React.createElement('div',{className:'product-link-meta',style:{marginTop:8}},'Embed code (iframe):'),
+          React.createElement('div',{className:'copy-link-box'},
+            React.createElement('span',{style:{flex:1}},embed),
+            React.createElement('button',{className:'copy-link-btn',onClick:()=>{navigator.clipboard?.writeText(embed).then(()=>toast('Embed code copied ✓'));}},'Copy')),
+          React.createElement(TyUrlInput,{product:p,currentTyUrl:tyUrls[p.id]||p.thankYouUrl||'',onSave:saveTyUrlForProduct}));
+      })
+  );
+}
+
+// Controlled input for a product's post-order redirect (thank-you) URL.
+function TyUrlInput({product,currentTyUrl,onSave}){
+  const[val,setVal]=useState(currentTyUrl||'');
+  const[saving,setSaving]=useState(false);
+  useEffect(()=>{setVal(currentTyUrl||'');},[currentTyUrl]);
+  const save=async()=>{
+    setSaving(true);
+    await onSave(product,val.trim());
+    setSaving(false);
+  };
+  return React.createElement('div',{className:'ty-url-row'},
+    React.createElement('div',{className:'form-group',style:{flex:1}},
+      React.createElement('label',{className:'form-label'},'Thank-You / Redirect URL (after order)'),
+      React.createElement('input',{className:'form-input',value:val,onChange:e=>setVal(e.target.value),placeholder:'https://your-thank-you-page.com'})),
+    React.createElement('button',{className:'btn btn-primary btn-sm',onClick:save,disabled:saving,style:{marginBottom:1}},saving?'Saving...':'Save'));
+}
+
 // ─── ERROR BOUNDARY ───────────────────────────────────────────
 class ErrorBoundary extends React.Component{
-  constructor(props){super(props);this.state={error:null};}
-  static getDerivedStateFromError(error){return{error};}
+  constructor(props){super(props);this.state={hasError:false,error:null};}
+  static getDerivedStateFromError(error){return{hasError:true,error};}
+  componentDidCatch(error,info){console.error('App error:',error,info);}
   render(){
-    if(this.state.error){
-      return React.createElement('div',{style:{padding:'32px',color:'#e74c3c',background:'#0a0c10',fontFamily:'monospace',minHeight:'100vh'}},
-        React.createElement('div',{style:{fontSize:20,fontWeight:700,marginBottom:12}},'⚠️ Application Error'),
-        React.createElement('div',{style:{background:'#12151c',border:'1px solid #2a3040',borderRadius:10,padding:16,whiteSpace:'pre-wrap',fontSize:13}},
-          String(this.state.error?.message||this.state.error||'Unknown error')));
+    if(this.state.hasError){
+      return React.createElement('div',{style:{padding:40,textAlign:'center',fontFamily:'sans-serif',color:'#e8eaf0',background:'#0a0c10',minHeight:'100vh'}},
+        React.createElement('div',{style:{fontSize:40,marginBottom:16}},'⚠️'),
+        React.createElement('div',{style:{fontSize:18,fontWeight:700,marginBottom:8}},'Something went wrong'),
+        React.createElement('div',{style:{fontSize:13,color:'#9aa0b4',marginBottom:20,maxWidth:420,margin:'0 auto 20px'}},String(this.state.error?.message||this.state.error||'Unknown error')),
+        React.createElement('button',{onClick:()=>window.location.reload(),style:{padding:'10px 20px',background:'#f5a623',color:'#000',border:'none',borderRadius:8,fontWeight:600,cursor:'pointer'}},'Reload App'));
     }
     return this.props.children;
   }
 }
- 
+
 // ─── BOOTSTRAP ────────────────────────────────────────────────
-try{
-  const root=ReactDOM.createRoot(document.getElementById('root'));
-  root.render(React.createElement(ErrorBoundary,null,React.createElement(App)));
-}catch(e){
-  document.getElementById('root').innerHTML=`<div style="padding:32px;color:#e74c3c;font-family:monospace;background:#0a0c10;min-height:100vh"><h2>⚠️ Startup Error</h2><pre style="margin-top:12px;background:#12151c;padding:16px;border-radius:8px;font-size:13px;">${e.message}</pre></div>`;
-}
+(function bootstrap(){
+  try{
+    const root=ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(ErrorBoundary,null,React.createElement(App)));
+  }catch(e){
+    document.getElementById('root').innerHTML='<div style="padding:40px;text-align:center;font-family:sans-serif;color:#e74c3c">Failed to start: '+(e&&e.message||e)+'</div>';
+  }
+})();
 </script>
 </body>
 </html>

@@ -583,6 +583,74 @@ function fmt(n,d=2){const v=parseFloat(n);return isNaN(v)?'—':v.toFixed(d);}
 function fmtGHC(n){return`GH₵${fmt(n,2)}`;}
 function fmtNGN(n){const v=parseFloat(n);return isNaN(v)?'—':`₦${v.toLocaleString('en-NG',{maximumFractionDigits:0})}`;}
 function today(){return new Date().toISOString().split('T')[0];}
+
+// ─── DASHBOARD NORMALIZER ────────────────────────────────────
+// Makes the frontend work with BOTH the old backend (v3.3) and the new
+// v3.4 backend. If the new fields are missing it computes them from the
+// legacy fields so dashboards never show "—" due to a backend version mismatch.
+//
+// v3.3 → v3.4 field mapping:
+//   revenueGHC (old = net after COGS+delivery) → netRevenueGHC
+//   grossRevenueGHC → not in v3.3, estimated via revenueGHC (safe fallback)
+//   netProfitNGN (old = after all expenses) → netProfitAfterAllExpensesNGN
+//   totalAdSpend (old) → adSpendNGN
+//   netProfitAfterAdsNGN → computed from grossProfitNGN - adSpendNGN
+function normalizeDash(raw) {
+  if (!raw) return {};
+  const d = { ...raw };
+
+  // ── GHC revenue fields ──────────────────────────────────────
+  // v3.3 sent revenueGHC = net (after COGS + delivery), v3.4 renamed it
+  if (d.netRevenueGHC == null && d.revenueGHC != null) {
+    d.netRevenueGHC = d.revenueGHC;
+  }
+  // grossRevenueGHC was added in v3.4. In v3.3 it wasn't returned separately,
+  // so we fall back to netRevenueGHC (a slight undercount but better than "—").
+  if (d.grossRevenueGHC == null) {
+    d.grossRevenueGHC = d.netRevenueGHC || d.revenueGHC || 0;
+  }
+  if (d.totalCOGS_GHC == null)         d.totalCOGS_GHC = 0;
+  if (d.totalDeliveryCost_GHC == null)  d.totalDeliveryCost_GHC = 0;
+  // Recompute netRevenueGHC properly if we have all components
+  if (d.totalCOGS_GHC > 0 || d.totalDeliveryCost_GHC > 0) {
+    d.netRevenueGHC = sp(d.grossRevenueGHC) - sp(d.totalCOGS_GHC) - sp(d.totalDeliveryCost_GHC);
+  }
+
+  // ── NGN expense fields ──────────────────────────────────────
+  // v3.3 used totalAdSpend; v3.4 renamed to adSpendNGN
+  if (d.adSpendNGN == null && d.totalAdSpend != null) {
+    d.adSpendNGN = d.totalAdSpend;
+  }
+  if (d.adSpendNGN == null) d.adSpendNGN = 0;
+  if (d.totalExpensesNGN == null) {
+    // In v3.3 we can't know the full total, best guess = ad spend
+    d.totalExpensesNGN = d.adSpendNGN;
+  }
+  if (!d.expenseByCategory) d.expenseByCategory = {};
+
+  // ── NGN profit fields ──────────────────────────────────────
+  const rate = d.lastExRate != null ? sp(d.lastExRate) : null;
+  if (d.grossProfitNGN == null) {
+    d.grossProfitNGN = rate != null ? sp(d.netRevenueGHC) * rate : null;
+  }
+  if (d.netProfitAfterAdsNGN == null) {
+    d.netProfitAfterAdsNGN = d.grossProfitNGN != null
+      ? sp(d.grossProfitNGN) - sp(d.adSpendNGN) : null;
+  }
+  if (d.netProfitAfterAllExpensesNGN == null) {
+    // v3.3 returned netProfitNGN = after all expenses
+    if (d.netProfitNGN != null) {
+      d.netProfitAfterAllExpensesNGN = d.netProfitNGN;
+    } else if (d.grossProfitNGN != null) {
+      d.netProfitAfterAllExpensesNGN = sp(d.grossProfitNGN) - sp(d.totalExpensesNGN);
+    } else {
+      d.netProfitAfterAllExpensesNGN = null;
+    }
+  }
+
+  return d;
+}
+
 function isActive(x){return x===true||x==='TRUE'||x==='true';}
 function statusOf(o){return o?.deliveryStatus||o?.status||'Not Confirmed';}
 function paymentOf(o){return o?.paymentStatus||'Unpaid';}
@@ -1118,13 +1186,13 @@ function DashboardPage({user,isAdmin,isSupplier,isCC,nav}){
   const[myData,setMyData]=useState(null);const[myLoading,setMyLoading]=useState(false);const[myError,setMyError]=useState('');
   useEffect(()=>{
     if(!isAdmin)return;setAdminLoading(true);setAdminError('');
-    API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed to load dashboard');});
+    API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(normalizeDash(r.data));else setAdminError(r.error||'Failed to load dashboard');});
   },[isAdmin]);
   useEffect(()=>{
     if(!isCC&&!isSupplier)return;setMyLoading(true);setMyError('');
     API.call({action:'getMyDashboard',username:user.username,role:user.role}).then(r=>{setMyLoading(false);if(r.success)setMyData(r.data||{});else setMyError(r.error||'Failed to load dashboard');});
   },[user.username,user.role,isCC,isSupplier]);
-  const reloadAdmin=useCallback(()=>{setAdminLoading(true);setAdminError('');cacheBust(['getDashboard']);API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(r.data);else setAdminError(r.error||'Failed');});},[]);
+  const reloadAdmin=useCallback(()=>{setAdminLoading(true);setAdminError('');cacheBust(['getDashboard']);API.call({action:'getDashboard'}).then(r=>{setAdminLoading(false);if(r.success)setAdminData(normalizeDash(r.data));else setAdminError(r.error||'Failed');});},[]);
   const reloadMy=useCallback(()=>{setMyLoading(true);setMyError('');cacheBust(['getMyDashboard']);API.call({action:'getMyDashboard',username:user.username,role:user.role}).then(r=>{setMyLoading(false);if(r.success)setMyData(r.data||{});else setMyError(r.error||'Failed');});},[user.username,user.role]);
   if(isAdmin){
     if(adminLoading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading dashboard...'));
@@ -1826,7 +1894,7 @@ function FinancialsPage({user,isAdmin,nav}){
       API.call({action:'getPayoutRecords'}),
       API.call({action:'getStaff'}),
     ]);
-    if(d.success)setDash(d.data||{});
+    if(d.success)setDash(normalizeDash(d.data||{}));
     if(w.success)setWithdrawals(w.data||[]);
     if(p.success)setPayouts(p.data||[]);
     if(s.success)setStaff(s.data||[]);
@@ -2021,7 +2089,7 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
     if(force)cacheBust(['getDashboard']);
     const r=await API.call({action:'getDashboard'});
     setDashLoading(false);
-    if(r.success)setDash(r.data||{});
+    if(r.success)setDash(normalizeDash(r.data||{}));
   },[isAdmin]);
   useEffect(()=>{loadDash();},[loadDash]);
 

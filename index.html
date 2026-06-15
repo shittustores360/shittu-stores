@@ -68,9 +68,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .stat-card::before{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;opacity:0.06;transform:translate(20px,-20px)}
 .stat-card.orange::before{background:var(--accent)}.stat-card.green::before{background:var(--green)}
 .stat-card.red::before{background:var(--red)}.stat-card.blue::before{background:var(--blue)}.stat-card.purple::before{background:var(--purple)}
+.stat-card.clickable{cursor:pointer;transition:all var(--transition)}
+.stat-card.clickable:hover{border-color:var(--accent);box-shadow:0 0 0 2px rgba(245,166,35,0.15)}
+.stat-card.featured{grid-column:span 2;border:1.5px solid rgba(245,166,35,0.35);background:linear-gradient(135deg,rgba(245,166,35,0.08),var(--bg2) 60%)}
+.stat-card.featured .stat-value{font-size:28px}
 .stat-label{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
 .stat-value{font-family:var(--font-head);font-size:20px;font-weight:700;color:var(--text)}
 .stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-click-hint{font-size:10px;color:var(--accent);margin-top:6px;opacity:0.85;font-weight:600}
 .table-wrap{overflow-x:auto;border-radius:var(--radius-lg);border:1px solid var(--border)}
 table{width:100%;border-collapse:collapse}
 thead{background:var(--bg3)}
@@ -207,6 +212,21 @@ tr:hover td{background:var(--bg3)}
 .reschedule-pill{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:7px 12px;font-size:12px;display:flex;flex-direction:column;gap:2px;min-width:96px}
 .reschedule-pill .rp-date{font-weight:700;color:var(--text);font-family:var(--font-mono);font-size:12px}
 .reschedule-pill .rp-count{font-size:11px;color:var(--blue);font-weight:600}
+.session-warn-banner{position:fixed;top:0;left:0;right:0;z-index:8000;background:var(--red);color:#fff;padding:8px 20px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;box-shadow:0 2px 12px rgba(231,76,60,0.5)}
+.session-warn-banner button{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;border-radius:6px;padding:4px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.session-warn-banner button:hover{background:rgba(255,255,255,0.35)}
+.profit-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;margin-bottom:2px;border-radius:8px;background:var(--bg3);border:1px solid var(--border)}
+.profit-row.highlight{background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);margin-top:10px}
+.profit-row.divider-top{margin-top:10px}
+.profit-filter-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.profit-filter-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all var(--transition);user-select:none}
+.profit-filter-chip.active{background:var(--red-dim);border-color:rgba(231,76,60,0.3);color:var(--red)}
+.profit-filter-chip input{accent-color:var(--red)}
+.profit-preset-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.profit-result-card{background:linear-gradient(135deg,rgba(245,166,35,0.08),var(--bg2));border:1.5px solid rgba(245,166,35,0.3);border-radius:var(--radius-lg);padding:20px;text-align:center;margin-bottom:16px}
+.profit-result-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:8px}
+.profit-result-value{font-family:var(--font-head);font-size:32px;font-weight:800}
+.profit-result-sub{font-size:12px;color:var(--text2);margin-top:8px;line-height:1.6}
 .cof-root{min-height:100vh;background:linear-gradient(135deg,#0d0f14 0%,#111520 40%,#0a0c10 100%);font-family:'Outfit',sans-serif;color:#e8eaf0;position:relative;overflow-x:hidden}
 .cof-root::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(245,166,35,0.08) 0%,transparent 60%);pointer-events:none;z-index:0}
 .cof-root::after{content:'';position:fixed;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#f5a623,#e8912a,transparent);z-index:10}
@@ -272,6 +292,7 @@ tr:hover td{background:var(--bg3)}
   .hamburger{display:block}
   .form-grid-2,.form-grid-3{grid-template-columns:1fr}
   .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-card.featured{grid-column:span 2}
   .content{padding:16px}
   .filters-bar{flex-direction:column;align-items:stretch}
   .search-input{width:100%}
@@ -286,6 +307,7 @@ tr:hover td{background:var(--bg3)}
 <div id="root"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 const SITE_API_URL = 'https://script.google.com/macros/s/AKfycbwxdGslHWScLe-l3lNt1SJLx_AbveynGvu-y7RwGkUemxhc_zRGBU7kPo5ZpDe6b1C8/exec';
 
@@ -307,8 +329,8 @@ const BUST_MAP={
   saveThankYouUrl:['getProducts'],
   addStaff:['getStaff'],updateStaff:['getStaff'],deleteStaff:['getStaff'],
   addSupplier:['getSuppliers'],updateSupplier:['getSuppliers'],deleteSupplier:['getSuppliers'],
-  addExpense:['getExpenses'],deleteExpense:['getExpenses'],
-  addWithdrawal:['getWithdrawals'],
+  addExpense:['getExpenses','getDashboard'],deleteExpense:['getExpenses','getDashboard'],
+  addWithdrawal:['getWithdrawals','getDashboard'],
   addPayoutRecord:['getPayoutRecords','getDashboard','getMyDashboard'],
   signupSupplier:['getSuppliers'],signupStaff:['getStaff'],
   saveEmail:['getStaff','getSuppliers','getEmailSettings'],
@@ -342,9 +364,32 @@ const API={
 };
 
 // ─── THANK-YOU URL ───────────────────────────────────────────
-// Stored on the backend per-product (product.thankYouUrl) so the
-// redirect works inside the embedded iframe on ANY visitor's browser.
 function getTyUrl(product){return (product&&product.thankYouUrl)?String(product.thankYouUrl).trim():'';}
+
+// ─── EMAILJS LOGIN ALERTS ─────────────────────────────────────
+// Optional, free, client-side login-alert email. Uses MailApp-free EmailJS
+// (https://www.emailjs.com — free tier ~200 emails/month) ONLY if the admin
+// has configured a Service ID / Template ID / Public Key under
+// Settings → Login Alerts. If not configured, this silently does nothing —
+// the platform does not depend on EmailJS for anything else (all other
+// emails are sent for free via the Apps Script backend's MailApp).
+function getEmailJsConfig(){
+  try{return JSON.parse(localStorage.getItem('ssEmailJsConfig')||'{}');}catch{return{};}
+}
+function saveEmailJsConfig(cfg){localStorage.setItem('ssEmailJsConfig',JSON.stringify(cfg||{}));}
+function sendLoginAlert(user){
+  try{
+    const cfg=getEmailJsConfig();
+    if(!cfg.enabled||!cfg.serviceId||!cfg.templateId||!cfg.publicKey||!cfg.alertEmail)return;
+    if(typeof emailjs==='undefined')return;
+    emailjs.send(cfg.serviceId,cfg.templateId,{
+      to_email:cfg.alertEmail,
+      user_name:user.name||user.username,
+      user_role:user.role,
+      login_time:new Date().toLocaleString(),
+    },{publicKey:cfg.publicKey}).catch(()=>{/* fail silently — never block login */});
+  }catch(e){/* never block login on alert failure */}
+}
 
 // ─── THEME ────────────────────────────────────────────────────
 const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
@@ -386,6 +431,144 @@ const CONTACT_STATUSES=['Uncontacted','Contacted'];
 const PAYMENT_OPTIONS=['Paid','Unpaid'];
 const READINESS_STATUSES=['Ready for Delivery','Not Ready for Delivery','Cancelled','Rescheduled'];
 const STAFF_PAYOUT_NGN=2000;
+const EXPENSE_CATEGORIES=['Ad Cost','Salary','Logistics','Packaging','Restock','Transport','Misc'];
+
+// ─── SESSION TIMEOUT (auto re-login) ──────────────────────────
+// For security, sessions are not permanent: after SESSION_TIMEOUT_MS of
+// inactivity the user is automatically signed out and must log back in.
+// A warning modal appears SESSION_WARN_MS before that happens, giving the
+// user a chance to stay signed in.
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;   // 30 minutes of inactivity
+const SESSION_WARN_MS    =  5 * 60 * 1000;   // warn 5 min before expiry
+const SESSION_CHECK_MS   = 20 * 1000;        // poll every 20 s
+
+function useSessionTimeout(isLoggedIn, onLogout) {
+  const lastActivityRef = useRef(Date.now());
+  const [showWarning, setShowWarning] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState(0);
+  const checkTimerRef = useRef(null);
+
+  const resetActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+    setShowWarning(false);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) { setShowWarning(false); return; }
+    const events = ['mousemove','keydown','click','scroll','touchstart'];
+    events.forEach(ev => window.addEventListener(ev, resetActivity, { passive: true }));
+    resetActivity();
+    checkTimerRef.current = setInterval(() => {
+      const idle      = Date.now() - lastActivityRef.current;
+      const remaining = Math.max(0, SESSION_TIMEOUT_MS - idle);
+      if (remaining <= 0) { onLogout(); return; }
+      if (remaining <= SESSION_WARN_MS) {
+        setShowWarning(true);
+        setSecondsLeft(Math.round(remaining / 1000));
+      }
+    }, SESSION_CHECK_MS);
+    return () => {
+      events.forEach(ev => window.removeEventListener(ev, resetActivity));
+      if (checkTimerRef.current) clearInterval(checkTimerRef.current);
+    };
+  }, [isLoggedIn, onLogout, resetActivity]);
+
+  return { showWarning, secondsLeft, stayIn: resetActivity };
+}
+
+function SessionWarningModal({ secondsLeft, onStay, onLogout }) {
+  return React.createElement('div', { className: 'modal-overlay', style: { zIndex: 9000 } },
+    React.createElement('div', { className: 'modal', style: { maxWidth: 400, textAlign: 'center' } },
+      React.createElement('div', { className: 'modal-body', style: { padding: 36 } },
+        React.createElement('div', { style: { fontSize: 48, marginBottom: 12 } }, '⏳'),
+        React.createElement('div', { className: 'modal-title', style: { marginBottom: 10, fontSize: 18 } }, 'Session Expiring'),
+        React.createElement('div', { style: { color: 'var(--text2)', fontSize: 14, marginBottom: 24, lineHeight: 1.7 } },
+          `You have been inactive. For your security, you will be signed out in `,
+          React.createElement('strong', { style: { color: 'var(--red)' } }, `${secondsLeft} seconds`), '.'
+        ),
+        React.createElement('div', { style: { display: 'flex', gap: 10, justifyContent: 'center' } },
+          React.createElement('button', { className: 'btn btn-danger', onClick: onLogout }, 'Sign Out Now'),
+          React.createElement('button', { className: 'btn btn-primary', onClick: onStay }, '✓ Stay Signed In')
+        )
+      )
+    )
+  );
+}
+
+// ─── PROFIT BREAKDOWN MODAL ───────────────────────────────────
+// Shows the full waterfall from gross revenue down to the true bottom-line
+// profit, plus a breakdown of every expense category. Used from the
+// Dashboard / Financials "Gross Profit" card so admins can see exactly how
+// numbers were derived without leaving the page.
+function ProfitBreakdownModal({ data, onClose, onOpenAnalytics }) {
+  const d = data || {};
+  const rate = d.lastExRate;
+  const rows = [
+    { label:'Gross Revenue (GHC)', value:fmtGHC(d.grossRevenueGHC), sub:'All delivered + paid orders (selling price)', color:'var(--green)' },
+    { label:'− Cost of Goods Sold (GHC)', value:`−${fmtGHC(d.totalCOGS_GHC)}`, sub:'Sum of product cost for delivered+paid', color:'var(--red)' },
+    { label:'− Delivery Costs (GHC)', value:`−${fmtGHC(d.totalDeliveryCost_GHC)}`, sub:'Sum of delivery price for delivered+paid', color:'var(--red)' },
+    { label:'= Revenue (GHC)', value:fmtGHC(d.netRevenueGHC), sub:'Gross revenue minus product cost and delivery — this is the figure shown as "Revenue" on your dashboard', color:sp(d.netRevenueGHC)>=0?'var(--green)':'var(--red)', highlight:true, divider:true },
+    ...(rate != null ? [
+      { label:`× Exchange Rate`, value:`₦${rate} per GH₵`, sub:'From your last recorded withdrawal', color:'var(--blue)' },
+      { label:'= Gross Profit (NGN)', value:fmtNGN(d.grossProfitNGN), sub:'Revenue (GHC) converted to Naira — before any NGN expenses', color:sp(d.grossProfitNGN)>=0?'var(--green)':'var(--red)', divider:true },
+      { label:'− ALL Expenses (NGN)', value:`−${fmtNGN(d.totalExpensesNGN)}`, sub:'Every expense category combined (ads + salary + logistics + …)', color:'var(--red)' },
+      { label:'= Net Profit (NGN)', value:fmtNGN(d.netProfitAfterAllExpensesNGN), sub:'True bottom-line profit — this is the figure shown as "Net Profit" on your dashboard', color:sp(d.netProfitAfterAllExpensesNGN)>=0?'var(--green)':'var(--red)', highlight:true, divider:true },
+    ] : [
+      { label:'Exchange Rate', value:'Not set', sub:'Record a withdrawal to enable NGN profit calculations', color:'var(--text3)' }
+    ])
+  ];
+
+  const catBreakdown = d.expenseByCategory || {};
+  const catEntries = Object.entries(catBreakdown).sort((a,b) => b[1]-a[1]);
+
+  return React.createElement('div', { className:'modal-overlay', onClick:e=>{ if(e.target===e.currentTarget)onClose(); } },
+    React.createElement('div', { className:'modal', style:{ maxWidth:560 } },
+      React.createElement('div', { className:'modal-header' },
+        React.createElement('div', { className:'modal-title' }, '💰 Profit Breakdown'),
+        React.createElement('button', { className:'close-btn', onClick:onClose }, '×')
+      ),
+      React.createElement('div', { className:'modal-body' },
+        React.createElement('div', { className:'alert-info', style:{ marginBottom:16 } },
+          'ℹ️ Revenue counts only Delivered + Paid orders. All figures are cumulative (all time).'
+        ),
+        rows.map((r,i) =>
+          React.createElement('div', {
+            key:i,
+            style:{
+              display:'flex', justifyContent:'space-between', alignItems:'flex-start',
+              padding:'10px 14px', borderRadius:8, marginBottom:3,
+              background: r.highlight ? 'rgba(245,166,35,0.08)' : 'var(--bg3)',
+              border: r.highlight ? '1px solid rgba(245,166,35,0.3)' : '1px solid var(--border)',
+              marginTop: r.divider ? 14 : 0,
+            }
+          },
+            React.createElement('div', null,
+              React.createElement('div', { style:{ fontSize:13, fontWeight:r.highlight?700:500, color:'var(--text)' } }, r.label),
+              React.createElement('div', { style:{ fontSize:11, color:'var(--text3)', marginTop:2 } }, r.sub)
+            ),
+            React.createElement('div', { style:{ fontFamily:'var(--font-mono)', fontWeight:700, color:r.color, fontSize:r.highlight?15:13, whiteSpace:'nowrap', marginLeft:16 } }, r.value)
+          )
+        ),
+        catEntries.length > 0 && React.createElement('div', { style:{ marginTop:20 } },
+          React.createElement('div', { className:'section-divider' }, 'All Expenses by Category (NGN)'),
+          catEntries.map(([cat,amt]) =>
+            React.createElement('div', { key:cat, style:{ display:'flex', justifyContent:'space-between', padding:'7px 0', fontSize:13, borderBottom:'1px solid var(--border)' } },
+              React.createElement('span', { style:{ color:'var(--text2)' } }, cat),
+              React.createElement('span', { style:{ fontFamily:'var(--font-mono)', color:'var(--red)', fontWeight:600 } }, fmtNGN(amt))
+            )
+          )
+        ),
+        onOpenAnalytics && React.createElement('div', { className:'alert-info', style:{ marginTop:16, marginBottom:0 } },
+          '🔍 Want to see what your profit looks like under different expense scenarios (e.g. before ads, before salaries)? Open the Profit Analysis tool in Analytics.'
+        )
+      ),
+      React.createElement('div', { className:'modal-footer' },
+        onOpenAnalytics && React.createElement('button', { className:'btn btn-blue', onClick:()=>{onClose();onOpenAnalytics();} }, '🔍 Profit Analysis'),
+        React.createElement('button', { className:'btn btn-primary', onClick:onClose }, 'Close')
+      )
+    )
+  );
+}
 
 // ─── SIGNUP TOKENS ────────────────────────────────────────────
 function getSignupTokens(){try{return JSON.parse(localStorage.getItem('ssSignupTokens')||'{}');}catch{return{};}}
@@ -416,23 +599,17 @@ function supplierOwnsOrder(order,products,user){
 // ─── COPY CUSTOMER DETAILS ────────────────────────────────────
 function formatCustomerDetails(order){
   const lines=[
-    `📋 ORDER DETAILS`,
-    `━━━━━━━━━━━━━━━━━━━━━`,
-    `👤 Name:     ${order.customerName||'—'}`,
-    `📞 Phone:    ${order.contact||'—'}`,
+    `📋 ORDER DETAILS`,`━━━━━━━━━━━━━━━━━━━━━`,
+    `👤 Name:     ${order.customerName||'—'}`,`📞 Phone:    ${order.contact||'—'}`,
     order.contact2?`📞 Alt:      ${order.contact2}`:'',
-    `📍 Address:  ${order.address||'—'}`,
-    `━━━━━━━━━━━━━━━━━━━━━`,
-    `📦 Product:  ${order.product||'—'}`,
-    `🎁 Package:  ${order.bundleLabel||'—'}`,
+    `📍 Address:  ${order.address||'—'}`,`━━━━━━━━━━━━━━━━━━━━━`,
+    `📦 Product:  ${order.product||'—'}`,`🎁 Package:  ${order.bundleLabel||'—'}`,
     order.size?`📐 Size:     ${order.size}`:'',
     `💰 Price:    ${order.sellingPrice?fmtGHC(order.sellingPrice):'—'}`,
-    `💳 Payment:  ${paymentOf(order)}`,
-    `🚚 Status:   ${statusOf(order)}`,
+    `💳 Payment:  ${paymentOf(order)}`,`🚚 Status:   ${statusOf(order)}`,
     order.readinessStatus?`📦 Readiness: ${order.readinessStatus}`:'',
     order.rescheduledTo?`📅 Resched.:  ${order.rescheduledTo}`:'',
-    `📅 Date:     ${order.date||'—'}`,
-    order.notes?`📝 Notes:    ${order.notes}`:'',
+    `📅 Date:     ${order.date||'—'}`,order.notes?`📝 Notes:    ${order.notes}`:'',
   ].filter(Boolean);
   return lines.join('\n');
 }
@@ -443,23 +620,16 @@ function CopyDetailsBtn({order}){
     const ta=document.createElement('textarea');
     ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
     document.body.appendChild(ta);ta.select();
-    try{document.execCommand('copy');setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');}
-    catch{}
+    try{document.execCommand('copy');setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');}catch{}
     document.body.removeChild(ta);
   };
   const copy=()=>{
     const text=formatCustomerDetails(order);
     if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text)
-        .then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');})
-        .catch(()=>fallbackCopy(text));
+      navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');}).catch(()=>fallbackCopy(text));
     }else{fallbackCopy(text);}
   };
-  return React.createElement('button',{
-    className:`copy-detail-btn ${copied?'copied':''}`,
-    onClick:copy,
-    title:'Copy customer details'
-  },copied?'✓ Copied':'📋 Copy');
+  return React.createElement('button',{className:`copy-detail-btn ${copied?'copied':''}`,onClick:copy,title:'Copy customer details'},copied?'✓ Copied':'📋 Copy');
 }
 
 function statusBadge(s){
@@ -804,9 +974,15 @@ function App(){
   const signupToken=urlParams.get('token');
   const viewMode=urlParams.get('view');
   const productParam=urlParams.get('product');
-  const login=useCallback(u=>{setUser(u);localStorage.setItem('ssUser',JSON.stringify(u));},[]);
+  const login=useCallback(u=>{setUser(u);localStorage.setItem('ssUser',JSON.stringify(u));sendLoginAlert(u);},[]);
   const logout=useCallback(()=>{setUser(null);localStorage.removeItem('ssUser');setPage('dashboard');},[]);
   const nav=useCallback(p=>{setPage(p);setSidebarOpen(false);},[]);
+
+  // ── Session timeout (security re-login) ──
+  // Skip on the public order form / signup pages — only logged-in
+  // dashboard sessions time out.
+  const sessionActive = !!user && !signupType && !viewMode;
+  const { showWarning, secondsLeft, stayIn } = useSessionTimeout(sessionActive, logout);
 
   if(viewMode==='order'){
     return React.createElement(ThemeProvider,null,
@@ -843,7 +1019,7 @@ function App(){
     {id:'settings',icon:'⚙️',label:'Settings',show:true},
   ].filter(x=>x.show);
 
-  const ctx={user,isAdmin,isSupplier,isCC,can};
+  const ctx={user,isAdmin,isSupplier,isCC,can,nav};
 
   function renderPage(){
     switch(page){
@@ -862,6 +1038,7 @@ function App(){
   }
 
   return React.createElement(ThemeProvider,null,
+    showWarning && React.createElement(SessionWarningModal,{ secondsLeft, onStay:stayIn, onLogout:logout }),
     React.createElement(AppShell,{user,navItems,page,nav,sidebarOpen,setSidebarOpen,logout},renderPage()),
     React.createElement(ToastContainer)
   );
@@ -926,6 +1103,7 @@ function LoginPage({onLogin}){
           React.createElement('div',{style:{position:'relative'}},
             React.createElement('input',{className:'form-input',type:showPw?'text':'password',value:p,onChange:e=>setP(e.target.value),required:true,style:{paddingRight:40},autoComplete:'current-password'}),
             React.createElement('button',{type:'button',onClick:()=>setShowPw(v=>!v),style:{position:'absolute',right:10,top:'50%',transform:'translateY(-50%)',background:'none',border:'none',cursor:'pointer',color:'var(--text3)',fontSize:14}},showPw?'🙈':'👁'))),
+        React.createElement('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:14,textAlign:'center'}},'🔒 For your security you will be signed out automatically after 30 minutes of inactivity.'),
         React.createElement('button',{className:'btn btn-primary',type:'submit',style:{width:'100%'},disabled:loading},'Sign In')
       )
     )
@@ -935,7 +1113,7 @@ function LoginPage({onLogin}){
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD PAGE
 // ═══════════════════════════════════════════════════════════════
-function DashboardPage({user,isAdmin,isSupplier,isCC}){
+function DashboardPage({user,isAdmin,isSupplier,isCC,nav}){
   const[adminData,setAdminData]=useState(null);const[adminLoading,setAdminLoading]=useState(false);const[adminError,setAdminError]=useState('');
   const[myData,setMyData]=useState(null);const[myLoading,setMyLoading]=useState(false);const[myError,setMyError]=useState('');
   useEffect(()=>{
@@ -951,14 +1129,31 @@ function DashboardPage({user,isAdmin,isSupplier,isCC}){
   if(isAdmin){
     if(adminLoading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading dashboard...'));
     if(adminError)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)'}},'❌ '+adminError),React.createElement('button',{className:'btn btn-secondary',style:{marginTop:12},onClick:reloadAdmin},'Retry'));
-    return React.createElement(AdminDashboard,{data:adminData||{},reload:reloadAdmin});
+    return React.createElement(AdminDashboard,{data:adminData||{},reload:reloadAdmin,nav});
   }
   if(isSupplier)return React.createElement(SupplierDashboard,{data:myData,loading:myLoading,error:myError,user,reload:reloadMy});
   return React.createElement(StaffDashboard,{data:myData,loading:myLoading,error:myError,user,reload:reloadMy});
 }
 
-function AdminDashboard({data,reload}){
+// ═══════════════════════════════════════════════════════════════
+// ADMIN DASHBOARD
+//
+//  • "Revenue (GHC)" is now the TRUE revenue figure: gross revenue minus
+//    cost of goods sold minus delivery cost (i.e. netRevenueGHC from the
+//    backend). Gross revenue is shown underneath as a secondary figure.
+//  • "Net Profit (NGN)" is the featured, primary profit figure and equals
+//    netProfitAfterAllExpensesNGN — the true bottom line after Revenue is
+//    converted to Naira and EVERY expense category (ads, salary,
+//    logistics, etc.) is deducted.
+//  • Clicking "Net Profit" jumps to Analytics → Profit Analysis, where you
+//    can toggle expense categories on/off to see "Net Profit after Ads
+//    only", "after Ads + Salary", etc.
+//  • Clicking "Gross Profit" opens a quick read-only waterfall breakdown.
+// ═══════════════════════════════════════════════════════════════
+function AdminDashboard({data,reload,nav}){
   const d=data||{};
+  const[showProfitModal,setShowProfitModal]=useState(false);
+
   const monthlyData=useMemo(()=>{
     const months=[];
     for(let i=5;i>=0;i--){const dt=new Date();dt.setMonth(dt.getMonth()-i);const key=dt.toISOString().slice(0,7);const lbl=dt.toLocaleString('default',{month:'short'});months.push({key,label:lbl,value:0,delivered:0});}
@@ -966,42 +1161,90 @@ function AdminDashboard({data,reload}){
     recentOrders.forEach(o=>{const mk=String(o.date||'').slice(0,7);const m=months.find(x=>x.key===mk);if(m){m.value++;if(statusOf(o)==='Delivered')m.delivered++;}});
     return months;
   },[d.recentOrders]);
+
   const convRate=sp(d.totalOrders)>0?Math.round(sp(d.delivered)/sp(d.totalOrders)*100):0;
-  const stats=[
+  const goToProfitAnalysis=()=>{if(nav)nav('analytics');};
+
+  // Order stats
+  const orderStats=[
     {label:'Total Orders',value:d.totalOrders||0,sub:`${d.todayOrders||0} today`,cls:'orange'},
     {label:'Delivered',value:d.delivered||0,sub:'Successful',cls:'green'},
     {label:'Pending',value:d.pending||0,sub:'In progress',cls:'blue'},
     {label:'Canceled',value:d.canceled||0,sub:'Lost orders',cls:'red'},
-    {label:'Revenue (GHC)',value:fmtGHC(d.revenueGHC),sub:'Paid+delivered',cls:'green'},
-    {label:'Pending Revenue',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered, unpaid',cls:'orange'},
-    {label:'Revenue (NGN)',value:fmtNGN(d.revenueNGN),sub:'Withdrawn GHC→NGN',cls:'green'},
-    {label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'blue'},
-    {label:'Net Profit After Ads',value:fmtNGN(d.netProfitNGN),sub:`Ads: ${fmtNGN(d.totalAdSpend)}`,cls:sp(d.netProfitNGN)>=0?'green':'red'},
+  ];
+
+  // Revenue stats — Revenue (GHC) = gross revenue minus cost of goods and
+  // delivery cost. This is the headline figure; gross revenue is secondary.
+  const revenueStats=[
+    {
+      label:'Revenue (GHC)', value:fmtGHC(d.netRevenueGHC),
+      sub:`Gross ${fmtGHC(d.grossRevenueGHC)} − COGS ${fmtGHC(d.totalCOGS_GHC)} − Delivery ${fmtGHC(d.totalDeliveryCost_GHC)}`,
+      cls:'green', featured:true
+    },
+    {label:'Gross Revenue (GHC)',value:fmtGHC(d.grossRevenueGHC),sub:'Before product cost & delivery',cls:'blue'},
+    {label:'Pending Revenue (GHC)',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered but unpaid',cls:'orange'},
+    {label:'Total Withdrawn (NGN)',value:fmtNGN(d.revenueNGN),sub:'GHC converted to NGN',cls:'blue'},
+    {label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'purple'},
+  ];
+
+  // Profit stats — Net Profit (NGN) is the featured bottom-line figure
+  // (Revenue × exchange rate − ALL expenses). Gross Profit is clickable for
+  // a read-only waterfall; Net Profit is clickable to open the interactive
+  // Profit Analysis tool in Analytics.
+  const profitStats=[
+    {
+      label:'Net Profit (NGN)', value:fmtNGN(d.netProfitAfterAllExpensesNGN),
+      sub:`Revenue × ₦${d.lastExRate||'?'} − all expenses (${fmtNGN(d.totalExpensesNGN)})`,
+      cls:sp(d.netProfitAfterAllExpensesNGN)>=0?'green':'red',
+      featured:true, click:true, onClick:goToProfitAnalysis, hint:'🔍 Click to explore by expense category'
+    },
+    {
+      label:'Gross Profit (NGN)', value:fmtNGN(d.grossProfitNGN),
+      sub:'Revenue (GHC) × exchange rate — before expenses',
+      cls:sp(d.grossProfitNGN)>=0?'green':'red',
+      click:true, onClick:()=>setShowProfitModal(true), hint:'🔍 Click for full waterfall'
+    },
+    {label:'Total Expenses (NGN)',value:fmtNGN(d.totalExpensesNGN),sub:`incl. ad spend ${fmtNGN(d.adSpendNGN)}`,cls:'red'},
     {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Owed to staff',cls:'purple'},
     {label:'Avg Delivery Time',value:d.avgDeliveryDays!=null?`${d.avgDeliveryDays} days`:'—',sub:'Order→Delivered',cls:'blue'},
     {label:'All-Time Conversion',value:`${convRate}%`,sub:'Delivered ÷ Total orders',cls:'green'},
   ];
+
+  const renderStatCard=(s)=>React.createElement('div',{
+    key:s.label,
+    className:`stat-card ${s.cls}${s.click?' clickable':''}${s.featured?' featured':''}`,
+    onClick:s.click?s.onClick:undefined,
+    title:s.click?s.hint:undefined
+  },
+    React.createElement('div',{className:'stat-label'},s.label),
+    React.createElement('div',{className:'stat-value'},s.value),
+    React.createElement('div',{className:'stat-sub'},s.sub),
+    s.click&&React.createElement('div',{className:'stat-click-hint'},s.hint)
+  );
+
   return React.createElement('div',null,
+    showProfitModal&&React.createElement(ProfitBreakdownModal,{data:d,onClose:()=>setShowProfitModal(false),onOpenAnalytics:goToProfitAnalysis}),
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Admin Overview'),
       React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
-    React.createElement('div',{className:'stat-grid'},stats.map(s=>
-      React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
-        React.createElement('div',{className:'stat-label'},s.label),
-        React.createElement('div',{className:'stat-value'},s.value),
-        React.createElement('div',{className:'stat-sub'},s.sub)))),
+
+    React.createElement('div',{className:'section-divider',style:{marginBottom:10}},'📦 Order Summary'),
+    React.createElement('div',{className:'stat-grid'},orderStats.map(renderStatCard)),
+
+    React.createElement('div',{className:'section-divider',style:{marginBottom:10}},'💵 Revenue'),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
+      '💡 "Revenue (GHC)" is your true revenue: gross sales minus cost of goods sold and delivery cost.'),
+    React.createElement('div',{className:'stat-grid'},revenueStats.map(renderStatCard)),
+
+    React.createElement('div',{className:'section-divider',style:{marginBottom:10}},'📈 Profit'),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
+      '💡 "Net Profit (NGN)" is your true bottom line: Revenue converted to Naira, minus every expense (ads, salaries, logistics, etc). Click it to break it down by category in Analytics.'),
+    React.createElement('div',{className:'stat-grid'},profitStats.map(renderStatCard)),
+
     React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:24}},
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},
-          React.createElement('div',{className:'section-title',style:{fontSize:14}},'Orders Per Month'),
-          React.createElement('div',{className:'text-muted'},'Last 6 months')),
-        React.createElement(BarChart,{data:monthlyData.map(m=>({label:m.label,value:m.value})),color:'var(--accent)',height:90})),
-      React.createElement('div',{className:'card'},
-        React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},
-          React.createElement('div',{className:'section-title',style:{fontSize:14}},'Deliveries Per Month'),
-          React.createElement('div',{className:'text-muted'},'Last 6 months')),
-        React.createElement(LineChart,{data:monthlyData.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:90}))
-    ),
+      React.createElement('div',{className:'card'},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},React.createElement('div',{className:'section-title',style:{fontSize:14}},'Orders Per Month'),React.createElement('div',{className:'text-muted'},'Last 6 months')),React.createElement(BarChart,{data:monthlyData.map(m=>({label:m.label,value:m.value})),color:'var(--accent)',height:90})),
+      React.createElement('div',{className:'card'},React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:12}},React.createElement('div',{className:'section-title',style:{fontSize:14}},'Deliveries Per Month'),React.createElement('div',{className:'text-muted'},'Last 6 months')),React.createElement(LineChart,{data:monthlyData.map(m=>({label:m.label,value:m.delivered})),color:'var(--green)',height:90}))),
+
     d.staffPayouts&&d.staffPayouts.length>0&&React.createElement('div',{className:'card',style:{marginBottom:20}},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Staff Payout Summary'),
       React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'ℹ️ Counts orders where staff is set as "Contacted By".'),
@@ -1009,44 +1252,33 @@ function AdminDashboard({data,reload}){
         React.createElement('thead',null,React.createElement('tr',null,['Staff','Deliveries','Earned (NGN)','Pending (NGN)','Paid (NGN)','Balance'].map(h=>React.createElement('th',{key:h},h)))),
         React.createElement('tbody',null,d.staffPayouts.map(s=>
           React.createElement('tr',{key:s.name},
-            React.createElement('td',null,s.name),
-            React.createElement('td',null,s.count||0),
+            React.createElement('td',null,s.name),React.createElement('td',null,s.count||0),
             React.createElement('td',{className:'profit-positive'},fmtNGN(s.earned)),
             React.createElement('td',{className:sp(s.pending)>0?'profit-negative':'td-mono'},fmtNGN(s.pending)),
             React.createElement('td',{style:{color:'var(--green)',fontFamily:'var(--font-mono)',fontSize:12}},fmtNGN(s.paid||0)),
             React.createElement('td',{className:sp(s.balance)>0?'profit-negative':'profit-positive'},fmtNGN(s.balance||0)))))
-      ))
-    ),
+      ))),
+
     d.supplierSummary&&d.supplierSummary.length>0&&React.createElement('div',{className:'card'},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Supplier Summary'),
       React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
         React.createElement('thead',null,React.createElement('tr',null,['Supplier','Orders','Delivered','Pending','Cost (GHC)'].map(h=>React.createElement('th',{key:h},h)))),
         React.createElement('tbody',null,d.supplierSummary.map(s=>
           React.createElement('tr',{key:s.name},
-            React.createElement('td',null,s.name),
-            React.createElement('td',null,s.orders),
-            React.createElement('td',null,s.delivered),
-            React.createElement('td',null,s.pending),
+            React.createElement('td',null,s.name),React.createElement('td',null,s.orders),React.createElement('td',null,s.delivered),React.createElement('td',null,s.pending),
             React.createElement('td',{className:'profit-positive'},fmtGHC(s.costGHC)))))
-      ))
-    )
+      )))
   );
 }
 
 function StaffDashboard({data,loading,error,user,reload}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading your dashboard...'));
-  if(error)return React.createElement('div',null,
-    React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)',marginBottom:8}},'❌ '+error),React.createElement('button',{className:'btn btn-secondary',style:{marginTop:8},onClick:reload},'Retry')),
-    React.createElement('div',{className:'alert-info',style:{marginTop:12}},'💡 Make sure orders are marked as "Contacted" with your username to appear here.'));
+  if(error)return React.createElement('div',null,React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)',marginBottom:8}},'❌ '+error),React.createElement('button',{className:'btn btn-secondary',style:{marginTop:8},onClick:reload},'Retry')),React.createElement('div',{className:'alert-info',style:{marginTop:12}},'💡 Make sure orders are marked as "Contacted" with your username to appear here.'));
   const d=data||{};
   const totalEarned=sp(d.earnedNGN)||0;const paidOut=sp(d.paidOutNGN)||0;const unpaidBalance=Math.max(0,totalEarned-paidOut);
   return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',{className:'section-title'},`Welcome back, ${user.name||user.username} 👋`),
-      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
-    React.createElement('div',{className:'cc-info-box'},
-      React.createElement('div',{className:'cc-info-title'},'ℹ️ How your stats are counted'),
-      React.createElement('div',{className:'cc-info-text'},'Your earnings count when you mark an order as "Contacted" (with your name as the contacting staff), and that order is later delivered and paid. Each delivered+paid order you contacted earns you ₦2,000.')),
+    React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},`Welcome back, ${user.name||user.username} 👋`),React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
+    React.createElement('div',{className:'cc-info-box'},React.createElement('div',{className:'cc-info-title'},'ℹ️ How your stats are counted'),React.createElement('div',{className:'cc-info-text'},'Your earnings count when you mark an order as "Contacted" (with your name as the contacting staff), and that order is later delivered and paid. Each delivered+paid order you contacted earns you ₦2,000.')),
     (!d.ordersContacted||d.ordersContacted===0)&&React.createElement('div',{className:'alert-warning',style:{marginBottom:16}},'📋 No orders found where you are listed as the contacting staff yet.'),
     React.createElement('div',{className:'stat-grid'},[
       {label:'Orders I Contacted',value:d.ordersContacted||0,sub:'Total assigned to me',cls:'blue'},
@@ -1057,10 +1289,7 @@ function StaffDashboard({data,loading,error,user,reload}){
       {label:'Pending Payout',value:fmtNGN(d.pendingPayoutNGN),sub:'Delivered but not yet paid',cls:'orange'},
       {label:'Total Paid Out',value:fmtNGN(paidOut),sub:'Already received',cls:'blue'},
       {label:'Unpaid Balance',value:fmtNGN(unpaidBalance),sub:'Owed to you',cls:'purple'},
-    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
-      React.createElement('div',{className:'stat-label'},s.label),
-      React.createElement('div',{className:'stat-value'},s.value),
-      React.createElement('div',{className:'stat-sub'},s.sub))))
+    ].map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub))))
   );
 }
 
@@ -1068,24 +1297,8 @@ function SupplierDashboard({data,loading,error,user,reload}){
   if(loading)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}));
   if(error)return React.createElement('div',{className:'card'},React.createElement('div',{style:{color:'var(--red)'}},'❌ '+error),React.createElement('button',{className:'btn btn-secondary',style:{marginTop:8},onClick:reload},'Retry'));
   const d=data||{};
-  const stats=[
-    {label:'My Products Orders',value:d.totalOrders||0,sub:'All orders',cls:'blue'},
-    {label:'Delivered',value:d.delivered||0,sub:'Successfully delivered',cls:'green'},
-    {label:'Pending',value:d.pending||0,sub:'In progress',cls:'orange'},
-    {label:'Canceled',value:d.canceled||0,sub:'Lost',cls:'red'},
-    {label:'Cost of Goods Supplied (GHC)',value:fmtGHC(d.costGHC),sub:'Your product cost per delivered+paid order',cls:'green'},
-    {label:'This Month Conv.',value:d.monthlyConv!=null?`${d.monthlyConv}%`:'—',sub:'Delivered ÷ Orders this month',cls:'orange'},
-  ];
-  return React.createElement('div',null,
-    React.createElement('div',{className:'section-header'},
-      React.createElement('div',{className:'section-title'},`Welcome, ${user.name||user.username} 👋`),
-      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
-    React.createElement('div',{className:'stat-grid'},stats.map(s=>
-      React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
-        React.createElement('div',{className:'stat-label'},s.label),
-        React.createElement('div',{className:'stat-value'},s.value),
-        React.createElement('div',{className:'stat-sub'},s.sub))))
-  );
+  const stats=[{label:'My Products Orders',value:d.totalOrders||0,sub:'All orders',cls:'blue'},{label:'Delivered',value:d.delivered||0,sub:'Successfully delivered',cls:'green'},{label:'Pending',value:d.pending||0,sub:'In progress',cls:'orange'},{label:'Canceled',value:d.canceled||0,sub:'Lost',cls:'red'},{label:'Cost of Goods Supplied (GHC)',value:fmtGHC(d.costGHC),sub:'Your product cost per delivered+paid order',cls:'green'},{label:'This Month Conv.',value:d.monthlyConv!=null?`${d.monthlyConv}%`:'—',sub:'Delivered ÷ Orders this month',cls:'orange'}];
+  return React.createElement('div',null,React.createElement('div',{className:'section-header'},React.createElement('div',{className:'section-title'},`Welcome, ${user.name||user.username} 👋`),React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),React.createElement('div',{className:'stat-grid'},stats.map(s=>React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},React.createElement('div',{className:'stat-label'},s.label),React.createElement('div',{className:'stat-value'},s.value),React.createElement('div',{className:'stat-sub'},s.sub)))));
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1588,8 +1801,14 @@ function StaffAnalyticsPage({user}){
 
 // ═══════════════════════════════════════════════════════════════
 // FINANCIALS PAGE (admin) — revenue, withdrawals, staff payouts
+//
+//  Same Revenue / Net Profit logic as the Dashboard:
+//   • "Revenue (GHC)" = gross revenue − COGS − delivery cost (netRevenueGHC)
+//   • "Net Profit (NGN)" = Revenue × exchange rate − ALL expenses
+//     (netProfitAfterAllExpensesNGN), featured & clickable → Profit Analysis
+//   • "Gross Profit (NGN)" clickable → quick waterfall breakdown modal
 // ═══════════════════════════════════════════════════════════════
-function FinancialsPage({user,isAdmin}){
+function FinancialsPage({user,isAdmin,nav}){
   const[dash,setDash]=useState(null);
   const[withdrawals,setWithdrawals]=useState([]);
   const[payouts,setPayouts]=useState([]);
@@ -1597,6 +1816,7 @@ function FinancialsPage({user,isAdmin}){
   const[loading,setLoading]=useState(true);
   const[showWithdraw,setShowWithdraw]=useState(false);
   const[saving,setSaving]=useState(false);
+  const[showProfitModal,setShowProfitModal]=useState(false);
 
   const load=useCallback(async()=>{
     setLoading(true);
@@ -1624,6 +1844,8 @@ function FinancialsPage({user,isAdmin}){
     else toast(r.error||'Failed to record payout','error');
   };
 
+  const goToProfitAnalysis=()=>{if(nav)nav('analytics');};
+
   if(loading&&!dash)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading financials...'));
   const d=dash||{};
   const totalWithdrawnNGN=withdrawals.reduce((s,w)=>s+sp(w.amountNGN),0);
@@ -1631,11 +1853,28 @@ function FinancialsPage({user,isAdmin}){
   const totalPaidOut=payouts.reduce((s,p)=>s+sp(p.amountNGN),0);
 
   const fStats=[
-    {label:'Revenue (GHC)',value:fmtGHC(d.revenueGHC),sub:'Paid + delivered',cls:'green'},
+    {
+      label:'Revenue (GHC)', value:fmtGHC(d.netRevenueGHC),
+      sub:`Gross ${fmtGHC(d.grossRevenueGHC)} − COGS ${fmtGHC(d.totalCOGS_GHC)} − Delivery ${fmtGHC(d.totalDeliveryCost_GHC)}`,
+      cls:'green', featured:true
+    },
+    {label:'Gross Revenue (GHC)',value:fmtGHC(d.grossRevenueGHC),sub:'Before product cost & delivery',cls:'blue'},
     {label:'Pending Revenue',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered, unpaid',cls:'orange'},
     {label:'Total Withdrawn (GHC)',value:fmtGHC(totalWithdrawnGHC),sub:'Moved to NGN',cls:'blue'},
     {label:'Total Withdrawn (NGN)',value:fmtNGN(totalWithdrawnNGN),sub:'Received in Naira',cls:'green'},
-    {label:'Net Profit After Ads',value:fmtNGN(d.netProfitNGN),sub:`Ads: ${fmtNGN(d.totalAdSpend)}`,cls:sp(d.netProfitNGN)>=0?'green':'red'},
+    {
+      label:'Net Profit (NGN)', value:fmtNGN(d.netProfitAfterAllExpensesNGN),
+      sub:`Revenue × ₦${d.lastExRate||'?'} − all expenses (${fmtNGN(d.totalExpensesNGN)})`,
+      cls:sp(d.netProfitAfterAllExpensesNGN)>=0?'green':'red',
+      featured:true, click:true, onClick:goToProfitAnalysis, hint:'🔍 Click to explore by expense category'
+    },
+    {
+      label:'Gross Profit (NGN)', value:fmtNGN(d.grossProfitNGN),
+      sub:'Revenue (GHC) × exchange rate — before expenses',
+      cls:sp(d.grossProfitNGN)>=0?'green':'red',
+      click:true, onClick:()=>setShowProfitModal(true), hint:'🔍 Click for full waterfall'
+    },
+    {label:'Total Expenses (NGN)',value:fmtNGN(d.totalExpensesNGN),sub:`incl. ad spend ${fmtNGN(d.adSpendNGN)}`,cls:'red'},
     {label:'Total Paid to Staff',value:fmtNGN(totalPaidOut),sub:'All payouts',cls:'purple'},
     {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Still owed',cls:'orange'},
     {label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'blue'},
@@ -1643,16 +1882,25 @@ function FinancialsPage({user,isAdmin}){
 
   return React.createElement('div',null,
     saving&&React.createElement(SaveOverlay,{label:'Saving...'}),
+    showProfitModal&&React.createElement(ProfitBreakdownModal,{data:d,onClose:()=>setShowProfitModal(false),onOpenAnalytics:goToProfitAnalysis}),
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Financials'),
       React.createElement('div',{style:{display:'flex',gap:8}},
         React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:load},'↻ Refresh'),
         React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowWithdraw(true)},'+ Record Withdrawal'))),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
+      '💡 "Revenue" = gross sales minus product cost and delivery cost. "Net Profit" = Revenue converted to Naira minus ALL expenses. Click "Net Profit" to explore it by expense category in Analytics.'),
     React.createElement('div',{className:'stat-grid'},fStats.map(s=>
-      React.createElement('div',{key:s.label,className:`stat-card ${s.cls}`},
+      React.createElement('div',{
+        key:s.label,
+        className:`stat-card ${s.cls}${s.click?' clickable':''}${s.featured?' featured':''}`,
+        onClick:s.click?s.onClick:undefined,
+        title:s.click?s.hint:undefined
+      },
         React.createElement('div',{className:'stat-label'},s.label),
         React.createElement('div',{className:'stat-value'},s.value),
-        React.createElement('div',{className:'stat-sub'},s.sub)))),
+        React.createElement('div',{className:'stat-sub'},s.sub),
+        s.click&&React.createElement('div',{className:'stat-click-hint'},s.hint)))),
     React.createElement('div',{className:'card',style:{marginBottom:20}},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Staff Payouts'),
       React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'ℹ️ Balance is earnings (₦2,000 per delivered + paid order they contacted) minus what has already been paid.'),
@@ -1745,11 +1993,16 @@ function WithdrawalModal({onClose,onSaving,onSaved}){
 
 // ═══════════════════════════════════════════════════════════════
 // ANALYTICS PAGE (admin / supplier) — order & product performance
+// + Profit Analysis (admin only): interactively toggle expense
+//   categories on/off to see "what-if" net profit scenarios —
+//   e.g. Net Profit after Ads only, after Ads + Salary, etc.
 // ═══════════════════════════════════════════════════════════════
 function AnalyticsPage({user,isAdmin,isSupplier}){
   const[orders,setOrders]=useState([]);
   const[products,setProducts]=useState([]);
   const[loading,setLoading]=useState(true);
+  const[dash,setDash]=useState(null);
+  const[dashLoading,setDashLoading]=useState(isAdmin);
 
   const load=useCallback(async()=>{
     setLoading(true);
@@ -1761,6 +2014,16 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
     setLoading(false);
   },[isSupplier,user.username]);
   useEffect(()=>{load();},[load]);
+
+  const loadDash=useCallback(async(force=false)=>{
+    if(!isAdmin)return;
+    setDashLoading(true);
+    if(force)cacheBust(['getDashboard']);
+    const r=await API.call({action:'getDashboard'});
+    setDashLoading(false);
+    if(r.success)setDash(r.data||{});
+  },[isAdmin]);
+  useEffect(()=>{loadDash();},[loadDash]);
 
   const scoped=useMemo(()=>orders.filter(o=>supplierOwnsOrder(o,products,user)),[orders,products,user]);
 
@@ -1791,7 +2054,11 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
   return React.createElement('div',null,
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Analytics'),
-      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:load},'↻ Refresh')),
+      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>{load();loadDash(true);}},'↻ Refresh')),
+
+    isAdmin&&React.createElement(ProfitAnalysisCard,{dash,loading:dashLoading,reload:()=>loadDash(true)}),
+
+    React.createElement('div',{className:'section-divider',style:{marginBottom:10}},'📦 Order Performance'),
     React.createElement('div',{className:'stat-grid'},[
       {label:'Total Orders',value:total,sub:'All time',cls:'blue'},
       {label:'Delivered',value:delivered,sub:'Successful',cls:'green'},
@@ -1834,10 +2101,98 @@ function AnalyticsPage({user,isAdmin,isSupplier}){
   );
 }
 
+// ─── PROFIT ANALYSIS TOOL ──────────────────────────────────────
+// Lets the admin toggle individual expense categories on/off and instantly
+// see the resulting "Net Profit" — answering questions like "what would my
+// profit be after ads only?" or "after ads + salary, before logistics?".
+//
+//   Gross Profit (NGN)        = Revenue (GHC) × exchange rate  (no expenses)
+//   Net Profit (selected)     = Gross Profit − sum(selected category amounts)
+//   Net Profit (after ALL)    = Gross Profit − totalExpensesNGN
+function ProfitAnalysisCard({dash,loading,reload}){
+  const d=dash||{};
+  const catAmounts=d.expenseByCategory||{};
+  const allCats=useMemo(()=>{
+    const fromData=Object.keys(catAmounts);
+    const merged=[...EXPENSE_CATEGORIES];
+    fromData.forEach(c=>{if(!merged.includes(c))merged.push(c);});
+    return merged.filter(c=>sp(catAmounts[c])>0||EXPENSE_CATEGORIES.includes(c));
+  },[catAmounts]);
+
+  // Default selection = "after all expenses" (matches the Dashboard's
+  // featured Net Profit figure).
+  const [selected, setSelected] = useState(()=>new Set(allCats));
+  useEffect(()=>{ setSelected(new Set(allCats)); }, [allCats.join(',')]); // eslint-disable-line
+
+  const toggle=(cat)=>setSelected(prev=>{
+    const next=new Set(prev);
+    if(next.has(cat))next.delete(cat);else next.add(cat);
+    return next;
+  });
+
+  const grossProfit=sp(d.grossProfitNGN);
+  const selectedTotal=allCats.reduce((s,c)=>selected.has(c)?s+sp(catAmounts[c]||0):s,0);
+  const resultProfit=grossProfit-selectedTotal;
+  const allSelected=selected.size===allCats.length;
+  const noneSelected=selected.size===0;
+
+  const applyPreset=(preset)=>{
+    if(preset==='none')setSelected(new Set());
+    else if(preset==='all')setSelected(new Set(allCats));
+    else if(preset==='ads')setSelected(new Set(allCats.filter(c=>c==='Ad Cost')));
+    else if(preset==='ads-salary')setSelected(new Set(allCats.filter(c=>c==='Ad Cost'||c==='Salary')));
+  };
+
+  let resultLabel='Net Profit';
+  if(noneSelected)resultLabel='Gross Profit (no expenses deducted)';
+  else if(allSelected)resultLabel='Net Profit (after ALL expenses)';
+  else resultLabel=`Net Profit (after ${[...selected].join(', ')})`;
+
+  return React.createElement('div',{className:'card',style:{marginBottom:24}},
+    React.createElement('div',{className:'section-header',style:{marginBottom:14}},
+      React.createElement('div',null,
+        React.createElement('div',{className:'section-title'},'🔍 Profit Analysis'),
+        React.createElement('div',{className:'section-sub'},'Toggle expense categories to see net profit under different scenarios')),
+      React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:reload},'↻ Refresh')),
+    loading&&!dash
+      ?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}))
+      :d.lastExRate==null
+        ?React.createElement('div',{className:'alert-warning'},'⚠️ No exchange rate recorded yet. Record a withdrawal under Financials to enable NGN profit analysis.')
+        :React.createElement('div',null,
+          React.createElement('div',{className:'alert-info'},
+            `💡 Gross Profit (before any expense) = Revenue (GHC) ${fmtGHC(d.netRevenueGHC)} × ₦${d.lastExRate}/GH₵ = ${fmtNGN(grossProfit)}. Select which expense categories to subtract below.`),
+          React.createElement('div',{className:'profit-preset-row'},
+            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>applyPreset('none')},'Before Expenses (Gross)'),
+            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>applyPreset('ads')},'After Ads Only'),
+            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>applyPreset('ads-salary')},'After Ads + Salary'),
+            React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>applyPreset('all')},'After ALL Expenses')),
+          React.createElement('div',{className:'profit-filter-grid'},
+            allCats.length===0
+              ?React.createElement('div',{className:'text-muted'},'No expenses recorded yet — add some under the Expenses page.')
+              :allCats.map(cat=>
+                React.createElement('label',{key:cat,className:`profit-filter-chip ${selected.has(cat)?'active':''}`},
+                  React.createElement('input',{type:'checkbox',checked:selected.has(cat),onChange:()=>toggle(cat)}),
+                  React.createElement('span',null,cat),
+                  React.createElement('span',{style:{fontFamily:'var(--font-mono)',color:'var(--text3)'}},`(${fmtNGN(catAmounts[cat]||0)})`)
+                )
+              )
+          ),
+          React.createElement('div',{className:'profit-result-card'},
+            React.createElement('div',{className:'profit-result-label'},resultLabel),
+            React.createElement('div',{className:'profit-result-value',style:{color:resultProfit>=0?'var(--green)':'var(--red)'}},fmtNGN(resultProfit)),
+            React.createElement('div',{className:'profit-result-sub'},
+              `${fmtNGN(grossProfit)} (gross profit) − ${fmtNGN(selectedTotal)} (selected expenses) = ${fmtNGN(resultProfit)}`,
+              React.createElement('br'),
+              allSelected&&`This matches the "Net Profit" figure on your Dashboard.`
+            )
+          )
+        )
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════
 // EXPENSES PAGE (admin) — ad spend & other costs in NGN
 // ═══════════════════════════════════════════════════════════════
-const EXPENSE_CATEGORIES=['Ad Cost','Salary','Logistics','Packaging','Restock','Transport','Misc'];
 function ExpensesPage({user,isAdmin}){
   const[expenses,setExpenses]=useState([]);
   const[loading,setLoading]=useState(true);
@@ -1877,6 +2232,8 @@ function ExpensesPage({user,isAdmin}){
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Expenses'),
       React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowModal(true)},'+ Add Expense')),
+    React.createElement('div',{className:'alert-info',style:{marginBottom:14}},
+      '💡 Every expense recorded here is deducted from Gross Profit to calculate your dashboard\'s "Net Profit". Use Analytics → Profit Analysis to see profit with specific categories included or excluded.'),
     React.createElement('div',{className:'stat-grid'},[
       {label:'Total Expenses (NGN)',value:fmtNGN(totalNGN),sub:catFilter||'All categories',cls:'red'},
       {label:'Total Ad Spend',value:fmtNGN(adSpend),sub:'Ad Cost category',cls:'orange'},
@@ -2443,6 +2800,8 @@ function SettingsPage({user,isAdmin,isSupplier,isCC,onUserUpdate}){
     {id:'emails',label:'📋 All Emails',show:isAdmin},
     {id:'sendemail',label:'✉️ Send Email',show:isAdmin||isCC},
     {id:'forms',label:'🔗 Order Forms',show:isAdmin},
+    {id:'loginalerts',label:'🔐 Login Alerts',show:isAdmin},
+    {id:'security',label:'🛡️ Security',show:true},
   ].filter(t=>t.show);
 
   return React.createElement('div',null,
@@ -2455,7 +2814,9 @@ function SettingsPage({user,isAdmin,isSupplier,isCC,onUserUpdate}){
     tab==='password'&&React.createElement(PasswordTab,{user}),
     tab==='emails'&&React.createElement(AllEmailsTab),
     tab==='sendemail'&&React.createElement(SendEmailTab),
-    tab==='forms'&&React.createElement(OrderFormsTab)
+    tab==='forms'&&React.createElement(OrderFormsTab),
+    tab==='loginalerts'&&React.createElement(LoginAlertsTab),
+    tab==='security'&&React.createElement(SecurityTab)
   );
 }
 
@@ -2635,6 +2996,102 @@ function TyUrlInput({product,currentTyUrl,onSave}){
       React.createElement('label',{className:'form-label'},'Thank-You / Redirect URL (after order)'),
       React.createElement('input',{className:'form-input',value:val,onChange:e=>setVal(e.target.value),placeholder:'https://your-thank-you-page.com'})),
     React.createElement('button',{className:'btn btn-primary btn-sm',onClick:save,disabled:saving,style:{marginBottom:1}},saving?'Saving...':'Save'));
+}
+
+// ─── LOGIN ALERTS (optional, EmailJS) ─────────────────────────
+// Free, client-side, OPT-IN extra security layer: send an email to a chosen
+// address every time anyone signs in successfully. This is entirely
+// separate from (and not required by) the existing MailApp-based order
+// notifications, which keep working with zero configuration.
+//
+// Setup (one-time, free tier ~200 emails/month):
+//   1. Create a free account at https://www.emailjs.com
+//   2. Add an Email Service (e.g. Gmail) → copy its "Service ID"
+//   3. Create an Email Template with variables {{to_email}}, {{user_name}},
+//      {{user_role}}, {{login_time}} → copy its "Template ID"
+//   4. Account → General → copy your "Public Key"
+//   5. Paste all three below, set the alert email, enable, and Save.
+function LoginAlertsTab(){
+  const[cfg,setCfg]=useState(()=>{
+    const c=getEmailJsConfig();
+    return{enabled:!!c.enabled,alertEmail:c.alertEmail||'',serviceId:c.serviceId||'',templateId:c.templateId||'',publicKey:c.publicKey||''};
+  });
+  const[testing,setTesting]=useState(false);
+  const set=k=>e=>setCfg(p=>({...p,[k]:e.target.value}));
+
+  const save=()=>{
+    if(cfg.enabled){
+      if(!cfg.alertEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cfg.alertEmail)){toast('Enter a valid alert email','error');return;}
+      if(!cfg.serviceId||!cfg.templateId||!cfg.publicKey){toast('Fill in your EmailJS Service ID, Template ID and Public Key','error');return;}
+    }
+    saveEmailJsConfig(cfg);
+    toast('Login alert settings saved ✓');
+  };
+
+  const sendTest=async()=>{
+    if(!cfg.serviceId||!cfg.templateId||!cfg.publicKey||!cfg.alertEmail){toast('Fill in all fields first','error');return;}
+    if(typeof emailjs==='undefined'){toast('EmailJS library not loaded','error');return;}
+    setTesting(true);
+    try{
+      await emailjs.send(cfg.serviceId,cfg.templateId,{
+        to_email:cfg.alertEmail,user_name:'Test User',user_role:'test',login_time:new Date().toLocaleString()
+      },{publicKey:cfg.publicKey});
+      toast('Test email sent ✓ — check your inbox');
+    }catch(e){
+      toast('Test failed: '+(e?.text||e?.message||'check your EmailJS credentials'),'error');
+    }
+    setTesting(false);
+  };
+
+  return React.createElement('div',null,
+    React.createElement('div',{className:'gmail-connect-card'},
+      React.createElement('div',{className:'gmail-connect-title'},'🔐 Login Alert Emails (Optional, via EmailJS)'),
+      React.createElement('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.6}},
+        'Get an email every time someone signs in to this Business Manager — a useful extra layer of security on top of the automatic 30-minute session sign-out. ',
+        'This is completely optional and separate from your order-notification emails (those keep working via Apps Script regardless). ',
+        'Create a free account at ',React.createElement('strong',null,'emailjs.com'),', then fill in the details below.')),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+        React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},
+          React.createElement('input',{type:'checkbox',checked:cfg.enabled,onChange:e=>setCfg(p=>({...p,enabled:e.target.checked}))}),
+          'Enable login alert emails')),
+      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+        React.createElement('label',{className:'form-label'},'Send alerts to'),
+        React.createElement('input',{className:'form-input',type:'email',value:cfg.alertEmail,onChange:set('alertEmail'),placeholder:'you@example.com',disabled:!cfg.enabled})),
+      React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'EmailJS Service ID'),
+          React.createElement('input',{className:'form-input',value:cfg.serviceId,onChange:set('serviceId'),placeholder:'service_xxxxxxx',disabled:!cfg.enabled})),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'EmailJS Template ID'),
+          React.createElement('input',{className:'form-input',value:cfg.templateId,onChange:set('templateId'),placeholder:'template_xxxxxxx',disabled:!cfg.enabled})),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'EmailJS Public Key'),
+          React.createElement('input',{className:'form-input',value:cfg.publicKey,onChange:set('publicKey'),placeholder:'public key',disabled:!cfg.enabled}))),
+      React.createElement('div',{className:'alert-info'},
+        'Template variables available: {{to_email}}, {{user_name}}, {{user_role}}, {{login_time}}.'),
+      React.createElement('div',{style:{display:'flex',gap:10}},
+        React.createElement('button',{className:'btn btn-primary',onClick:save},'Save'),
+        React.createElement('button',{className:'btn btn-secondary',onClick:sendTest,disabled:testing||!cfg.enabled},testing?'Sending...':'Send Test Email')))
+  );
+}
+
+// ─── SECURITY (session timeout info) ──────────────────────────
+function SecurityTab(){
+  return React.createElement('div',null,
+    React.createElement('div',{className:'card',style:{marginBottom:16}},
+      React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'🔒 Automatic Sign-Out'),
+      React.createElement('div',{className:'cc-info-text',style:{marginBottom:12}},
+        `For security, accounts are not signed in permanently. If there's no activity (mouse movement, clicks, scrolling, or typing) for ${SESSION_TIMEOUT_MS/60000} minutes, you'll see a warning ${SESSION_WARN_MS/60000} minutes before being automatically signed out and returned to the login screen.`),
+      React.createElement('div',{className:'alert-info',style:{marginBottom:0}},
+        'ℹ️ Moving your mouse, typing, or clicking anywhere resets this timer. Choose "Stay Signed In" on the warning popup to continue working.')),
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},'✅ Other security notes'),
+      React.createElement('div',{className:'cc-info-text'},
+        '• Each staff/supplier account has its own username and password — never share logins.',React.createElement('br'),
+        '• Change your password periodically under the Password tab.',React.createElement('br'),
+        '• Optional login-alert emails can be configured under the Login Alerts tab so you know whenever someone signs in.'))
+  );
 }
 
 // ─── ERROR BOUNDARY ───────────────────────────────────────────

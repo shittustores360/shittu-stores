@@ -665,14 +665,29 @@ function supplierOwnsOrder(order,products,user){
 }
 
 // ─── COPY CUSTOMER DETAILS ────────────────────────────────────
-function formatCustomerDetails(order){
+function formatCustomerDetails(order,products){
+  let giftLine='';
+  if(products&&order.product&&order.bundleLabel){
+    const _p=products.find(p=>p.name===order.product);
+    if(_p){let _b=[];try{_b=JSON.parse(_p.bundles||'[]');}catch{}
+      const _bn=_b.find(x=>x.label===order.bundleLabel);
+      if(_bn&&_bn.hasFreeGift){
+        giftLine=_bn.freeGiftName
+          ?`🎁 Free Gift: ${_bn.freeGiftName}`
+          :'🎁 Free Gift: Included';
+      }
+    }
+  }
+  const _cc=(order.countryCode&&order.countryCode.trim())?order.countryCode.trim()+' ':'';
   const lines=[
     `📋 ORDER DETAILS`,`━━━━━━━━━━━━━━━━━━━━━`,
-    `👤 Name:     ${order.customerName||'—'}`,`📞 Phone:    ${order.contact||'—'}`,
-    order.contact2?`📞 Alt:      ${order.contact2}`:'',
+    `👤 Name:     ${order.customerName||'—'}`,
+    `📞 Phone:    ${_cc}${order.contact||'—'}`,
+    order.contact2?`📞 Alt:      ${_cc}${order.contact2}`:'',
     `📍 Address:  ${order.address||'—'}`,`━━━━━━━━━━━━━━━━━━━━━`,
     `📦 Product:  ${order.product||'—'}`,`🎁 Package:  ${order.bundleLabel||'—'}`,
     order.size?`📐 Size:     ${order.size}`:'',
+    giftLine,
     `💰 Price:    ${order.sellingPrice?fmtGHC(order.sellingPrice):'—'}`,
     `💳 Payment:  ${paymentOf(order)}`,`🚚 Status:   ${statusOf(order)}`,
     order.readinessStatus?`📦 Readiness: ${order.readinessStatus}`:'',
@@ -682,7 +697,7 @@ function formatCustomerDetails(order){
   return lines.join('\n');
 }
 
-function CopyDetailsBtn({order}){
+function CopyDetailsBtn({order,products}){
   const[copied,setCopied]=useState(false);
   const fallbackCopy=(text)=>{
     const ta=document.createElement('textarea');
@@ -692,7 +707,7 @@ function CopyDetailsBtn({order}){
     document.body.removeChild(ta);
   };
   const copy=()=>{
-    const text=formatCustomerDetails(order);
+    const text=formatCustomerDetails(order,products);
     if(navigator.clipboard&&navigator.clipboard.writeText){
       navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Customer details copied ✓');}).catch(()=>fallbackCopy(text));
     }else{fallbackCopy(text);}
@@ -768,7 +783,7 @@ function CustomerOrderForm({productName}){
   const[loadErr,setLoadErr]=useState('');
   const[selectedBundle,setSelectedBundle]=useState(null);
   const[selectedSize,setSelectedSize]=useState('');
-  const[form,setForm]=useState({customerName:'',contact:'',contact2:'',address:'',notes:''});
+  const[form,setForm]=useState({customerName:'',contact:'',contact2:'',address:'',notes:'',countryCode:'+233'});
   const[showContact2,setShowContact2]=useState(false);
   const[submitting,setSubmitting]=useState(false);
   const[submitErr,setSubmitErr]=useState('');
@@ -812,6 +827,7 @@ function CustomerOrderForm({productName}){
     const orderData={
       date:today(),customerName:form.customerName.trim(),contact:form.contact.trim(),
       contact2:form.contact2.trim(),address:form.address.trim(),notes:form.notes.trim(),
+      countryCode:form.countryCode||'',
       product:product.name,bundleLabel:selectedBundle.label,
       qty:selectedBundle.qty||1,sellingPrice:selectedBundle.sellingPrice||selectedBundle.price||'',
       costOfProduct:selectedBundle.costPrice||selectedBundle.cost||'',
@@ -894,7 +910,7 @@ function CustomerOrderForm({productName}){
             React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Package'),React.createElement('span',{className:'cof-success-val'},selectedBundle.label)),
             selectedSize&&React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Size'),React.createElement('span',{className:'cof-success-val'},selectedSize)),
             React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Amount'),React.createElement('span',{className:'cof-success-val',style:{color:'#f5a623'}},fmtGHC(selectedBundle.sellingPrice||selectedBundle.price||0))),
-            React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Phone'),React.createElement('span',{className:'cof-success-val'},form.contact))
+            React.createElement('div',{className:'cof-success-row'},React.createElement('span',{className:'cof-success-key'},'Phone'),React.createElement('span',{className:'cof-success-val'},(form.countryCode?form.countryCode+' ':'')+form.contact))
           ),
           redirecting&&tyUrl&&React.createElement('div',{className:'cof-redirecting'},
             React.createElement('div',{className:'cof-spinner',style:{margin:'0 auto 8px'}}),
@@ -939,9 +955,18 @@ function CustomerOrderForm({productName}){
         ),
         React.createElement('div',{className:'cof-field'},
           React.createElement('label',{className:'cof-label'},'Phone Number *'),
-          React.createElement('input',{className:'cof-input',type:'tel',placeholder:'Your WhatsApp / phone number',value:form.contact,onChange:setField('contact')}),
-          !showContact2&&React.createElement('button',{type:'button',className:'cof-phone2-btn',onClick:()=>setShowContact2(true)},'+ Add a second phone number'),
-          showContact2&&React.createElement('input',{className:'cof-input',type:'tel',placeholder:'Second phone (optional)',value:form.contact2,onChange:setField('contact2'),style:{marginTop:10}})
+          React.createElement('div',{style:{display:'flex',gap:6,alignItems:'stretch'}},
+            React.createElement('select',{className:'cof-select',style:{width:100,flexShrink:0,padding:'13px 8px',fontSize:13,cursor:'pointer'},value:form.countryCode,onChange:e=>setForm(p=>({...p,countryCode:e.target.value}))},['+233','+234','+1','+44','+27','+254','+255','+256'].map(c=>React.createElement('option',{key:c,value:c},c))),
+            React.createElement('input',{className:'cof-input',type:'tel',
+              placeholder:'Phone number',value:form.contact,onChange:setField('contact'),
+              style:{flex:1}})),
+          !showContact2&&React.createElement('button',{type:'button',className:'cof-phone2-btn',
+            onClick:()=>setShowContact2(true)},'+ Add a second phone number'),
+          showContact2&&React.createElement('div',{style:{display:'flex',gap:6,alignItems:'stretch',marginTop:10}},
+            React.createElement('select',{className:'cof-select',style:{width:100,flexShrink:0,padding:'13px 8px',fontSize:13,cursor:'pointer'},value:form.countryCode,onChange:e=>setForm(p=>({...p,countryCode:e.target.value}))},['+233','+234','+1','+44','+27','+254','+255','+256'].map(c=>React.createElement('option',{key:c,value:c},c))),
+            React.createElement('input',{className:'cof-input',type:'tel',
+              placeholder:'Second phone (optional)',value:form.contact2,
+              onChange:setField('contact2'),style:{flex:1}}))
         ),
         React.createElement('div',{className:'cof-field'},
           React.createElement('label',{className:'cof-label'},'Delivery Address *'),
@@ -1416,7 +1441,8 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
     const m={};
     filtered.forEach(o=>{
       if(readinessOf(o)==='Rescheduled'&&o.rescheduledTo){
-        m[o.rescheduledTo]=(m[o.rescheduledTo]||0)+1;
+        const dk=(o.rescheduledTo||'').split(' ')[0];
+        if(dk)m[dk]=(m[dk]||0)+1;
       }
     });
     return Object.entries(m).sort((a,b)=>a[0]<b[0]?-1:1);
@@ -1519,7 +1545,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
                 React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact),
                 o.contact2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact2),
                 o.address&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',maxWidth:110,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.address),
-                React.createElement('div',{className:'copy-btn-row'},React.createElement(CopyDetailsBtn,{order:o}))
+                React.createElement('div',{className:'copy-btn-row'},React.createElement(CopyDetailsBtn,{order:o,products}))
               ),
               React.createElement('td',null,
                 React.createElement('div',{style:{fontWeight:600}},o.product),
@@ -1625,22 +1651,36 @@ function ContactedByModal({staffList,onConfirm,onClose}){
   );
 }
 
-// Popup that captures the date the customer rescheduled their delivery to.
+// Popup that captures the date + optional time the customer rescheduled to.
 function RescheduleModal({order,onConfirm,onClose}){
-  const[date,setDate]=useState(order.rescheduledTo||today());
+  const[date,setDate]=useState(()=>{
+    const ex=order.rescheduledTo||'';
+    return ex.split(' ')[0]||today();
+  });
+  const[time,setTime]=useState(()=>{
+    const parts=(order.rescheduledTo||'').split(' ');
+    return parts.length>1?parts[1]:'';
+  });
+  const combined=date+(time?' '+time:'');
   return React.createElement('div',{className:'modal-overlay',onClick:e=>{if(e.target===e.currentTarget)onClose();}},
-    React.createElement('div',{className:'modal',style:{maxWidth:420}},
+    React.createElement('div',{className:'modal',style:{maxWidth:460}},
       React.createElement('div',{className:'modal-header'},
         React.createElement('div',{className:'modal-title'},'📅 Reschedule Delivery'),
         React.createElement('button',{className:'close-btn',onClick:onClose},'×')),
       React.createElement('div',{className:'modal-body'},
         React.createElement('div',{className:'alert-info',style:{marginBottom:14}},`When did ${order.customerName||'the customer'} ask to reschedule the delivery to?`),
-        React.createElement('div',{className:'form-group'},
-          React.createElement('label',{className:'form-label'},'New Delivery Date'),
-          React.createElement('input',{className:'form-input',type:'date',value:date,onChange:e=>setDate(e.target.value)}))),
+        React.createElement('div',{className:'form-grid form-grid-2'},
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Date'),
+            React.createElement('input',{className:'form-input',type:'date',value:date,onChange:e=>setDate(e.target.value)})),
+          React.createElement('div',{className:'form-group'},
+            React.createElement('label',{className:'form-label'},'Time (optional)'),
+            React.createElement('input',{className:'form-input',type:'time',value:time,onChange:e=>setTime(e.target.value)}))
+        )
+      ),
       React.createElement('div',{className:'modal-footer'},
         React.createElement('button',{className:'btn btn-secondary',onClick:onClose},'Cancel'),
-        React.createElement('button',{className:'btn btn-primary',onClick:()=>date&&onConfirm(date),disabled:!date},'Save Reschedule'))
+        React.createElement('button',{className:'btn btn-primary',onClick:()=>date&&onConfirm(combined),disabled:!date},'Save Reschedule'))
     )
   );
 }

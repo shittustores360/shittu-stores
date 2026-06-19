@@ -4,6 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Shittu Stores — Business Manager</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f5a623">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Shittu Stores">
+<link rel="apple-touch-icon" href="icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
@@ -392,6 +399,341 @@ function sendLoginAlert(user){
 }
 
 // ─── THEME ────────────────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════
+// PWA INSTALL BUTTON
+// ═══════════════════════════════════════════════════════════════
+function PwaInstallButton(){
+  const[deferredPrompt,setDeferredPrompt]=useState(null);
+  useEffect(()=>{
+    const onBefore=e=>{e.preventDefault();setDeferredPrompt(e);};
+    const onInstalled=()=>setDeferredPrompt(null);
+    window.addEventListener('beforeinstallprompt',onBefore);
+    window.addEventListener('appinstalled',onInstalled);
+    return()=>{
+      window.removeEventListener('beforeinstallprompt',onBefore);
+      window.removeEventListener('appinstalled',onInstalled);
+    };
+  },[]);
+  if(!deferredPrompt)return null;
+  const install=async()=>{
+    deferredPrompt.prompt();
+    const{outcome}=await deferredPrompt.userChoice;
+    if(outcome==='accepted')setDeferredPrompt(null);
+  };
+  return React.createElement('button',{
+    className:'btn btn-primary btn-sm',
+    onClick:install,
+    title:'Install Shittu Stores as a standalone app',
+    style:{marginRight:4}
+  },'\uD83D\uDCF2 Install App');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BROWSER NOTIFICATION HELPERS
+// ═══════════════════════════════════════════════════════════════
+async function requestNotificationPermission(){
+  if(!('Notification' in window))return;
+  if(Notification.permission==='default'){
+    await Notification.requestPermission();
+  }
+}
+
+function showOrderNotification(order){
+  const title='\uD83D\uDED2 New Order \u2014 Shittu Stores';
+  const body=[
+    order.customerName||'A customer',
+    'ordered',
+    order.product||'a product',
+    order.bundleLabel?'('+order.bundleLabel+')':'',
+  ].filter(Boolean).join(' ');
+
+  const opts={
+    body,
+    icon:'./icon.svg',
+    badge:'./icon.svg',
+    tag:'order-'+Date.now(),
+    requireInteraction:true,
+    vibrate:[200,100,200],
+    data:{url:window.location.href},
+  };
+
+  // Prefer service-worker notification (works in background tabs)
+  if('serviceWorker' in navigator&&navigator.serviceWorker.controller){
+    navigator.serviceWorker.controller.postMessage({
+      type:'SHOW_NOTIFICATION',title,body:opts.body,
+      tag:opts.tag,url:opts.data.url,
+    });
+    return;
+  }
+  // Fallback: direct Notification API (foreground only)
+  if('Notification' in window&&Notification.permission==='granted'){
+    try{
+      const n=new Notification(title,opts);
+      n.onclick=()=>{window.focus();n.close();};
+      setTimeout(()=>n.close(),15000);
+    }catch(e){}
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EMAILJS ORDER NOTIFICATIONS
+// Config stored in localStorage; no server required.
+// ═══════════════════════════════════════════════════════════════
+function getOrderNotifCfg(){
+  try{return JSON.parse(localStorage.getItem('ssOrderNotifConfig')||'{}');}catch{return{};}
+}
+function saveOrderNotifCfg(cfg){
+  localStorage.setItem('ssOrderNotifConfig',JSON.stringify(cfg||{}));
+}
+
+function sendOrderEmail(order){
+  try{
+    const cfg=getOrderNotifCfg();
+    if(!cfg.enabled||!cfg.serviceId||!cfg.templateId||!cfg.publicKey)return;
+    if(!cfg.recipientEmails)return;
+    if(typeof emailjs==='undefined')return;
+    const emails=cfg.recipientEmails.split(',').map(e=>e.trim()).filter(Boolean);
+    if(!emails.length)return;
+    const cc=(order.countryCode&&order.countryCode.trim())?order.countryCode.trim()+' ':'';
+    const tplParams={
+      customer_name:    order.customerName||'\u2014',
+      customer_phone:   cc+(order.contact||'\u2014'),
+      customer_phone2:  order.contact2?(cc+order.contact2):'',
+      customer_address: order.address||'\u2014',
+      product_name:     order.product||'\u2014',
+      bundle_label:     order.bundleLabel||'\u2014',
+      size:             order.size||'',
+      selling_price:    order.sellingPrice
+                          ?('GH\u20B5'+parseFloat(order.sellingPrice).toFixed(2))
+                          :'\u2014',
+      order_date:       order.date||new Date().toISOString().slice(0,10),
+      notes:            order.notes||'',
+      order_source:     order.source==='order_form'
+                          ?'Customer Order Form':'Business Manager',
+    };
+    emails.forEach(to=>{
+      emailjs.send(
+        cfg.serviceId,cfg.templateId,
+        {...tplParams,to_email:to},
+        {publicKey:cfg.publicKey}
+      ).catch(()=>{/* fail silently */});
+    });
+  }catch(e){/* never block the main flow */}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ORDER NOTIFICATIONS SETTINGS TAB
+// ═══════════════════════════════════════════════════════════════
+function OrderNotificationsTab(){
+  const[cfg,setCfg]=useState(()=>getOrderNotifCfg());
+  const[perm,setPerm]=useState(
+    ()=>'Notification' in window?Notification.permission:'unavailable'
+  );
+  const[testing,setTesting]=useState(false);
+  const set=k=>e=>setCfg(p=>({...p,[k]:e.target.value}));
+
+  const save=()=>{
+    if(cfg.enabled){
+      if(!cfg.serviceId||!cfg.templateId||!cfg.publicKey){
+        toast('Fill in Service ID, Template ID and Public Key','error');return;
+      }
+      if(!cfg.recipientEmails){
+        toast('Enter at least one recipient email','error');return;
+      }
+    }
+    saveOrderNotifCfg(cfg);
+    toast('Notification settings saved \u2713');
+  };
+
+  const reqPerm=async()=>{
+    await requestNotificationPermission();
+    setPerm(Notification.permission);
+  };
+
+  const testBrowserNotif=()=>{
+    if(perm!=='granted'){toast('Grant notification permission first','error');return;}
+    showOrderNotification({
+      customerName:'Test Customer',product:'Test Product',
+      bundleLabel:'1 Bottle',contact:'0812345678',source:'manager',
+    });
+    toast('Browser notification fired \u2713');
+  };
+
+  const sendTestEmail=async()=>{
+    if(!cfg.serviceId||!cfg.templateId||!cfg.publicKey){
+      toast('Fill in all three EmailJS fields first','error');return;
+    }
+    if(!cfg.recipientEmails){toast('Enter recipient email(s)','error');return;}
+    if(typeof emailjs==='undefined'){toast('EmailJS library not loaded','error');return;}
+    setTesting(true);
+    const emails=cfg.recipientEmails.split(',').map(e=>e.trim()).filter(Boolean);
+    const tpl={
+      customer_name:'Test Customer',
+      customer_phone:'+233 0000000000',
+      customer_phone2:'',
+      customer_address:'123 Test Street, Accra',
+      product_name:'Test Product',
+      bundle_label:'1 Bottle',
+      size:'',
+      selling_price:'GH\u20B5100.00',
+      order_date:new Date().toISOString().slice(0,10),
+      notes:'This is a test notification from Shittu Stores.',
+      order_source:'Business Manager',
+    };
+    try{
+      await Promise.all(
+        emails.map(to=>emailjs.send(
+          cfg.serviceId,cfg.templateId,
+          {...tpl,to_email:to},
+          {publicKey:cfg.publicKey}
+        ))
+      );
+      toast('Test email sent \u2713 — check your inbox');
+    }catch(err){
+      toast('Failed: '+(err?.text||err?.message||String(err)),'error');
+    }
+    setTesting(false);
+  };
+
+  const permColor=perm==='granted'?'var(--green)':perm==='denied'?'var(--red)':'var(--accent)';
+  const permLabel=perm==='granted'?'\u2713 Granted'
+    :perm==='denied'?'\u2717 Denied \u2014 change in your browser settings'
+    :'Not yet requested';
+
+  return React.createElement('div',null,
+
+    // ── Browser Notifications ──────────────────────────────────
+    React.createElement('div',{className:'card',style:{marginBottom:16}},
+      React.createElement('div',{className:'section-title',style:{fontSize:14,marginBottom:12}},
+        '\uD83D\uDD14 Browser Notifications'),
+      React.createElement('div',{className:'alert-info',style:{marginBottom:14}},
+        'Shows a system pop-up whenever any order is placed \u2014 fires immediately, even '
+        +'when the tab is in the background. Clicking the notification brings the app into focus.'),
+      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',marginBottom:10}},
+        React.createElement('span',{style:{fontSize:13,fontWeight:600,color:permColor}},
+          'Permission: '+permLabel),
+        perm!=='granted'&&perm!=='denied'&&
+          React.createElement('button',{className:'btn btn-primary btn-sm',onClick:reqPerm},
+            'Request Permission'),
+        perm==='granted'&&
+          React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:testBrowserNotif},
+            'Send Test Notification'),
+      ),
+      perm==='denied'&&React.createElement('div',{className:'alert-warning',style:{marginBottom:0}},
+        '\u26A0\uFE0F Notifications are blocked in your browser. To re-enable: click the lock icon in the address bar \u2192 Notifications \u2192 Allow.')
+    ),
+
+    // ── EmailJS setup hint ──────────────────────────────────────
+    React.createElement('div',{className:'gmail-connect-card',style:{marginBottom:12}},
+      React.createElement('div',{className:'gmail-connect-title'},
+        '\uD83D\uDCE7 Order Email Alerts via EmailJS (free)'),
+      React.createElement('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.75}},
+        'Sends an email the instant a new order arrives \u2014 entirely from the browser, no server needed. ',
+        React.createElement('strong',null,'Setup (one-time, 5 min):'),
+        React.createElement('ol',{style:{margin:'8px 0 0 16px',padding:0}},
+          React.createElement('li',null,'Create a free account at ',
+            React.createElement('strong',null,'emailjs.com'),' (free tier = 200 emails/month).'),
+          React.createElement('li',null,'Add an Email Service (Gmail, Outlook, etc.) \u2192 copy its Service ID.'),
+          React.createElement('li',null,'Create an Email Template using the variables listed below \u2192 copy its Template ID.'),
+          React.createElement('li',null,'Go to Account \u2192 General \u2192 copy your Public Key.'),
+          React.createElement('li',null,'Paste all three into the form below and save.')
+        ),
+        React.createElement('div',{style:{marginTop:10,padding:'8px 10px',background:'var(--bg3)',borderRadius:8,fontSize:11,fontFamily:'var(--font-mono)',lineHeight:2}},
+          'Template variables: {{to_email}} {{customer_name}} {{customer_phone}} {{customer_phone2}} {{customer_address}} {{product_name}} {{bundle_label}} {{size}} {{selling_price}} {{order_date}} {{notes}} {{order_source}}')
+      )
+    ),
+
+    // ── Config form ────────────────────────────────────────────
+    React.createElement('div',{className:'card'},
+      React.createElement('div',{className:'form-group',style:{marginBottom:14}},
+        React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},
+          React.createElement('input',{
+            type:'checkbox',checked:!!cfg.enabled,
+            onChange:e=>setCfg(p=>({...p,enabled:e.target.checked}))
+          }),
+          'Enable EmailJS order notification emails')),
+      React.createElement('div',{className:'form-group',style:{marginBottom:12}},
+        React.createElement('label',{className:'form-label'},'Recipient Emails (comma-separated)'),
+        React.createElement('input',{
+          className:'form-input',type:'text',
+          value:cfg.recipientEmails||'',onChange:set('recipientEmails'),
+          placeholder:'owner@example.com, manager@example.com',
+          disabled:!cfg.enabled,
+        })
+      ),
+      React.createElement('div',{className:'form-grid form-grid-3',style:{marginBottom:14}},
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'Service ID'),
+          React.createElement('input',{
+            className:'form-input',value:cfg.serviceId||'',onChange:set('serviceId'),
+            placeholder:'service_xxxxxxx',disabled:!cfg.enabled,
+          })
+        ),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'Template ID'),
+          React.createElement('input',{
+            className:'form-input',value:cfg.templateId||'',onChange:set('templateId'),
+            placeholder:'template_xxxxxxx',disabled:!cfg.enabled,
+          })
+        ),
+        React.createElement('div',{className:'form-group'},
+          React.createElement('label',{className:'form-label'},'Public Key'),
+          React.createElement('input',{
+            className:'form-input',value:cfg.publicKey||'',onChange:set('publicKey'),
+            placeholder:'your public key',disabled:!cfg.enabled,
+          })
+        )
+      ),
+      React.createElement('div',{className:'alert-info',style:{marginBottom:14}},
+        '\uD83D\uDCBB These settings are stored in this browser only. Every device/staff member '
+        +'who wants notifications must configure this on their own device.'),
+      React.createElement('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
+        React.createElement('button',{className:'btn btn-primary',onClick:save},'Save Settings'),
+        React.createElement('button',{
+          className:'btn btn-secondary',onClick:sendTestEmail,
+          disabled:testing||!cfg.enabled,
+        },
+          testing
+            ?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Sending\u2026')
+            :'Send Test Email'
+        )
+      )
+    )
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SERVICE WORKER REGISTRATION
+// ═══════════════════════════════════════════════════════════════
+(function registerServiceWorker(){
+  if(!('serviceWorker' in navigator))return;
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg=>{
+        console.log('[Shittu PWA] SW registered, scope:',reg.scope);
+        // Periodic background sync — Chrome 80+ only
+        if('periodicSync' in reg){
+          navigator.permissions.query({name:'periodic-background-sync'})
+            .then(status=>{
+              if(status.state==='granted'){
+                reg.periodicSync.register('check-orders',{minInterval:5*60*1000})
+                  .catch(()=>{});
+              }
+            }).catch(()=>{});
+        }
+      })
+      .catch(err=>console.warn('[Shittu PWA] SW registration skipped:',err.message));
+  });
+  // Listen for wake-up message from periodic sync
+  navigator.serviceWorker.addEventListener('message',e=>{
+    if(e.data&&e.data.type==='PERIODIC_SYNC'){
+      // Silently refresh dashboard data — any open DashboardPage will re-render
+      cacheBust(['getDashboard']);
+    }
+  });
+})();
+
 const ThemeCtx=createContext({theme:'dark',toggleTheme:()=>{}});
 function ThemeProvider({children}){
   const[theme,setTheme]=useState(()=>localStorage.getItem('ssTheme')||'dark');
@@ -840,6 +1182,7 @@ function CustomerOrderForm({productName}){
     setSubmitting(false);
     if(r.success){
       setDone(true);
+      showOrderNotification(orderData);sendOrderEmail(orderData);
       // Redirect to the thank-you page stored on this product (backend), if any.
       const tyUrl=getTyUrl(product);
       if(tyUrl){
@@ -1178,7 +1521,7 @@ function LoginPage({onLogin}){
     e.preventDefault();setErr('');setLoading(true);
     const r=await API.call({action:'login',username:u,password:p});
     setLoading(false);
-    if(r.success&&r.data&&!r.data.error)onLogin(r.data);
+    if(r.success&&r.data&&!r.data.error){onLogin(r.data);requestNotificationPermission();}
     else setErr(r.data?.error||r.error||'Invalid username or password.');
   };
   return React.createElement('div',{className:'login-wrap'},
@@ -1742,7 +2085,7 @@ function OrderModal({order,products,user,isAdmin,onSave,onSaving,onClose}){
       ?await API.call({action:'updateOrder',id:order.id,order:JSON.stringify(payload)})
       :await API.call({action:'addOrder',order:JSON.stringify(payload)});
     setSaving(false);if(onSaving)onSaving(false);
-    if(r.success){const saved=isEdit?payload:{...payload,id:r.data?.id||('tmp_'+Date.now())};onSave(saved);}
+    if(r.success){const saved=isEdit?payload:{...payload,id:r.data?.id||('tmp_'+Date.now())};onSave(saved);if(!isEdit){showOrderNotification(saved);sendOrderEmail(saved);}}
     else toast(r.error||'Save failed','error');
   };
 
@@ -2924,6 +3267,7 @@ function SettingsPage({user,isAdmin,isSupplier,isCC,onUserUpdate}){
     tab==='sendemail'&&React.createElement(SendEmailTab),
     tab==='forms'&&React.createElement(OrderFormsTab),
     tab==='loginalerts'&&React.createElement(LoginAlertsTab),
+    tab==='ordernotifs'&&React.createElement(OrderNotificationsTab),
     tab==='security'&&React.createElement(SecurityTab)
   );
 }

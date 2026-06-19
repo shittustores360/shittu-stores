@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0a0c10"/>
+  <!-- Inner card -->
+  <rect x="32" y="32" width="448" height="448" rx="72" fill="#12151c"/>
+  <!-- Gold accent bar top -->
+  <rect x="32" y="32" width="448" height="8" rx="4" fill="#f5a623"/>
+  <!-- Store icon: shopping bag outline -->
+  <path d="M186 200 h140 l-18 140 H204 Z" fill="none" stroke="#f5a623" stroke-width="18" stroke-linejoin="round"/>
+  <path d="M216 200 c0-44 80-44 80 0" fill="none" stroke="#f5a623" stroke-width="18" stroke-linecap="round"/>
+  <!-- Handle dots -->
+  <circle cx="228" cy="200" r="10" fill="#f5a623"/>
+  <circle cx="284" cy="200" r="10" fill="#f5a623"/>
+  <!-- SS wordmark -->
+  <text x="256" y="408" text-anchor="middle"
+        font-family="Georgia,'Times New Roman',serif"
+        font-size="72" font-weight="900" letter-spacing="4"
+        fill="#f5a623">SS</text>
+</svg>

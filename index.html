@@ -2259,7 +2259,8 @@ function ProfitAnalysisCard({dash,loading,reload}){
 }
 
 // ═══════════════════════════════════════════════════════════════
-// EXPENSES PAGE (admin) — ad spend & other costs in NGN
+// EXPENSES PAGE (admin) — ad spend & other costs in NGN, plus a
+// Staff Payouts section so admins can pay staff straight from here.
 // ═══════════════════════════════════════════════════════════════
 function ExpensesPage({user,isAdmin}){
   const[expenses,setExpenses]=useState([]);
@@ -2267,6 +2268,8 @@ function ExpensesPage({user,isAdmin}){
   const[showModal,setShowModal]=useState(false);
   const[saving,setSaving]=useState(false);
   const[catFilter,setCatFilter]=useState('');
+  const[dash,setDash]=useState(null);
+  const[dashLoading,setDashLoading]=useState(true);
 
   const load=useCallback(async()=>{
     setLoading(true);
@@ -2275,6 +2278,27 @@ function ExpensesPage({user,isAdmin}){
     setLoading(false);
   },[]);
   useEffect(()=>{load();},[load]);
+
+  // Staff payout data lives on the dashboard payload (d.staffPayouts), same
+  // source the Financials page uses, so the two stay in sync automatically.
+  const loadDash=useCallback(async(force=false)=>{
+    setDashLoading(true);
+    if(force)cacheBust(['getDashboard']);
+    const r=await API.call({action:'getDashboard'});
+    setDashLoading(false);
+    if(r.success)setDash(normalizeDash(r.data||{}));
+  },[]);
+  useEffect(()=>{loadDash();},[loadDash]);
+
+  const recordPayout=async(staffName,amountNGN)=>{
+    if(!amountNGN||sp(amountNGN)<=0){toast('Enter a valid amount','error');return;}
+    setSaving(true);
+    const rec={staffName,amountNGN:String(amountNGN),date:today()};
+    const r=await API.call({action:'addPayoutRecord',record:JSON.stringify(rec)});
+    setSaving(false);
+    if(r.success){toast(`Paid ${fmtNGN(amountNGN)} to ${staffName} ✓`);cacheBust(['getPayoutRecords','getDashboard','getMyDashboard']);loadDash(true);}
+    else toast(r.error||'Failed to record payout','error');
+  };
 
   const filtered=useMemo(()=>{
     let r=[...expenses].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
@@ -2296,7 +2320,7 @@ function ExpensesPage({user,isAdmin}){
   if(loading&&expenses.length===0)return React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}),React.createElement('div',{className:'loading-label'},'Loading expenses...'));
 
   return React.createElement('div',null,
-    saving&&React.createElement(SaveOverlay,{label:'Saving expense...'}),
+    saving&&React.createElement(SaveOverlay,{label:'Saving...'}),
     React.createElement('div',{className:'section-header'},
       React.createElement('div',{className:'section-title'},'Expenses'),
       React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowModal(true)},'+ Add Expense')),
@@ -2310,6 +2334,25 @@ function ExpensesPage({user,isAdmin}){
       React.createElement('div',{className:'stat-label'},s.label),
       React.createElement('div',{className:'stat-value'},s.value),
       React.createElement('div',{className:'stat-sub'},s.sub)))),
+
+    // ─── Staff Payouts ───────────────────────────────────────
+    React.createElement('div',{className:'card',style:{marginBottom:20}},
+      React.createElement('div',{className:'section-header',style:{marginBottom:12}},
+        React.createElement('div',null,
+          React.createElement('div',{className:'section-title',style:{fontSize:14}},'👥 Staff Payouts'),
+          React.createElement('div',{className:'section-sub'},'Pay staff their ₦2,000-per-delivery earnings straight from here')),
+        React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:()=>loadDash(true)},'↻ Refresh')),
+      React.createElement('div',{className:'alert-info',style:{marginBottom:12}},'ℹ️ Balance is earnings (₦2,000 per delivered + paid order they contacted) minus what has already been paid. Recording a payout here is the same as paying from Financials — both stay in sync.'),
+      dashLoading&&!dash
+        ?React.createElement('div',{className:'loading-full'},React.createElement('div',{className:'spinner'}))
+        :(dash&&dash.staffPayouts&&dash.staffPayouts.length>0)
+          ?React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+              React.createElement('thead',null,React.createElement('tr',null,['Staff','Deliveries','Earned','Paid','Balance','Action'].map(h=>React.createElement('th',{key:h},h)))),
+              React.createElement('tbody',null,dash.staffPayouts.map(s=>
+                React.createElement(StaffPayoutRow,{key:s.name,staff:s,onPay:recordPayout})))
+            ))
+          :React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'💸'),React.createElement('div',{className:'empty-text'},'No staff payout data yet'))),
+
     Object.keys(byCat).length>0&&React.createElement('div',{className:'card',style:{marginBottom:20}},
       React.createElement('div',{className:'section-title',style:{marginBottom:12}},'Spend by Category'),
       Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([cat,amt])=>{

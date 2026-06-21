@@ -844,20 +844,60 @@ function SessionWarningModal({ secondsLeft, onStay, onLogout }) {
 // numbers were derived without leaving the page.
 function ProfitBreakdownModal({ data, onClose, onOpenAnalytics }) {
   const d = data || {};
-  const rate = d.lastExRate;
   const rows = [
-    { label:'Gross Revenue (GHC)', value:fmtGHC(d.grossRevenueGHC), sub:'All delivered + paid orders (selling price)', color:'var(--green)' },
-    { label:'− Cost of Goods Sold (GHC)', value:`−${fmtGHC(d.totalCOGS_GHC)}`, sub:'Sum of product cost for delivered+paid', color:'var(--red)' },
-    { label:'− Delivery Costs (GHC)', value:`−${fmtGHC(d.totalDeliveryCost_GHC)}`, sub:'Sum of delivery price for delivered+paid', color:'var(--red)' },
-    { label:'= Revenue (GHC)', value:fmtGHC(d.netRevenueGHC), sub:'Gross revenue minus product cost and delivery — this is the figure shown as "Revenue" on your dashboard', color:sp(d.netRevenueGHC)>=0?'var(--green)':'var(--red)', highlight:true, divider:true },
-    ...(rate != null ? [
-      { label:`× Exchange Rate`, value:`₦${rate} per GH₵`, sub:'From your last recorded withdrawal', color:'var(--blue)' },
-      { label:'= Gross Profit (NGN)', value:fmtNGN(d.grossProfitNGN), sub:'Revenue (GHC) converted to Naira — before any NGN expenses', color:sp(d.grossProfitNGN)>=0?'var(--green)':'var(--red)', divider:true },
-      { label:'− ALL Expenses (NGN)', value:`−${fmtNGN(d.totalExpensesNGN)}`, sub:'Every expense category combined (ads + salary + logistics + …)', color:'var(--red)' },
-      { label:'= Net Profit (NGN)', value:fmtNGN(d.netProfitAfterAllExpensesNGN), sub:'True bottom-line profit — this is the figure shown as "Net Profit" on your dashboard', color:sp(d.netProfitAfterAllExpensesNGN)>=0?'var(--green)':'var(--red)', highlight:true, divider:true },
-    ] : [
-      { label:'Exchange Rate', value:'Not set', sub:'Record a withdrawal to enable NGN profit calculations', color:'var(--text3)' }
-    ])
+    {
+      label:'Total Withdrawn (NGN) — Revenue',
+      value:fmtNGN(d.revenueNGN),
+      sub:'Actual cash received in Naira. Already net of COGS and delivery from Ghana.',
+      color:'var(--green)', highlight:true,
+    },
+    {
+      label:'− Operating Expenses (NGN)',
+      value:`−${fmtNGN(d.totalExpensesNGN)}`,
+      sub:`Ads ₦${fmtNGN(d.adSpendNGN)} + other recorded costs (see Analytics for category breakdown)`,
+      color:'var(--red)',
+    },
+    {
+      label:'− Staff Payouts Paid (NGN)',
+      value:`−${fmtNGN(d.totalPaidOutToStaff||0)}`,
+      sub:'₦2,000 commissions paid to contacting staff — counted as salary',
+      color:'var(--red)',
+    },
+    {
+      label:'= Net Profit (NGN)',
+      value:fmtNGN(d.netProfitAfterAllExpensesNGN),
+      sub:'True bottom-line profit shown on your dashboard.',
+      color:sp(d.netProfitAfterAllExpensesNGN)>=0?'var(--green)':'var(--red)',
+      highlight:true, divider:true,
+    },
+    {
+      label:'── Ghana Reference (GHC) ──',
+      value:'', sub:'', color:'var(--text3)',
+    },
+    {
+      label:'Gross Revenue (GHC)',
+      value:fmtGHC(d.grossRevenueGHC),
+      sub:'All delivered + paid orders — total selling price in Cedis',
+      color:'var(--blue)',
+    },
+    {
+      label:'− COGS (GHC)',
+      value:`−${fmtGHC(d.totalCOGS_GHC)}`,
+      sub:'Product cost for delivered+paid orders',
+      color:'var(--text3)',
+    },
+    {
+      label:'− Delivery Cost (GHC)',
+      value:`−${fmtGHC(d.totalDeliveryCost_GHC)}`,
+      sub:'Delivery fees for delivered+paid orders',
+      color:'var(--text3)',
+    },
+    {
+      label:'= Net Revenue (GHC)',
+      value:fmtGHC(d.netRevenueGHC),
+      sub:'Profit made in Ghana before converting to NGN',
+      color:'var(--blue)',
+    },
   ];
 
   const catBreakdown = d.expenseByCategory || {};
@@ -970,25 +1010,39 @@ function normalizeDash(raw) {
   }
   if (!d.expenseByCategory) d.expenseByCategory = {};
 
-  // ── NGN profit fields ──────────────────────────────────────
-  const rate = d.lastExRate != null ? sp(d.lastExRate) : null;
-  if (d.grossProfitNGN == null) {
-    d.grossProfitNGN = rate != null ? sp(d.netRevenueGHC) * rate : null;
+  // ── NEW PROFIT MODEL ───────────────────────────────────────
+  // Revenue (NGN) = Total Withdrawn (NGN)
+  //   The owner converts GHC → NGN after paying for products and
+  //   delivery in Ghana, so the withdrawn amount is already net of
+  //   COGS and delivery — it is the real cash received.
+  //
+  // Gross Profit (NGN) = Revenue (NGN)  [before operating expenses]
+  // Net Profit   (NGN) = Revenue − Expenses − Staff Payouts Paid
+
+  // Ensure revenueNGN is present (sum of all withdrawals — from backend)
+  if(d.revenueNGN==null)d.revenueNGN=0;
+
+  // Staff payouts paid (derived from the staffPayouts summary array)
+  const _staffPaid=(d.staffPayouts||[]).reduce((s,st)=>s+sp(st.paid||0),0);
+  if(d.totalPaidOutToStaff==null)d.totalPaidOutToStaff=_staffPaid;
+
+  // Add Staff Payouts as a category so Profit Analysis can toggle it
+  if(!d.expenseByCategory)d.expenseByCategory={};
+  if(sp(d.totalPaidOutToStaff)>0){
+    d.expenseByCategory['Staff Payouts']=sp(d.totalPaidOutToStaff);
   }
-  if (d.netProfitAfterAdsNGN == null) {
-    d.netProfitAfterAdsNGN = d.grossProfitNGN != null
-      ? sp(d.grossProfitNGN) - sp(d.adSpendNGN) : null;
-  }
-  if (d.netProfitAfterAllExpensesNGN == null) {
-    // v3.3 returned netProfitNGN = after all expenses
-    if (d.netProfitNGN != null) {
-      d.netProfitAfterAllExpensesNGN = d.netProfitNGN;
-    } else if (d.grossProfitNGN != null) {
-      d.netProfitAfterAllExpensesNGN = sp(d.grossProfitNGN) - sp(d.totalExpensesNGN);
-    } else {
-      d.netProfitAfterAllExpensesNGN = null;
-    }
-  }
+
+  // Gross Profit = Total Withdrawn (already net of COGS + delivery)
+  d.grossProfitNGN=sp(d.revenueNGN);
+
+  // Net Profit = Withdrawn − All Expenses − Staff Payouts Paid
+  const _totalReal=sp(d.totalExpensesNGN)+sp(d.totalPaidOutToStaff);
+  d.totalRealExpensesNGN=_totalReal;
+  d.netProfitAfterAllExpensesNGN=d.grossProfitNGN-_totalReal;
+  d.netProfitAfterAdsNGN=d.grossProfitNGN-sp(d.adSpendNGN)-sp(d.totalPaidOutToStaff);
+
+  // Legacy aliases
+  d.netProfitNGN=d.netProfitAfterAllExpensesNGN;
 
   return d;
 }
@@ -1609,17 +1663,17 @@ function AdminDashboard({data,reload,nav}){
     {label:'Canceled',value:d.canceled||0,sub:'Lost orders',cls:'red'},
   ];
 
-  // Revenue stats — Revenue (GHC) = gross revenue minus cost of goods and
-  // delivery cost. This is the headline figure; gross revenue is secondary.
+  // Revenue stats — Total Withdrawn (NGN) is the primary revenue figure.
+  // GHC metrics are shown for reference only.
   const revenueStats=[
     {
-      label:'Revenue (GHC)', value:fmtGHC(d.netRevenueGHC),
-      sub:`Gross ${fmtGHC(d.grossRevenueGHC)} − COGS ${fmtGHC(d.totalCOGS_GHC)} − Delivery ${fmtGHC(d.totalDeliveryCost_GHC)}`,
+      label:'Revenue — Total Withdrawn (NGN)', value:fmtNGN(d.revenueNGN),
+      sub:'Actual cash received in Naira — already net of COGS & delivery from Ghana.',
       cls:'green', featured:true
     },
-    {label:'Gross Revenue (GHC)',value:fmtGHC(d.grossRevenueGHC),sub:'Before product cost & delivery',cls:'blue'},
-    {label:'Pending Revenue (GHC)',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered but unpaid',cls:'orange'},
-    {label:'Total Withdrawn (NGN)',value:fmtNGN(d.revenueNGN),sub:'GHC converted to NGN',cls:'blue'},
+    {label:'Net Revenue (GHC)',value:fmtGHC(d.netRevenueGHC),sub:'GHC sales − COGS − delivery (reference)',cls:'blue'},
+    {label:'Gross Revenue (GHC)',value:fmtGHC(d.grossRevenueGHC),sub:'All delivered+paid selling prices',cls:'blue'},
+    {label:'Pending Revenue (GHC)',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered but unpaid — not yet withdrawn',cls:'orange'},
     {label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'purple'},
   ];
 
@@ -1630,18 +1684,19 @@ function AdminDashboard({data,reload,nav}){
   const profitStats=[
     {
       label:'Net Profit (NGN)', value:fmtNGN(d.netProfitAfterAllExpensesNGN),
-      sub:`Revenue × ₦${d.lastExRate||'?'} − all expenses (${fmtNGN(d.totalExpensesNGN)})`,
+      sub:`Withdrawn ${fmtNGN(d.grossProfitNGN)} − expenses ${fmtNGN(d.totalExpensesNGN)} − staff payouts ${fmtNGN(d.totalPaidOutToStaff||0)}`,
       cls:sp(d.netProfitAfterAllExpensesNGN)>=0?'green':'red',
       featured:true, click:true, onClick:goToProfitAnalysis, hint:'🔍 Click to explore by expense category'
     },
     {
       label:'Gross Profit (NGN)', value:fmtNGN(d.grossProfitNGN),
-      sub:'Revenue (GHC) × exchange rate — before expenses',
+      sub:'Total Withdrawn (NGN) — before any operating expense deductions',
       cls:sp(d.grossProfitNGN)>=0?'green':'red',
       click:true, onClick:()=>setShowProfitModal(true), hint:'🔍 Click for full waterfall'
     },
-    {label:'Total Expenses (NGN)',value:fmtNGN(d.totalExpensesNGN),sub:`incl. ad spend ${fmtNGN(d.adSpendNGN)}`,cls:'red'},
-    {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Owed to staff',cls:'purple'},
+    {label:'Total Expenses (NGN)',value:fmtNGN(d.totalExpensesNGN),sub:`Ad spend: ${fmtNGN(d.adSpendNGN)} — see Analytics for full breakdown`,cls:'red'},
+    {label:'Staff Payouts Paid (NGN)',value:fmtNGN(d.totalPaidOutToStaff||0),sub:'Commissions paid to staff (counted as salary)',cls:'purple'},
+    {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Earned by staff but not yet paid',cls:'orange'},
     {label:'Avg Delivery Time',value:d.avgDeliveryDays!=null?`${d.avgDeliveryDays} days`:'—',sub:'Order→Delivered',cls:'blue'},
     {label:'All-Time Conversion',value:`${convRate}%`,sub:'Delivered ÷ Total orders',cls:'green'},
   ];
@@ -1669,12 +1724,12 @@ function AdminDashboard({data,reload,nav}){
 
     React.createElement('div',{className:'section-divider',style:{marginBottom:10}},'💵 Revenue'),
     React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
-      '💡 "Revenue (GHC)" is your true revenue: gross sales minus cost of goods sold and delivery cost.'),
+      '💡 Revenue (NGN) = Total Withdrawn — the actual cash you received in Naira, already net of COGS and delivery in Ghana. GHC figures below are for reference only.'),
     React.createElement('div',{className:'stat-grid'},revenueStats.map(renderStatCard)),
 
     React.createElement('div',{className:'section-divider',style:{marginBottom:10}},'📈 Profit'),
     React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
-      '💡 "Net Profit (NGN)" is your true bottom line: Revenue converted to Naira, minus every expense (ads, salaries, logistics, etc). Click it to break it down by category in Analytics.'),
+      '💡 Net Profit = Total Withdrawn (NGN) minus all expenses AND staff payouts paid. Staff payouts count as salary. Click "Net Profit" to explore by category in Analytics.'),
     React.createElement('div',{className:'stat-grid'},profitStats.map(renderStatCard)),
 
     React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:24}},
@@ -2174,7 +2229,8 @@ function StaffAnalyticsPage({user}){
   },[]);
 
   const username=user.username;
-  const myOrders=useMemo(()=>orders.filter(o=>o.contactedBy===username),[orders,username]);
+  const _uLow=username.toLowerCase();
+  const myOrders=useMemo(()=>orders.filter(o=>(o.contactedBy||'').toLowerCase()===_uLow),[orders,username]);
   const years=useMemo(()=>{
     const s=new Set(myOrders.map(o=>String(o.date||'').slice(0,4)).filter(Boolean));
     return[...s].sort().reverse();
@@ -2305,29 +2361,29 @@ function FinancialsPage({user,isAdmin,nav}){
 
   const fStats=[
     {
-      label:'Revenue (GHC)', value:fmtGHC(d.netRevenueGHC),
-      sub:`Gross ${fmtGHC(d.grossRevenueGHC)} − COGS ${fmtGHC(d.totalCOGS_GHC)} − Delivery ${fmtGHC(d.totalDeliveryCost_GHC)}`,
+      label:'Revenue — Total Withdrawn (NGN)', value:fmtNGN(totalWithdrawnNGN),
+      sub:'Actual cash received in Naira — already net of COGS & delivery from Ghana',
       cls:'green', featured:true
     },
-    {label:'Gross Revenue (GHC)',value:fmtGHC(d.grossRevenueGHC),sub:'Before product cost & delivery',cls:'blue'},
-    {label:'Pending Revenue',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered, unpaid',cls:'orange'},
-    {label:'Total Withdrawn (GHC)',value:fmtGHC(totalWithdrawnGHC),sub:'Moved to NGN',cls:'blue'},
-    {label:'Total Withdrawn (NGN)',value:fmtNGN(totalWithdrawnNGN),sub:'Received in Naira',cls:'green'},
+    {label:'Net Revenue (GHC)',value:fmtGHC(d.netRevenueGHC),sub:'GHC sales − COGS − delivery (reference)',cls:'blue'},
+    {label:'Gross Revenue (GHC)',value:fmtGHC(d.grossRevenueGHC),sub:'All delivered+paid selling prices',cls:'blue'},
+    {label:'Pending Revenue (GHC)',value:fmtGHC(d.pendingRevenueGHC),sub:'Delivered but unpaid — not yet withdrawn',cls:'orange'},
+    {label:'Total Withdrawn (GHC)',value:fmtGHC(totalWithdrawnGHC),sub:'Moved from Ghana to Naira',cls:'blue'},
     {
       label:'Net Profit (NGN)', value:fmtNGN(d.netProfitAfterAllExpensesNGN),
-      sub:`Revenue × ₦${d.lastExRate||'?'} − all expenses (${fmtNGN(d.totalExpensesNGN)})`,
+      sub:`Withdrawn ${fmtNGN(d.grossProfitNGN)} − expenses ${fmtNGN(d.totalExpensesNGN)} − staff payouts ${fmtNGN(d.totalPaidOutToStaff||0)}`,
       cls:sp(d.netProfitAfterAllExpensesNGN)>=0?'green':'red',
       featured:true, click:true, onClick:goToProfitAnalysis, hint:'🔍 Click to explore by expense category'
     },
     {
       label:'Gross Profit (NGN)', value:fmtNGN(d.grossProfitNGN),
-      sub:'Revenue (GHC) × exchange rate — before expenses',
+      sub:'Total Withdrawn (NGN) — before any operating expense deductions',
       cls:sp(d.grossProfitNGN)>=0?'green':'red',
       click:true, onClick:()=>setShowProfitModal(true), hint:'🔍 Click for full waterfall'
     },
-    {label:'Total Expenses (NGN)',value:fmtNGN(d.totalExpensesNGN),sub:`incl. ad spend ${fmtNGN(d.adSpendNGN)}`,cls:'red'},
-    {label:'Total Paid to Staff',value:fmtNGN(totalPaidOut),sub:'All payouts',cls:'purple'},
-    {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Still owed',cls:'orange'},
+    {label:'Total Expenses (NGN)',value:fmtNGN(d.totalExpensesNGN),sub:`Ad spend: ${fmtNGN(d.adSpendNGN)} — see Analytics for full breakdown`,cls:'red'},
+    {label:'Staff Payouts Paid (NGN)',value:fmtNGN(totalPaidOut),sub:'Commissions paid — counted as salary/operating expense',cls:'purple'},
+    {label:'Pending Staff Payouts',value:fmtNGN(d.pendingStaffPayout),sub:'Earned by staff but not yet paid — a future obligation',cls:'orange'},
     {label:'Last Exchange Rate',value:d.lastExRate?`₦${d.lastExRate}/GH₵`:'—',sub:'From last withdrawal',cls:'blue'},
   ];
 
@@ -2340,7 +2396,7 @@ function FinancialsPage({user,isAdmin,nav}){
         React.createElement('button',{className:'btn btn-secondary btn-sm',onClick:load},'↻ Refresh'),
         React.createElement('button',{className:'btn btn-primary',onClick:()=>setShowWithdraw(true)},'+ Record Withdrawal'))),
     React.createElement('div',{className:'alert-info',style:{marginBottom:12}},
-      '💡 "Revenue" = gross sales minus product cost and delivery cost. "Net Profit" = Revenue converted to Naira minus ALL expenses. Click "Net Profit" to explore it by expense category in Analytics.'),
+      '💡 Revenue = Total Withdrawn (NGN) — actual cash received. Net Profit = Revenue minus all expenses and staff payouts paid. Staff payouts are counted as salary (operating expense).'),
     React.createElement('div',{className:'stat-grid'},fStats.map(s=>
       React.createElement('div',{
         key:s.label,

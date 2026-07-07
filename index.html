@@ -685,18 +685,24 @@ function normalizeDash(raw){
   if(d.adSpendNGN==null)d.adSpendNGN=0;
   if(d.totalExpensesNGN==null)d.totalExpensesNGN=d.adSpendNGN;
   if(!d.expenseByCategory)d.expenseByCategory={};
-  if(d.totalPaidOutToStaff==null)d.totalPaidOutToStaff=0;
+  // ── v3.7 fix: never silently drop real staff payouts to zero ──
+  // Trust the backend total, but cross-check it against the per-staff
+  // breakdown (staffPayouts[].paid) the backend already sends. If the
+  // breakdown adds up to more (stale cache, case-mismatch on an older
+  // backend, etc.) use the larger, more complete number so Dashboard
+  // and Financials always show the same real amount.
+  const staffPayoutsList=Array.isArray(d.staffPayouts)?d.staffPayouts:[];
+  const paidFromBreakdown=staffPayoutsList.reduce((s,st)=>s+sp(st.paid),0);
+  const paidFromBackend=sp(d.totalPaidOutToStaff);
+  d.totalPaidOutToStaff=Math.max(paidFromBackend,paidFromBreakdown);
+  if(!d.expenseByCategory['Staff Payouts']&&d.totalPaidOutToStaff>0)
+    d.expenseByCategory['Staff Payouts']=d.totalPaidOutToStaff;
   // CORRECTED: grossProfitNGN = revenueNGN (total cash withdrawn)
   const revenueNGN=sp(d.revenueNGN)||0;
   d.grossProfitNGN=revenueNGN>0?revenueNGN:(d.lastExRate!=null?sp(d.netRevenueGHC)*sp(d.lastExRate):null);
   // netProfitAfterAllExpensesNGN = withdrawn - all expenses - staff payouts paid out
   const totalReal=sp(d.totalExpensesNGN)+sp(d.totalPaidOutToStaff);
-  if(d.netProfitAfterAllExpensesNGN==null){
-    d.netProfitAfterAllExpensesNGN=d.grossProfitNGN!=null?sp(d.grossProfitNGN)-totalReal:null;
-  }else{
-    // Re-compute to make sure staff payouts are included (older backends may not have included them)
-    d.netProfitAfterAllExpensesNGN=d.grossProfitNGN!=null?sp(d.grossProfitNGN)-totalReal:null;
-  }
+  d.netProfitAfterAllExpensesNGN=d.grossProfitNGN!=null?sp(d.grossProfitNGN)-totalReal:null;
   if(d.netProfitAfterAdsNGN==null)
     d.netProfitAfterAdsNGN=d.grossProfitNGN!=null?sp(d.grossProfitNGN)-sp(d.adSpendNGN):null;
   return d;
@@ -716,8 +722,10 @@ function supplierOwnsOrder(order,products,user){
 }
 
 // ─── COPY CUSTOMER DETAILS (full info including free gift + phone code) ──
+function truthy(v){return v===true||v==='true'||v==='TRUE'||v===1||v==='1';}
 function formatCustomerDetails(order){
-  const freeGiftLine=order.hasFreeGift?`🎁 Free Gift: ${order.freeGiftName||'Included'}`:'';
+  const hasGift=truthy(order.hasFreeGift);
+  const freeGiftLine=hasGift?`🎁 Free Gift:  ${order.freeGiftName||'Included'} (bundled with this package)`:'';
   const lines=[
     '📋 ORDER DETAILS',
     '━━━━━━━━━━━━━━━━━━━━━',
@@ -728,8 +736,8 @@ function formatCustomerDetails(order){
     '━━━━━━━━━━━━━━━━━━━━━',
     `📦 Product:   ${order.product||'—'}`,
     `🎁 Package:   ${order.bundleLabel||'—'}`,
-    order.size?`📐 Size:       ${order.size}`:'',
     freeGiftLine,
+    order.size?`📐 Size:       ${order.size}`:'',
     `💰 Price:     ${order.sellingPrice?fmtGHC(order.sellingPrice):'—'}`,
     `💳 Payment:   ${paymentOf(order)}`,
     `🚚 Status:    ${statusOf(order)}`,

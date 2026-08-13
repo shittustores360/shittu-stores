@@ -2340,6 +2340,7 @@ function SuppliersPage({user}){
 function SupplierModal({supplier,onSaving,onSaved,onClose}){
   const isEdit=!!supplier;
   const[f,setF]=useState(()=>({name:supplier?.name||'',username:supplier?.username||'',password:supplier?.password||'',email:supplier?.email||'',phone:supplier?.phone||'',phone2:supplier?.phone2||'',location:supplier?.location||'',active:supplier?isActive(supplier.active):true}));
+  const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
   const save=async()=>{
     if(!f.name.trim()||!f.username.trim()){toast('Name and username required','error');return;}
     if(!isEdit&&!f.password.trim()){toast('Password required','error');return;}

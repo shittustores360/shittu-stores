@@ -557,8 +557,9 @@ function formatPhone(val){
   if(!v)return'—';
   const already=COUNTRIES.some(c=>v.startsWith(c.dial));
   if(already)return v;
-  const defaultDial=detectDefaultDialCode();
-  return`${defaultDial}${v.replace(/^0+/,'')}`;
+  // Shittu Stores is Ghana-based — a number typed without a country code
+  // is always Ghanaian, regardless of the device's own timezone.
+  return`+233${v.replace(/^0+/,'')}`;
 }
 const COUNTRIES=[
   {name:'Ghana',code:'GH',dial:'+233',flag:'🇬🇭'},
@@ -824,50 +825,123 @@ function supplierOwnsOrder(order,products,user){
 }
 
 // ─── COPY CUSTOMER DETAILS (full info including free gift + phone code) ──
+// ─── COPY: ORDER NUMBER, SUPPLIER LOOKUP, COST RESOLUTION ─────
 function truthy(v){return v===true||v==='true'||v==='TRUE'||v===1||v==='1';}
-function formatCustomerDetails(order){
+
+// Short, human-scannable order number derived from the order's UUID.
+// Same order → same number every time, so no backend changes needed.
+function orderNumberOf(order){
+  const raw=String(order?.id||'').replace(/-/g,'');
+  return 'ORD-'+(raw.slice(-8).toUpperCase()||'00000000');
+}
+
+// Finds the supplier tied to an order — via order.supplierUsername first,
+// falling back to the product's assigned supplier(s).
+function findSupplierForOrder(order,products,suppliers){
+  let username=order?.supplierUsername||order?.supplier||'';
+  if(!username){
+    const product=(products||[]).find(p=>p.name===order?.product);
+    if(product){
+      const su=readList(product.supplierUsernames||product.supplierUsername);
+      username=su[0]||product.supplierUsername||'';
+    }
+  }
+  if(!username)return null;
+  return (suppliers||[]).find(s=>s.username===username)||null;
+}
+
+// Same fallback as the backend's resolveOrderCost(): if an order was saved
+// without a cost price, look it up from the product's bundle so the
+// supplier payout is never blank, even on old orders.
+function resolveOrderCostFrontend(order,products){
+  const fromOrder=sp(order?.costOfProduct);
+  if(fromOrder>0)return fromOrder;
+  const product=(products||[]).find(p=>p.name===order?.product);
+  if(!product)return 0;
+  let bundles=[];try{bundles=JSON.parse(product.bundles||'[]');}catch(e){}
+  const b=bundles.find(x=>x.label===order?.bundleLabel);
+  if(!b)return 0;
+  return sp(b.costPrice||b.cost||0);
+}
+
+// ── Copy #1: for the delivery/logistics company ──
+// Full customer + order detail, PLUS supplier name/location and the
+// cost price the supplier is owed.
+function formatDeliveryCopyDetails(order,products,supplier){
   const hasGift=truthy(order.hasFreeGift);
   const freeGiftLine=hasGift?`🎁 Free Gift:  ${order.freeGiftName||'Included'} (bundled with this package)`:'';
+  const costPrice=resolveOrderCostFrontend(order,products);
   const lines=[
-    '📋 ORDER DETAILS',
+    '🚚 DELIVERY DETAILS',
     '━━━━━━━━━━━━━━━━━━━━━',
-    `👤 Name:      ${order.customerName||'—'}`,
-    `📞 Phone:     ${formatPhone(order.contact)}`,
-    order.contact2?`📞 Alt Phone:  ${formatPhone(order.contact2)}`:'',
-    `📍 Address:   ${order.address||'—'}`,
+    `🆔 Order #:    ${orderNumberOf(order)}`,
+    `👤 Name:       ${order.customerName||'—'}`,
+    `📞 Phone:      ${formatPhone(order.contact)}`,
+    order.contact2?`📞 Alt Phone:   ${formatPhone(order.contact2)}`:'',
+    `📍 Address:    ${order.address||'—'}`,
     '━━━━━━━━━━━━━━━━━━━━━',
-    `📦 Product:   ${order.product||'—'}`,
-    `🎁 Package:   ${order.bundleLabel||'—'}`,
+    `📦 Product:    ${order.product||'—'}`,
+    `🎁 Package:    ${order.bundleLabel||'—'}`,
     freeGiftLine,
-    order.size?`📐 Size:       ${order.size}`:'',
-    `💰 Price:     ${order.sellingPrice?fmtGHC(order.sellingPrice):'—'}`,
-    `💳 Payment:   ${paymentOf(order)}`,
-    `🚚 Status:    ${statusOf(order)}`,
-    order.readinessStatus?`📦 Readiness:  ${order.readinessStatus}`:'',
+    order.size?`📐 Size:        ${order.size}`:'',
+    `💰 Price:      ${order.sellingPrice?fmtGHC(order.sellingPrice):'—'}`,
+    `💳 Payment:    ${paymentOf(order)}`,
+    `🚚 Status:     ${statusOf(order)}`,
+    order.readinessStatus?`📦 Readiness:   ${order.readinessStatus}`:'',
     order.rescheduledTo?`📅 Rescheduled: ${order.rescheduledTo}`:'',
     `📅 Date:       ${order.date||'—'}`,
     order.notes?`📝 Notes:      ${order.notes}`:'',
-    order.source?`🌐 Source:     ${order.source==='order_form'?'Customer Order Form':'Manager'}`:'',
+    '━━━━━━━━━━━━━━━━━━━━━',
+    `🏭 Supplier:           ${supplier?(supplier.name||supplier.username):'—'}`,
+    `📍 Supplier Location:  ${supplier&&supplier.location?supplier.location:'—'}`,
+    `💵 Pay Supplier (Cost Price): ${costPrice?fmtGHC(costPrice):'—'}`,
     '━━━━━━━━━━━━━━━━━━━━━',
   ].filter(Boolean);
   return lines.join('\n');
 }
 
-function CopyDetailsBtn({order}){
+// ── Copy #2: for the supplier ──
+// Deliberately minimal — order #, what/how much they need to hand over,
+// and how much they're getting paid. Nothing about the customer.
+function formatSupplierCopyDetails(order,products){
+  const costPrice=resolveOrderCostFrontend(order,products);
+  const lines=[
+    '📦 SUPPLIER ORDER NOTICE',
+    '━━━━━━━━━━━━━━━━━━━━━',
+    `🆔 Order #:    ${orderNumberOf(order)}`,
+    `📦 Product:    ${order.product||'—'}`,
+    `🎁 Package:    ${order.bundleLabel||'—'}${order.qty?`  (Qty: ${order.qty})`:''}`,
+    order.size?`📐 Size:        ${order.size}`:'',
+    `💵 Amount to Pay: ${costPrice?fmtGHC(costPrice):'—'}`,
+    '━━━━━━━━━━━━━━━━━━━━━',
+  ].filter(Boolean);
+  return lines.join('\n');
+}
+
+// ── Generic copy-to-clipboard button ──
+function CopyBtn({label,title,getText}){
   const[copied,setCopied]=useState(false);
   const fallbackCopy=(text)=>{
     const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
     document.body.appendChild(ta);ta.select();
-    try{document.execCommand('copy');setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Details copied ✓');}catch{}
+    try{document.execCommand('copy');setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Copied ✓');}catch{}
     document.body.removeChild(ta);
   };
   const copy=()=>{
-    const text=formatCustomerDetails(order);
+    const text=getText();
     if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Details copied ✓');}).catch(()=>fallbackCopy(text));
+      navigator.clipboard.writeText(text).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),2000);toast('Copied ✓');}).catch(()=>fallbackCopy(text));
     }else fallbackCopy(text);
   };
-  return React.createElement('button',{className:`copy-detail-btn ${copied?'copied':''}`,onClick:copy,title:'Copy all order details'},copied?'✓ Copied':'📋 Copy');
+  return React.createElement('button',{className:`copy-detail-btn ${copied?'copied':''}`,onClick:copy,title:title||label},copied?'✓ Copied':label);
+}
+
+// ── Both copy buttons together, used in the Orders table ──
+function CopyButtonsRow({order,products,suppliers}){
+  const supplier=useMemo(()=>findSupplierForOrder(order,products,suppliers),[order,products,suppliers]);
+  return React.createElement('div',{style:{display:'flex',gap:3,flexWrap:'wrap'}},
+    React.createElement(CopyBtn,{label:'🚚 Delivery',title:'Copy details for the delivery company',getText:()=>formatDeliveryCopyDetails(order,products,supplier)}),
+    React.createElement(CopyBtn,{label:'🏭 Supplier',title:'Copy details for the supplier',getText:()=>formatSupplierCopyDetails(order,products)}));
 }
 
 function statusBadge(s){
@@ -1372,6 +1446,7 @@ function DashboardPage({user,isAdmin,isSupplier,isCC,nav}){
 function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const[orders,setOrders]=useState([]);const[loading,setLoading]=useState(true);
   const[products,setProducts]=useState([]);const[staffList,setStaffList]=useState([]);
+  const[suppliers,setSuppliers]=useState([]);
   const[showModal,setShowModal]=useState(false);const[editing,setEditing]=useState(null);
   const[search,setSearch]=useState('');const[statusFilter,setStatusFilter]=useState('');
   const[contactFilter,setContactFilter]=useState('');const[payFilter,setPayFilter]=useState('');
@@ -1381,8 +1456,8 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
   const load=useCallback(async()=>{
     setLoading(true);const params={action:'getOrders'};
     if(isSupplier)params.supplierUsername=user.username;
-    const[or,pr,sf]=await Promise.all([API.call(params),API.call({action:'getProducts'}),API.call({action:'getStaff'})]);
-    if(or.success)setOrders(or.data||[]);if(pr.success)setProducts(pr.data||[]);if(sf.success)setStaffList(sf.data||[]);
+    const[or,pr,sf,sup]=await Promise.all([API.call(params),API.call({action:'getProducts'}),API.call({action:'getStaff'}),API.call({action:'getSuppliers'})]);
+    if(or.success)setOrders(or.data||[]);if(pr.success)setProducts(pr.data||[]);if(sf.success)setStaffList(sf.data||[]);if(sup.success)setSuppliers(sup.data||[]);
     setLoading(false);
   },[isSupplier,user.username]);
   useEffect(()=>{load();},[load]);
@@ -1451,7 +1526,7 @@ function OrdersPage({user,can,isAdmin,isSupplier,isCC}){
             React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact),
             o.contact2&&React.createElement('div',{style:{fontSize:11,color:'var(--text3)'}},o.contact2),
             o.address&&React.createElement('div',{style:{fontSize:10,color:'var(--text3)',maxWidth:110,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},o.address),
-            React.createElement('div',{className:'copy-btn-row'},React.createElement(CopyDetailsBtn,{order:o}))),
+            React.createElement('div',{className:'copy-btn-row'},React.createElement(CopyButtonsRow,{order:o,products,suppliers}))),
           React.createElement('td',null,
             React.createElement('div',{style:{fontWeight:600}},o.product),
             o.bundleLabel&&React.createElement('div',{style:{fontSize:11,color:'var(--accent)'}},o.bundleLabel),
@@ -2247,13 +2322,13 @@ function SuppliersPage({user}){
         React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},Icon('plus'),' New Supplier'))),
     React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'ℹ️ Suppliers see only orders for their assigned products. Assign products in the Products page.'),
     list.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🚚'),React.createElement('div',{className:'empty-text'},'No suppliers yet.'))
-    :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
-        React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Email','Phone','Assigned Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
+    :ReaReact.createElement('thead',null,React.createElement('tr',null,['Name','Username','Email','Phone','Location','Assigned Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
         React.createElement('tbody',null,list.map(s=>{const assigned=productsBySupplier[s.username]||[];return React.createElement('tr',{key:s.id},
           React.createElement('td',{style:{fontWeight:600}},s.name||s.username),
           React.createElement('td',{className:'td-mono'},s.username),
           React.createElement('td',null,s.email?React.createElement('span',{className:'badge badge-email-set'},s.email):React.createElement('span',{className:'badge badge-email-missing'},'No email')),
           React.createElement('td',{className:'td-mono',style:{fontSize:11}},s.phone||'—'),
+          React.createElement('td',{style:{fontSize:12,color:'var(--text2)'}},s.location||'—'),
           React.createElement('td',null,assigned.length===0?React.createElement('span',{style:{color:'var(--text3)',fontSize:12}},'None'):React.createElement('div',{style:{display:'flex',flexWrap:'wrap',gap:3}},assigned.map((n,i)=>React.createElement('span',{key:i,className:'badge badge-supplier'},n)))),
           React.createElement('td',null,React.createElement('span',{className:`badge ${isActive(s.active)?'badge-delivered':'badge-canceled'}`},isActive(s.active)?'Active':'Inactive')),
           React.createElement('td',null,React.createElement('div',{style:{display:'flex',gap:4}},
@@ -2264,12 +2339,11 @@ function SuppliersPage({user}){
 
 function SupplierModal({supplier,onSaving,onSaved,onClose}){
   const isEdit=!!supplier;
-  const[f,setF]=useState(()=>({name:supplier?.name||'',username:supplier?.username||'',password:supplier?.password||'',email:supplier?.email||'',phone:supplier?.phone||'',phone2:supplier?.phone2||'',active:supplier?isActive(supplier.active):true}));
-  const[saving,setSaving]=useState(false);const set=k=>e=>setF(p=>({...p,[k]:e.target.value}));
+  const[f,setF]=useState(()=>({name:supplier?.name||'',username:supplier?.username||'',password:supplier?.password||'',email:supplier?.email||'',phone:supplier?.phone||'',phone2:supplier?.phone2||'',location:supplier?.location||'',active:supplier?isActive(supplier.active):true}));
   const save=async()=>{
     if(!f.name.trim()||!f.username.trim()){toast('Name and username required','error');return;}
     if(!isEdit&&!f.password.trim()){toast('Password required','error');return;}
-    const payload={name:f.name.trim(),username:f.username.trim(),email:f.email.trim(),phone:f.phone.trim(),phone2:f.phone2.trim(),active:f.active,role:'supplier'};
+    const payload={name:f.name.trim(),username:f.username.trim(),email:f.email.trim(),phone:f.phone.trim(),phone2:f.phone2.trim(),location:f.location.trim(),active:f.active,role:'supplier'};
     if(f.password.trim())payload.password=f.password.trim();
     setSaving(true);if(onSaving)onSaving(true);
     const r=isEdit?await API.call({action:'updateSupplier',id:supplier.id,supplier:JSON.stringify(payload)}):await API.call({action:'addSupplier',supplier:JSON.stringify(payload)});
@@ -2288,8 +2362,9 @@ function SupplierModal({supplier,onSaving,onSaved,onClose}){
         React.createElement('div',{className:'form-grid form-grid-2',style:{marginBottom:14}},
           React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'Phone'),React.createElement(PhoneInput,{value:f.phone,onChange:v=>setF(p=>({...p,phone:v})),placeholder:'Phone number'})),
           React.createElement('div',{className:'form-group'},React.createElement('label',{className:'form-label'},'2nd Phone'),React.createElement(PhoneInput,{value:f.phone2,onChange:v=>setF(p=>({...p,phone2:v})),placeholder:'Optional'}))),
+        React.createElement('div',{className:'form-group',style:{marginBottom:14}},React.createElement('label',{className:'form-label'},'Location'),React.createElement('input',{className:'form-input',value:f.location,onChange:set('location'),placeholder:'e.g. Kumasi, Ashanti Region'})),
         React.createElement('div',{className:'form-group'},React.createElement('label',{style:{display:'flex',alignItems:'center',gap:6,fontSize:13,cursor:'pointer'}},React.createElement('input',{type:'checkbox',checked:f.active,onChange:e=>setF(p=>({...p,active:e.target.checked}))}),'Active account')),
-        React.createElement('div',{className:'alert-info',style:{marginTop:14}},'💡 Assign products to this supplier from the Products page.')),
+        React.createElement('div',{className:'alert-info',style:{marginTop:14}},'💡 Location is pulled in automatically on the "Copy for Delivery" button. Assign products to this supplier from the Products page.')),
       React.createElement('div',{className:'modal-footer'},React.createElement('button',{className:'btn btn-secondary',onClick:onClose,disabled:saving},'Cancel'),React.createElement('button',{className:'btn btn-primary',onClick:save,disabled:saving},saving?React.createElement('span',null,React.createElement('span',{className:'spinner'}),' Saving...'):'Save Supplier'))));
 }
 // ─── SETTINGS PAGE ────────────────────────────────────────────

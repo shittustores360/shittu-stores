@@ -2322,7 +2322,8 @@ function SuppliersPage({user}){
         React.createElement('button',{className:'btn btn-primary',onClick:()=>{setEditing(null);setShowModal(true);}},Icon('plus'),' New Supplier'))),
     React.createElement('div',{className:'alert-info',style:{marginBottom:14}},'ℹ️ Suppliers see only orders for their assigned products. Assign products in the Products page.'),
     list.length===0?React.createElement('div',{className:'empty-state'},React.createElement('div',{className:'empty-icon'},'🚚'),React.createElement('div',{className:'empty-text'},'No suppliers yet.'))
-    :ReaReact.createElement('thead',null,React.createElement('tr',null,['Name','Username','Email','Phone','Location','Assigned Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
+    :React.createElement('div',{className:'table-wrap'},React.createElement('table',null,
+        React.createElement('thead',null,React.createElement('tr',null,['Name','Username','Email','Phone','Location','Assigned Products','Status','Actions'].map(h=>React.createElement('th',{key:h},h)))),
         React.createElement('tbody',null,list.map(s=>{const assigned=productsBySupplier[s.username]||[];return React.createElement('tr',{key:s.id},
           React.createElement('td',{style:{fontWeight:600}},s.name||s.username),
           React.createElement('td',{className:'td-mono'},s.username),
